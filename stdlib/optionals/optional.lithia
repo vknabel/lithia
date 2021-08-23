@@ -1,0 +1,18 @@
+package optionals
+
+import booleans
+
+enum Optional {
+  data Some { value }
+  data None
+}
+
+describe "optional", { it =>
+  it "can have some value", { _ =>
+    Some(value: 41)
+  }
+ 
+  it "can be none", { _ =>
+    None
+  }
+}

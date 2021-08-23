@@ -1,0 +1,51 @@
+package optionals
+
+import booleans
+import numbers
+import comparables
+
+func equalFor { someWitness, lhs, rhs =>
+  Optional(
+    Some: { lsome =>
+      Optional(
+        Some: { rsome =>
+          someWitness.equal lsome, rsome
+        },
+        None: { _ =>  booleans.False }
+      ) rhs
+    },
+    None: { _ =>
+      Optional(
+        Some: { _ => booleans.False },
+        None: { _ => booleans.True }
+      )
+    }
+  ) lhs
+}
+
+
+func equatableFor { someWitness =>
+  comparables.Equatable(
+    equal: equalFor someWitness
+  )
+}
+
+describe "optionals are equatable", { it =>
+  let neverEquatable = comparables.Equatable(equal: { _ => booleans.False })
+  let alwaysEquatable = comparables.Equatable(equal: { _ => booleans.True })
+  
+  it "none and none always equal", { expect =>
+    expect neverEquatable, None, None
+  }
+  
+  it "some and none are never equal", { expect =>
+    expect alwaysEquatable, Some(value: 1), None
+    expect alwaysEquatable, None, Some(value: 1)
+  }
+  
+  it "some and some delegate equality to values", { expect =>
+    expect numbers, Some(value: 1), Some(value: 1)
+    expect comparables.negated numbers, Some(value: 1), Some(value: 2)
+    expect comparables.negated numbers, Some(value: 2), Some(value: 1)
+  }
+}

@@ -1,0 +1,17 @@
+package comparables
+
+data Equatable {
+  equal lhs, rhs
+}
+
+func map { transform, witness =>
+  comparables.Equatable(
+    equal: { lhs, rhs =>
+      transform (witness lhs, rhs)
+    }
+  )
+}
+
+func negated {
+  map booleans.negate
+}

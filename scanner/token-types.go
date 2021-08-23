@@ -41,12 +41,13 @@ const (
 	FLOAT      // 3.14159
 
 	// keywords
-	PACKAGE // package examples
-	DATA    // data Type { }
-	ENUM    // enum Type { }
-	LET     // let var = expr
-	FUNC    // func tion { _ => }
-	IMPORT  // import package
+	WILDCARD // _
+	PACKAGE  // package examples
+	DATA     // data Type { }
+	ENUM     // enum Type { }
+	LET      // let var = expr
+	FUNC     // func tion { _ => }
+	IMPORT   // import package
 
 	// special tokens
 	EOF
@@ -54,6 +55,7 @@ const (
 )
 
 var reservedKeywords = map[string]TokenType{
+	"_":       WILDCARD,
 	"package": PACKAGE,
 	"data":    DATA,
 	"enum":    ENUM,
@@ -124,6 +126,8 @@ func (t TokenType) String() string {
 		return "FLOAT"
 	case PACKAGE:
 		return "PACKAGE"
+	case WILDCARD:
+		return "WILDCARD"
 	case DATA:
 		return "DATA"
 	case ENUM:

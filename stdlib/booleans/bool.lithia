@@ -1,0 +1,13 @@
+package booleans
+
+enum Bool {
+  data True { }
+  data False { }
+}
+
+func negated {
+  Bool(
+    True: { _ => False },
+    False: { _ => True }
+  )
+}

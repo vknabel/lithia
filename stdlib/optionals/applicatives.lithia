@@ -1,0 +1,35 @@
+package optionals
+
+func map { transform =>
+  Optional(
+    Some: { some => transform some.value },
+    None: { _ => None }
+  )
+}
+
+describe "optional map", { it =>
+  let equality = optionals.equalityWitness booleans
+  
+  it "always returns None if None", { expect =>
+    let sut = None
+    let result = map { n => n + 1 }, sut
+    expect.toEqual equality, result, None
+  }
+  
+  it "applies function to some value", { expect =>
+    let sut = Some(value: 41)
+    let result = map { n => n + 1 }, sut
+    expect.toEqual equality, result, Some(value: 42)
+  }
+}
+
+describe "is none", { it =>
+  it "is false for some", { expect =>
+    expect booleans.not isNone Some(value: 41)
+    expect booleans.not isNone Some(value: Some(value: "nested"))
+  }
+  
+  it "is true for none", { assert =>
+    expect isNone None
+  }
+}
