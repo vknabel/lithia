@@ -5,9 +5,7 @@ enum Bool {
   data False { }
 }
 
-func negated {
-  Bool(
+func negated => Bool(
     True: { _ => False },
     False: { _ => True }
   )
-}
