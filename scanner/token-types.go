@@ -6,21 +6,22 @@ type TokenType int
 
 const (
 	// single character tokens
-	COMMA                = iota // ,
-	LEFT_PAREN                  // (
-	RIGHT_PAREN                 // )
-	LEFT_BRACE                  // {
-	RIGHT_BRACE                 // }
-	LEFT_BRACKET                // [
-	RIGHT_BRACKET               // ]
-	SEMICOLON_OR_NEWLINE        // ;
-	COLON                       // :
-	DOT                         // .
-	MINUS                       // -
-	PLUS                        // +
-	STAR                        // *
-	SLASH                       // /
-	PERCENT                     // %
+	COMMA         = iota // ,
+	LEFT_PAREN           // (
+	RIGHT_PAREN          // )
+	LEFT_BRACE           // {
+	RIGHT_BRACE          // }
+	LEFT_BRACKET         // [
+	RIGHT_BRACKET        // ]
+	SEMICOLON            // ;
+	NEWLINE              // \n
+	COLON                // :
+	DOT                  // .
+	MINUS                // -
+	PLUS                 // +
+	STAR                 // *
+	SLASH                // /
+	PERCENT              // %
 
 	// one or two characters
 	BANG          // !
@@ -36,22 +37,30 @@ const (
 	// literals
 	IDENTIFIER // identifier
 	STRING     // "string"
-	NUMBER     // 3.14159
+	INT        // 42
+	FLOAT      // 3.14159
 
 	// keywords
-	DATA   // data Type { }
-	UNION  // union Type { }
-	ENUM   // enum Type { }
-	LET    // let var = expr
-	FUNC   // func tion { _ => }
-	IMPORT // import package
+	PACKAGE // package examples
+	DATA    // data Type { }
+	ENUM    // enum Type { }
+	LET     // let var = expr
+	FUNC    // func tion { _ => }
+	IMPORT  // import package
 
 	// special tokens
 	EOF
 	ILLEGAL
-	LINE_COMMENT
-	BLOCK_COMMENT
 )
+
+var reservedKeywords = map[string]TokenType{
+	"package": PACKAGE,
+	"data":    DATA,
+	"enum":    ENUM,
+	"let":     LET,
+	"func":    FUNC,
+	"import":  IMPORT,
+}
 
 func (t TokenType) String() string {
 	switch t {
@@ -69,8 +78,10 @@ func (t TokenType) String() string {
 		return "LEFT_BRACKET"
 	case RIGHT_BRACKET:
 		return "RIGHT_BRACKET"
-	case SEMICOLON_OR_NEWLINE:
-		return "SEMICOLON_OR_NEWLINE"
+	case SEMICOLON:
+		return "SEMICOLON"
+	case NEWLINE:
+		return "NEWLINE"
 	case COLON:
 		return "COLON"
 	case DOT:
@@ -107,12 +118,14 @@ func (t TokenType) String() string {
 		return "IDENTIFIER"
 	case STRING:
 		return "STRING"
-	case NUMBER:
-		return "NUMBER"
+	case INT:
+		return "INT"
+	case FLOAT:
+		return "FLOAT"
+	case PACKAGE:
+		return "PACKAGE"
 	case DATA:
 		return "DATA"
-	case UNION:
-		return "UNION"
 	case ENUM:
 		return "ENUM"
 	case LET:
