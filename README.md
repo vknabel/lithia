@@ -26,6 +26,7 @@ On the other hand we explicitly opted out a pretty long list of features: mutabi
 ### Data Types
 
 are structured data with named properties. In most other languages they are called `struct`.
+As all types they must always start with a capital letter. 
 
 ```
 data Person {
