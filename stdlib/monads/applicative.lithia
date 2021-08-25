@@ -1,5 +1,0 @@
-package monads
-
-data Applicative {
-    map f, value
-}

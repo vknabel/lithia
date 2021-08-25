@@ -1,0 +1,9 @@
+package prelude
+
+enum List {
+  data Cons {
+    head
+    tail
+  }
+  data Nil
+}

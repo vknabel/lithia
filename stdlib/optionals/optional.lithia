@@ -1,11 +1,6 @@
 package optionals
 
-import booleans
-
-enum Optional {
-  data Some { value }
-  data None
-}
+let Optional = prelude.Optional
 
 describe "optional", { it =>
   it "can have some value", { _ =>

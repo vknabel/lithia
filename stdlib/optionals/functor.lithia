@@ -1,5 +1,10 @@
 package optionals
 
+import monads
+import booleans
+
+let functor = monads.Functor(map: map)
+
 func map { transform =>
   Optional(
     Some: { some => transform some.value },

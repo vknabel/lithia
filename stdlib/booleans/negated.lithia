@@ -1,0 +1,6 @@
+package booleans
+
+func negated => Bool(
+    True: { _ => False },
+    False: { _ => True }
+  )

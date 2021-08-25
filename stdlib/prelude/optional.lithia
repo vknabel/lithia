@@ -1,0 +1,6 @@
+package prelude
+
+enum Optional {
+  data Some { value }
+  data None
+}

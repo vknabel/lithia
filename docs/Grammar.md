@@ -2,7 +2,7 @@
 
 ```
 start -> "package" IDENTIFIER line-sep import* line-sep decl-stmt*;
-import -> "import" IDENTIFIER ("{" (IDENTIFIER ("," IDENTIFIER)*)? "}")?;
+import -> "import" IDENTIFIER ("." IDENTIFIER)* ("{" (IDENTIFIER ("," IDENTIFIER)*)? "}")?;
 
 line-sep -> "\n" | ";";
 

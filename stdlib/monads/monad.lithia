@@ -1,0 +1,17 @@
+package monads
+
+// Left-Identity: (pipe [pure, flatMap f], value) == f value
+// Right-Identity: (pipe [pure, flatMap { x => x }], value) == pure value
+// Associative: (pipe [pure, flatMap f, flatMap g], value) == pipe [pure, flatMap g, flatMap f], value
+data Monad {
+    pure value
+    flatMap f, instance
+}
+
+func pure { value, witness =>
+    witness.pure value
+}
+
+func flatMap { f, witness, instance =>
+    witness.flatMap f, instance
+}

@@ -4,8 +4,8 @@ import booleans
 
 func isNone {
   Optional(
-    Some: { _ => booleans.False },
-    None: { _ => booleans.True },
+    Some: { _ => False },
+    None: { _ => True },
   )
 }
 

@@ -1,0 +1,47 @@
+package prelude
+
+/**
+ * Recursively walk a tree of nodes, calling a function on each node.
+ * The given accumulator function merges each element into a new one for the next call.
+ *
+ * @param accumulator into, next
+ * @param initial
+ * @param list
+ */
+func reduceList { accumulator, initial, list =>
+    List(
+        Cons: { cons =>
+            let accumulatedRest = reduceList accumulator, initial, cons.tail
+            accumulator accumulatedRest, cons.head
+        },
+        Nil: { nil => initial }
+    )
+}
+
+/**
+ * Pipes a given value through a list of functions.
+ * The first function is applied to the value, the second to the result of the first, etc.
+ * 
+ * @param functions
+ * @param initial
+ */
+func pipe { functions, initial =>
+    reduceList { into, next => next into }, initial, functions
+}
+
+/**
+ * Applies the given body to the given value.
+ * Mostly useful for readability, e.g. in destructings.
+ * 
+ * ```
+ * with True, Bool(True: { _ => }, False: { _ => })
+ * ```
+ *
+ * @param value
+ * @param body
+ */
+func with { value, body =>
+    body value
+}
+
+func compose { f, g, value => f g value }

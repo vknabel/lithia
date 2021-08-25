@@ -1,11 +1,9 @@
 package comparables
 
-data Equatable {
-  equal lhs, rhs
-}
+let Equatable = prelude.Equatable
 
 func map { transform, witness =>
-  comparables.Equatable(
+  Equatable(
     equal: { lhs, rhs =>
       transform (witness lhs, rhs)
     }

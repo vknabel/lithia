@@ -1,0 +1,6 @@
+package prelude
+
+enum Bool {
+  data True
+  data False
+}
