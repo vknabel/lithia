@@ -6,35 +6,35 @@ import booleans
 let functor = monads.Functor(map: map)
 
 func map { transform =>
-  Optional(
+  switch Optional {
     Some: { some => transform some.value },
     None: { _ => None }
-  )
+  }
 }
 
-describe "optional map", { it =>
+describe "optional map" { it =>
   let equality = optionals.equalityWitness booleans
   
-  it "always returns None if None", { expect =>
+  it "always returns None if None" { expect =>
     let sut = None
     let result = map { n => n + 1 }, sut
     expect.toEqual equality, result, None
   }
   
-  it "applies function to some value", { expect =>
-    let sut = Some(value: 41)
-    let result = map { n => n + 1 }, sut
-    expect.toEqual equality, result, Some(value: 42)
+  it "applies function to some value" { expect =>
+    let sut = Some 41
+    let result = map { n => n + 1 } sut
+    expect.toEqual equality result (Some 42)
   }
 }
 
-describe "is none", { it =>
-  it "is false for some", { expect =>
-    expect booleans.not isNone Some(value: 41)
-    expect booleans.not isNone Some(value: Some(value: "nested"))
+describe "is none" { it =>
+  it "is false for some" { expect =>
+    expect booleans.not isNone (Some 41)
+    expect booleans.not isNone (Some $ Some "nested"))
   }
   
-  it "is true for none", { assert =>
+  it "is true for none" { assert =>
     expect isNone None
   }
 }

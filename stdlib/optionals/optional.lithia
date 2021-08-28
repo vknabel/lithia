@@ -2,12 +2,12 @@ package optionals
 
 let Optional = prelude.Optional
 
-describe "optional", { it =>
-  it "can have some value", { _ =>
-    Some(value: 41)
+describe "optional" { it =>
+  it "can have some value" { _ =>
+    Some 41
   }
  
-  it "can be none", { _ =>
+  it "can be none" { _ =>
     None
   }
 }

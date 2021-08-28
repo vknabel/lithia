@@ -3,47 +3,45 @@ package optionals
 import numbers
 import comparables
 
-func equalFor { someWitness, lhs, rhs =>
-  Optional(
+func equalFor { someWitness lhs rhs =>
+  switch Optional {
     Some: { lsome =>
-      Optional(
+      switch Optional {
         Some: { rsome =>
-          someWitness.equal lsome, rsome
+          someWitness.equal lsome rsome
         },
         None: { _ =>  False }
-      ) rhs
+      } rhs
     },
     None: { _ =>
-      Optional(
+      switch Optional {
         Some: { _ => False },
         None: { _ => True }
-      )
+      }
     }
-  ) lhs
+  } lhs
 }
 
 func equatableFor { someWitness =>
-  Equatable(
-    equal: equalFor someWitness
-  )
+  Equatable equalFor someWitness
 }
 
-describe "optionals are equatable", { it =>
-  let neverEquatable = Equatable(equal: { _ => False })
-  let alwaysEquatable = Equatable(equal: { _ => True })
+describe "optionals are equatable" { it =>
+  let neverEquatable = Equatable { _ => False }
+  let alwaysEquatable = Equatable { _ => True }
   
-  it "none and none always equal", { expect =>
-    expect neverEquatable, None, None
+  it "none and none always equal" { expect =>
+    expect neverEquatable None None
   }
   
   it "some and none are never equal", { expect =>
-    expect alwaysEquatable, Some(value: 1), None
-    expect alwaysEquatable, None, Some(value: 1)
+    expect alwaysEquatable (Some 1) None
+    expect alwaysEquatable None (Some 1)
   }
   
-  it "some and some delegate equality to values", { expect =>
-    expect numbers, Some(value: 1), Some(value: 1)
-    expect comparables.negated numbers, Some(value: 1), Some(value: 2)
-    expect comparables.negated numbers, Some(value: 2), Some(value: 1)
+  it "some and some delegate equality to values" { expect =>
+    expect numbers (Some 1) (Some 1)
+    expect comparables.negated numbers (Some 1) (Some 2)
+    expect comparables.negated numbers (Some 2) (Some 1)
   }
 }

@@ -2,20 +2,20 @@ package optionals
 
 import booleans
 
-func isNone {
-  Optional(
+func isNone { =>
+  switch Optional {
     Some: { _ => False },
-    None: { _ => True },
-  )
+    None: { _ => True }
+  }
 }
 
-describe "is none", { it =>
+describe "is none" { it =>
   it "true for none", { expect =>
     expect isNone None
   }
   
-  it "false for some", { expect =>
-    expect booleans.not isNone Some(value: 41)
-    expect booleans.not isNone Some(value: None)
+  it "false for some" { expect =>
+    expect booleans.not isNone (Some 41)
+    expect booleans.not isNone (Some None)
   }
 }

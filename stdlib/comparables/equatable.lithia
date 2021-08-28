@@ -2,14 +2,12 @@ package comparables
 
 let Equatable = prelude.Equatable
 
-func map { transform, witness =>
-  Equatable(
-    equal: { lhs, rhs =>
-      transform (witness lhs, rhs)
-    }
-  )
+func map { transform witness =>
+  Equatable { lhs, rhs =>
+    transform (witness lhs rhs)
+  }
 }
 
-func negated {
+func negated { =>
   map booleans.negate
 }

@@ -3,9 +3,9 @@ package monads
 // 1. Identity: (map { a => a}, value) == value
 // 2. Associative: (pipe [map f, map g], value) == map pipe [f, g], value
 data Functor {
-    map f, value
+    map f value
 }
 
-func map { f, witness, value =>
-    witness.map f, value
+func map { f witness value =>
+    witness.map f value
 }

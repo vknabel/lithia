@@ -1,6 +1,8 @@
 package booleans
 
-func negated => Bool(
+func negated { =>
+  switch Bool {
     True: { _ => False },
     False: { _ => True }
-  )
+  }
+}

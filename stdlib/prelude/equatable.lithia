@@ -1,5 +1,5 @@
 package prelude
 
 data Equatable {
-  equal lhs, rhs
+  equal lhs rhs
 }
