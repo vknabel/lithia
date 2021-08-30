@@ -4,12 +4,14 @@ let Bool = prelude.Bool
 let True = prelude.True
 let False = prelude.False
 
-describe "optional" { it =>
-  it "can have some value" { _ =>
+package tests
+
+describe "optional", { it =>
+  it "can have some value", { _ =>
     Some 41
   }
  
-  it "can be none" { _ =>
+  it "can be none", { _ =>
     None
   }
 }

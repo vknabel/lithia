@@ -1,0 +1,15 @@
+package prelude
+
+data Variable {
+    current
+    observer
+    stream
+}
+
+data Observer {
+    accept value
+}
+
+data Stream {
+    subscribe observer
+}

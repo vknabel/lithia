@@ -1,0 +1,21 @@
+package example
+
+import some.package
+import other.pack {
+    a, b, c
+}
+
+enum Abc {
+    A
+    data B { }
+    enum C {
+        data D { }
+    }
+}
+data A {
+    a b, c
+    d
+}
+
+simple invocation
+complex invocation, with params

@@ -1,0 +1,24 @@
+package expect
+
+import strings
+import comparables
+
+func toEqual { equality, actual, expected =>
+    let areEqual = equality.equal actual, expected
+    type areEqual {
+        True: { _ => },
+        False: { _ =>
+            let message = strings.concat [
+                "Expected ",
+                actual,
+                " to equal ",
+                expected
+            ]
+            fail.current message
+        }
+    }
+}
+
+func toNotEqual { equality =>
+    toEqual comparables.negated equality
+}

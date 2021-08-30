@@ -1,5 +1,7 @@
 package prelude
 
 data Equatable {
-  equal lhs rhs
+  equal lhs, rhs
 }
+
+let sameEquatable = Equatable { lhs, rhs => lhs == rhs }

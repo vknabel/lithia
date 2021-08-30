@@ -3,18 +3,18 @@ package optionals
 import booleans
 
 func isNone { =>
-  switch Optional {
+  type Optional {
     Some: { _ => False },
     None: { _ => True }
   }
 }
 
-describe "is none" { it =>
+describe "is none", { it =>
   it "true for none", { expect =>
     expect isNone None
   }
   
-  it "false for some" { expect =>
+  it "false for some", { expect =>
     expect booleans.not isNone (Some 41)
     expect booleans.not isNone (Some None)
   }

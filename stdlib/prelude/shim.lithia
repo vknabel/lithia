@@ -1,0 +1,3 @@
+package prelude
+
+func print { message => }

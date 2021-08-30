@@ -1,0 +1,8 @@
+package prelude
+
+func when { condition, then =>
+    with condition, type Bool {
+        True: { _ => then },
+        False: { _ => }
+    }
+}

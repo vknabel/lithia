@@ -1,0 +1,5 @@
+package expect
+
+import tests
+
+let fail = Variable tests.fail

@@ -9,7 +9,7 @@ package prelude
  * @param list
  */
 func reduceList { accumulator initial list =>
-    switch List {
+    type List {
         Cons: { cons =>
             let accumulatedRest = reduceList accumulator initial cons.tail
             accumulator accumulatedRest cons.head
@@ -40,8 +40,8 @@ func pipe { functions initial =>
  * @param value
  * @param body
  */
-func with { value body =>
+func with { value, body =>
     body value
 }
 
-func compose { f g value => f g value }
+func compose { f, g, value => f g value }

@@ -1,0 +1,11 @@
+package expect
+
+import comparables
+
+func toBe { =>
+    toEqual sameEquatable
+}
+
+func toNotBe { =>
+    toEqual comparables.negated sameEquatable
+}

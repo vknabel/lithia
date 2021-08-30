@@ -3,18 +3,18 @@ package optionals
 import numbers
 import comparables
 
-func equalFor { someWitness lhs rhs =>
-  switch Optional {
+func equalFor { someWitness, lhs, rhs =>
+  type Optional {
     Some: { lsome =>
-      switch Optional {
+      type Optional {
         Some: { rsome =>
-          someWitness.equal lsome rsome
+          someWitness.equal lsome, rsome
         },
         None: { _ =>  False }
       } rhs
     },
     None: { _ =>
-      switch Optional {
+      type Optional {
         Some: { _ => False },
         None: { _ => True }
       }
@@ -31,12 +31,12 @@ describe "optionals are equatable" { it =>
   let alwaysEquatable = Equatable { _ => True }
   
   it "none and none always equal" { expect =>
-    expect neverEquatable None None
+    expect (neverEquatable None, None)
   }
   
   it "some and none are never equal", { expect =>
-    expect alwaysEquatable (Some 1) None
-    expect alwaysEquatable None (Some 1)
+    expect (alwaysEquatable Some 1, None)
+    expect (alwaysEquatable None, Some 1)
   }
   
   it "some and some delegate equality to values" { expect =>
