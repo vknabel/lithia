@@ -19,3 +19,7 @@ data A {
 
 simple invocation
 complex invocation, with params
+
+import tests
+
+func mainTests { => tests.runAllTests }

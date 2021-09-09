@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"strings"
 
+	sitter "github.com/smacker/go-tree-sitter"
+	"github.com/vknabel/go-lithia/interpreter"
+	"github.com/vknabel/go-lithia/parser"
 	"github.com/vknabel/go-lithia/reporting"
-	"github.com/vknabel/go-lithia/scanner"
 )
 
 func main() {
@@ -36,12 +37,13 @@ func runFile(filename string) error {
 		return err
 	}
 	script := string(scriptData)
-	err = run(script)
-	return err
+	runScript(script, interpreter.NewInterpreter())
+	return nil
 }
 
 func runPrompt() error {
 	reader := bufio.NewReader(os.Stdin)
+	interpreter := interpreter.NewInterpreter()
 	for {
 		fmt.Print("> ")
 		line, err := reader.ReadString('\n')
@@ -50,23 +52,33 @@ func runPrompt() error {
 		} else if err != nil {
 			reporting.ReportError(1, err.Error())
 		}
-		run(line)
+		lazyValue := runScript(line, interpreter)
+		value, err := lazyValue.Evaluate()
+		if err != nil {
+			reporting.ReportError(1, err.Error())
+		}
+		if value != nil {
+			fmt.Println(value)
+		}
 	}
 }
 
-func run(script string) error {
-	reader := strings.NewReader(script)
-	scanner := scanner.NewScanner(reader)
-	tokens, errs := scanner.ScanTokens()
-
-	if len(errs) > 0 {
-		for _, err := range errs {
-			reporting.ReportError(1, err.Error())
-		}
+func runScript(script string, interpreter *interpreter.Interpreter) *interpreter.LazyRuntimeValue {
+	tree, err := parse(script)
+	if err != nil {
+		reporting.ReportError(0, err.Error())
+		return nil
 	}
-
-	for _, token := range tokens {
-		fmt.Println(token)
+	value, err := interpreter.Interpret(tree, []byte(script))
+	if err != nil {
+		reporting.ReportError(0, err.Error())
+		return nil
 	}
-	return nil
+	return value
+}
+
+func parse(script string) (*sitter.Tree, error) {
+	parser := parser.NewParser()
+	tree, error := parser.Parse(script)
+	return tree, error
 }

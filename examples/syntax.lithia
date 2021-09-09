@@ -1,14 +1,22 @@
+let a = 1
+
 enum Bool {
   data True
   data False
 }
 
-func if { condition, then, else =>
-  Bool(
-    True: { _ => then },
-    False: { _ => else }
-  ) condition
+data Some {
+  value
 }
+
+Some 1
+
+// func if { condition, then, else =>
+//   switch Bool {
+//     True: { a => then },
+//     False: { a => else }
+//   }, condition
+// }
 
 func and { lhs, rhs =>
   if lhs, (if rhs, True, False), False
