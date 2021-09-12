@@ -159,6 +159,51 @@ func (interpreter *Interpreter) EvaluateComplexInvocationExpr(expr *sitter.Node,
 	return function.Call(args)
 }
 
+func (interpreter *Interpreter) EvaluateEnumDeclaration(enumDecl *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
+	name := enumDecl.ChildByFieldName("name").Content(source)
+	casesNode := enumDecl.ChildByFieldName("cases")
+	if casesNode == nil {
+		enum := NewConstantRuntimeValue(EnumDeclRuntimeValue{name: name, cases: make(map[string]*LazyRuntimeValue)})
+		return enum, nil
+	}
+	caseCount := int(casesNode.ChildCount())
+	cases := make(map[string]*LazyRuntimeValue)
+	for i := 0; i < caseCount; i++ {
+		child := casesNode.Child(i)
+		switch child.Type() {
+		case parser.TYPE_NODE_ENUM_CASE_REFERENCE:
+			caseName := child.Content(source)
+			lookedUp, _ := interpreter.root.Get(caseName)
+			if lookedUp == nil {
+				return nil, fmt.Errorf("undefined enum case %s", caseName)
+			}
+			cases[caseName] = lookedUp
+		case parser.TYPE_NODE_DATA_DECLARATION:
+			caseName := child.ChildByFieldName("name").Content(source)
+			runtimeValue, err := interpreter.EvaluateDataDeclaration(child, source)
+			if err != nil {
+				return nil, err
+			}
+			cases[caseName] = runtimeValue
+		case parser.TYPE_NODE_ENUM_DECLARATION:
+			caseName := child.ChildByFieldName("name").Content(source)
+			runtimeValue, err := interpreter.EvaluateEnumDeclaration(child, source)
+			if err != nil {
+				return nil, err
+			}
+			cases[caseName] = runtimeValue
+		default:
+			return nil, fmt.Errorf("unexpected node type %s", child.Type())
+		}
+	}
+	constantValue := NewConstantRuntimeValue(EnumDeclRuntimeValue{
+		name:  name,
+		cases: cases,
+	})
+	interpreter.root.Declare(name, constantValue)
+	return constantValue, nil
+}
+
 func (interpreter *Interpreter) EvaluateIdentifier(node *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
 	string := node.Content(source)
 	if value, ok := interpreter.root.Get(string); ok {
@@ -184,14 +229,8 @@ func (interpreter *Interpreter) EvaluateNode(node *sitter.Node, source []byte) (
 		return interpreter.EvaluateFunctionDeclaration(node, source)
 	case parser.TYPE_NODE_DATA_DECLARATION:
 		return interpreter.EvaluateDataDeclaration(node, source)
-	// case parser.TYPE_NODE_DATA_PROPERTY_LIST:
-	// 	return interpreter.Evaluate(node)
-	// case parser.TYPE_NODE_DATA_PROPERTY_VALUE:
-	// 	return interpreter.Evaluate(node)
-	// case parser.TYPE_NODE_DATA_PROPERTY_FUNCTION:
-	// 	return interpreter.Evaluate(node)
-	// case parser.TYPE_NODE_ENUM_DECLARATION:
-	// 	return interpreter.Evaluate(node)
+	case parser.TYPE_NODE_ENUM_DECLARATION:
+		return interpreter.EvaluateEnumDeclaration(node, source)
 	// case parser.TYPE_NODE_ENUM_CASE_LIST:
 	// 	return interpreter.Evaluate(node)
 	case parser.TYPE_NODE_COMPLEX_INVOCATION_EXPRESSION:

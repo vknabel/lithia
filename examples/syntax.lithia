@@ -1,12 +1,15 @@
 let a = 1
 
+enum Optional {
+  data Some {
+    value
+  }
+  data None
+}
+
 enum Bool {
   data True
   data False
-}
-
-data Some {
-  value
 }
 
 Some 1

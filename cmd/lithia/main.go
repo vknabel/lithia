@@ -49,13 +49,20 @@ func runPrompt() error {
 		line, err := reader.ReadString('\n')
 		if err == io.EOF {
 			return nil
-		} else if err != nil {
-			reporting.ReportError(1, err.Error())
 		}
-		lazyValue := runScript(line, interpreter)
+		if err != nil {
+			reporting.ReportError(1, err.Error())
+			continue
+		}
+		lazyValue, err := runScript(line, interpreter)
+		if err != nil {
+			reporting.ReportError(1, err.Error())
+			continue
+		}
 		value, err := lazyValue.Evaluate()
 		if err != nil {
 			reporting.ReportError(1, err.Error())
+			continue
 		}
 		if value != nil {
 			fmt.Println(value)
@@ -63,18 +70,16 @@ func runPrompt() error {
 	}
 }
 
-func runScript(script string, interpreter *interpreter.Interpreter) *interpreter.LazyRuntimeValue {
+func runScript(script string, interpreter *interpreter.Interpreter) (*interpreter.LazyRuntimeValue, error) {
 	tree, err := parse(script)
 	if err != nil {
-		reporting.ReportError(0, err.Error())
-		return nil
+		return nil, err
 	}
 	value, err := interpreter.Interpret(tree, []byte(script))
 	if err != nil {
-		reporting.ReportError(0, err.Error())
-		return nil
+		return nil, err
 	}
-	return value
+	return value, nil
 }
 
 func parse(script string) (*sitter.Tree, error) {
