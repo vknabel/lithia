@@ -109,8 +109,12 @@ func (typeExpr TypeExpression) Call(arguments []*LazyRuntimeValue) (*LazyRuntime
 }
 
 func (f Function) Call(arguments []*LazyRuntimeValue) (*LazyRuntimeValue, error) {
-	if len(arguments) >= len(f.arguments) {
-		return nil, fmt.Errorf("function %s expects %d arguments, got %d", f.name, len(f.arguments), len(arguments))
+	if len(arguments) < len(f.arguments) {
+		return NewConstantRuntimeValue(CurriedCallable{
+			actual:         f,
+			args:           arguments,
+			remainingArity: len(f.arguments) - len(arguments),
+		}), nil
 	}
 	closure := NewEnvironment(f.closure)
 	for i, argName := range f.arguments {
