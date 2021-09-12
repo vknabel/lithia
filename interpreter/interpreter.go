@@ -73,7 +73,20 @@ func (interpreter *Interpreter) EvaluateLetDeclaration(letDecl *sitter.Node, sou
 	return lazyValue, nil
 }
 func (interpreter *Interpreter) EvaluateFunctionDeclaration(funcDecl *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
-	return nil, fmt.Errorf("unimplemented")
+	name := funcDecl.ChildByFieldName("name").Content(source)
+	functionNode := funcDecl.ChildByFieldName("function")
+	function, err := interpreter.ParseFunctionLiteral(functionNode, source, interpreter.root)
+	function.name = name
+
+	if err != nil {
+		return nil, err
+	}
+	impl := NewConstantRuntimeValue(function)
+	err = interpreter.root.Declare(name, impl)
+	if err != nil {
+		return nil, err
+	}
+	return impl, nil
 }
 func (interpreter *Interpreter) EvaluateDataDeclaration(dataDecl *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
 	name := dataDecl.ChildByFieldName("name").Content(source)
@@ -121,6 +134,19 @@ func (interpreter *Interpreter) ParseParamterList(list *sitter.Node, source []by
 		params[i] = child.Content(source)
 	}
 	return params, nil
+}
+
+func (interpreter *Interpreter) ParseStatementList(list *sitter.Node, source []byte) ([]*LazyRuntimeValue, error) {
+	stmts := make([]*LazyRuntimeValue, list.ChildCount())
+	for i := 0; i < int(list.ChildCount()); i++ {
+		child := list.Child(i)
+		stmt, err := interpreter.EvaluateNode(child, source)
+		if err != nil {
+			return nil, err
+		}
+		stmts[i] = stmt
+	}
+	return stmts, nil
 }
 
 func (interpreter *Interpreter) EvaluateNumberLiteral(numberDecl *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
@@ -210,11 +236,13 @@ func (interpreter *Interpreter) EvaluateEnumDeclaration(enumDecl *sitter.Node, s
 
 func (interpreter *Interpreter) EvaluateIdentifier(node *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
 	string := node.Content(source)
-	if value, ok := interpreter.root.Get(string); ok {
-		return value, nil
-	} else {
-		return nil, fmt.Errorf("undefined identifier %s", string)
-	}
+	return NewLazyRuntimeValue(func() (RuntimeValue, error) {
+		if value, ok := interpreter.root.Get(string); ok {
+			return value, nil
+		} else {
+			return nil, fmt.Errorf("undefined identifier %s", string)
+		}
+	}), nil
 }
 
 func (interpreter *Interpreter) EvaluateMemberAccess(node *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
@@ -321,19 +349,60 @@ func (interpreter *Interpreter) EvaluateStringLiteral(node *sitter.Node, source 
 }
 
 func (interpreter *Interpreter) EvaluateBinaryExpression(node *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
-	return nil, fmt.Errorf("unimplemented")
+	return nil, fmt.Errorf("unimplemented %d:%d", node.StartPoint().Row, node.StartPoint().Column)
 }
 
 func (interpreter *Interpreter) EvaluateUnaryExpression(node *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
-	return nil, fmt.Errorf("unimplemented")
+	return nil, fmt.Errorf("unimplemented %d:%d", node.StartPoint().Row, node.StartPoint().Column)
+}
+
+func (interpreter *Interpreter) ParseFunctionLiteral(node *sitter.Node, source []byte, env *Environment) (Function, error) {
+	parametersNode := node.ChildByFieldName("parameters")
+	bodyNode := node.ChildByFieldName("body")
+
+	closure := NewEnvironment(env)
+	// TODO: both nodes are optional!
+	var (
+		params []string
+		err    error
+		stmts  []*LazyRuntimeValue
+	)
+	if parametersNode != nil {
+		params, err = interpreter.ParseParamterList(parametersNode, source)
+		if err != nil {
+			return Function{}, err
+		}
+	} else {
+		params = []string{}
+	}
+
+	if bodyNode != nil {
+		stmts, err = interpreter.ParseStatementList(bodyNode, source)
+		if err != nil {
+			return Function{}, err
+		}
+	} else {
+		stmts = []*LazyRuntimeValue{}
+		return Function{}, fmt.Errorf("empty functions not implemented yet")
+	}
+
+	return Function{
+		arguments: params,
+		body:      stmts,
+		closure:   closure,
+	}, nil
 }
 
 func (interpreter *Interpreter) EvaluateFunctionLiteral(node *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
-	return nil, fmt.Errorf("unimplemented")
+	function, err := interpreter.ParseFunctionLiteral(node, source, interpreter.root)
+	if err != nil {
+		return nil, err
+	}
+	return NewConstantRuntimeValue(function), nil
 }
 
 func (interpreter *Interpreter) EvaluateArrayLiteral(node *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
-	return nil, fmt.Errorf("unimplemented")
+	return nil, fmt.Errorf("unimplemented %d:%d", node.StartPoint().Row, node.StartPoint().Column)
 }
 
 func (interpreter *Interpreter) EvaluateNode(node *sitter.Node, source []byte) (*LazyRuntimeValue, error) {

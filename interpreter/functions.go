@@ -15,6 +15,13 @@ type CurriedCallable struct {
 	remainingArity int
 }
 
+type Function struct {
+	name      string
+	arguments []string
+	body      []*LazyRuntimeValue
+	closure   *Environment
+}
+
 func (c CurriedCallable) Call(arguments []*LazyRuntimeValue) (*LazyRuntimeValue, error) {
 	allArgs := append(c.args, arguments...)
 	if len(arguments) < c.remainingArity {
@@ -99,4 +106,37 @@ func (typeExpr TypeExpression) Call(arguments []*LazyRuntimeValue) (*LazyRuntime
 		return callable.Call(arguments)
 	}
 	return nil, fmt.Errorf("no matching case")
+}
+
+func (f Function) Call(arguments []*LazyRuntimeValue) (*LazyRuntimeValue, error) {
+	if len(arguments) >= len(f.arguments) {
+		return nil, fmt.Errorf("function %s expects %d arguments, got %d", f.name, len(f.arguments), len(arguments))
+	}
+	closure := NewEnvironment(f.closure)
+	for i, argName := range f.arguments {
+		err := closure.Declare(argName, arguments[i])
+		if err != nil {
+			return nil, err
+		}
+	}
+	return NewLazyRuntimeValue(func() (RuntimeValue, error) {
+		var (
+			lastValue RuntimeValue
+			err       error
+		)
+		for _, statement := range f.body {
+			lastValue, err = statement.Evaluate()
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		if len(arguments) == len(f.arguments) {
+			return lastValue, nil
+		} else if function, ok := lastValue.(Callable); ok {
+			return function.Call(arguments[len(f.arguments)-1:])
+		} else {
+			return nil, fmt.Errorf("function %s returns %s, which is not callable", f.name, lastValue)
+		}
+	}), nil
 }
