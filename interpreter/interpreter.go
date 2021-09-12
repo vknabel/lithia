@@ -238,7 +238,7 @@ func (interpreter *Interpreter) EvaluateIdentifier(node *sitter.Node, source []b
 	string := node.Content(source)
 	return NewLazyRuntimeValue(func() (RuntimeValue, error) {
 		if value, ok := interpreter.root.Get(string); ok {
-			return value, nil
+			return value.Evaluate()
 		} else {
 			return nil, fmt.Errorf("undefined identifier %s", string)
 		}
