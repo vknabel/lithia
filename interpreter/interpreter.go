@@ -73,7 +73,7 @@ func (interpreter *Interpreter) EvaluateLetDeclaration(letDecl *sitter.Node, sou
 	return lazyValue, nil
 }
 func (interpreter *Interpreter) EvaluateFunctionDeclaration(funcDecl *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
-	return nil, nil
+	return nil, fmt.Errorf("unimplemented")
 }
 func (interpreter *Interpreter) EvaluateDataDeclaration(dataDecl *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
 	name := dataDecl.ChildByFieldName("name").Content(source)
@@ -159,6 +159,10 @@ func (interpreter *Interpreter) EvaluateComplexInvocationExpr(expr *sitter.Node,
 	return function.Call(args)
 }
 
+func (interpreter *Interpreter) EvaluateSimpleInvocation(expr *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
+	return interpreter.EvaluateComplexInvocationExpr(expr, source)
+}
+
 func (interpreter *Interpreter) EvaluateEnumDeclaration(enumDecl *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
 	name := enumDecl.ChildByFieldName("name").Content(source)
 	casesNode := enumDecl.ChildByFieldName("cases")
@@ -213,6 +217,125 @@ func (interpreter *Interpreter) EvaluateIdentifier(node *sitter.Node, source []b
 	}
 }
 
+func (interpreter *Interpreter) EvaluateMemberAccess(node *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
+	if node.NamedChildCount() < 2 {
+		return nil, fmt.Errorf("expected at least 2 children, got %d", node.ChildCount())
+	}
+	literalNode := node.Child(0)
+	lazyObject, err := interpreter.EvaluateNode(literalNode, source)
+	if err != nil {
+		return nil, err
+	}
+
+	keyPath := make([]string, node.NamedChildCount()-1)
+	for i := 1; i < int(node.NamedChildCount()); i++ {
+		child := node.NamedChild(i)
+		keyPath[i-1] = child.Content(source)
+	}
+	lazyResult := NewLazyRuntimeValue(func() (RuntimeValue, error) {
+		objectValue, err := lazyObject.Evaluate()
+		if err != nil {
+			return nil, err
+		}
+		for i := 0; i < len(keyPath); i++ {
+			object, ok := objectValue.(MemberAccessable)
+			if !ok {
+				return nil, fmt.Errorf("cannot access %s of %s", keyPath[i], objectValue)
+			}
+			objectValue, err = object.Lookup(keyPath[i])
+			if err != nil {
+				return nil, err
+			}
+		}
+		return objectValue, nil
+	})
+	return lazyResult, nil
+}
+
+func (interpreter *Interpreter) EvaluateTypeExpression(node *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
+	typeNode := node.ChildByFieldName("type")
+	bodyNode := node.ChildByFieldName("body")
+	if typeNode == nil || bodyNode == nil {
+		return nil, fmt.Errorf("expected type and body")
+	}
+	lazyTypeValue, err := interpreter.EvaluateNode(typeNode, source)
+	if err != nil {
+		return nil, err
+	}
+
+	caseCount := int(bodyNode.NamedChildCount())
+	typeCases := make(map[string]*LazyRuntimeValue, caseCount)
+	for i := 0; i < caseCount; i++ {
+		typeCaseNode := bodyNode.NamedChild(i)
+		labelNode := typeCaseNode.ChildByFieldName("label")
+		bodyNode := typeCaseNode.ChildByFieldName("body")
+		if labelNode == nil || bodyNode == nil {
+			return nil, fmt.Errorf("expected label and body")
+		}
+		if err != nil {
+			return nil, err
+		}
+		lazyBody, err := interpreter.EvaluateNode(bodyNode, source)
+		if err != nil {
+			return nil, err
+		}
+		typeCases[labelNode.Content(source)] = lazyBody
+	}
+	lazyCheckedTypeExpression := NewLazyRuntimeValue(func() (RuntimeValue, error) {
+		typeValue, err := lazyTypeValue.Evaluate()
+		if err != nil {
+			return nil, err
+		}
+		enumDecl, ok := typeValue.(EnumDeclRuntimeValue)
+		if !ok {
+			return nil, fmt.Errorf("expected enum type, got %s", typeValue)
+		}
+		typeExpression := TypeExpression{typeValue: enumDecl, cases: typeCases}
+		if len(enumDecl.cases) != len(typeCases) {
+			return nil, fmt.Errorf("expected %d cases, got %d", len(enumDecl.cases), len(typeCases))
+		}
+		for label := range typeCases {
+			if _, ok := enumDecl.cases[label]; !ok {
+				return nil, fmt.Errorf("undefined enum case %s", label)
+			}
+		}
+		return typeExpression, nil
+	})
+	return lazyCheckedTypeExpression, nil
+}
+
+func (interpreter *Interpreter) EvaluateGroup(node *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
+	expressionNode := node.ChildByFieldName("expression")
+	if expressionNode == nil {
+		return nil, fmt.Errorf("expected expression")
+	}
+	return interpreter.EvaluateNode(expressionNode, source)
+}
+
+func (interpreter *Interpreter) EvaluateStringLiteral(node *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
+	string, err := strconv.Unquote(node.Content(source))
+	if err != nil {
+		return nil, err
+	}
+	return NewConstantRuntimeValue(string), nil
+}
+
+func (interpreter *Interpreter) EvaluateBinaryExpression(node *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
+	return nil, fmt.Errorf("unimplemented")
+}
+
+func (interpreter *Interpreter) EvaluateUnaryExpression(node *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
+	return nil, fmt.Errorf("unimplemented")
+}
+
+func (interpreter *Interpreter) EvaluateFunctionLiteral(node *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
+	return nil, fmt.Errorf("unimplemented")
+}
+
+func (interpreter *Interpreter) EvaluateArrayLiteral(node *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
+	return nil, fmt.Errorf("unimplemented")
+}
+
 func (interpreter *Interpreter) EvaluateNode(node *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
 	fmt.Printf("evaluating node of type %s\n", node.Type())
 
@@ -231,42 +354,36 @@ func (interpreter *Interpreter) EvaluateNode(node *sitter.Node, source []byte) (
 		return interpreter.EvaluateDataDeclaration(node, source)
 	case parser.TYPE_NODE_ENUM_DECLARATION:
 		return interpreter.EvaluateEnumDeclaration(node, source)
-	// case parser.TYPE_NODE_ENUM_CASE_LIST:
-	// 	return interpreter.Evaluate(node)
 	case parser.TYPE_NODE_COMPLEX_INVOCATION_EXPRESSION:
 		return interpreter.EvaluateComplexInvocationExpr(node, source)
-	// case parser.TYPE_NODE_SIMPLE_INVOCATION_EXPRESSION:
-	// 	return interpreter.Evaluate(node)
-	// case parser.TYPE_NODE_UNARY_EXPRESSION:
-	// 	return interpreter.Evaluate(node)
-	// case parser.TYPE_NODE_BINARY_EXPRESSION:
-	// 	return interpreter.Evaluate(node)
-	// case parser.TYPE_NODE_MEMBER_ACCESS:
-	// 	return interpreter.Evaluate(node)
-	// case parser.TYPE_NODE_TYPE_EXPRESSION:
-	// 	return interpreter.Evaluate(node)
-	// case parser.TYPE_NODE_TYPE_BODY:
-	// 	return interpreter.Evaluate(node)
-	// case parser.TYPE_NODE_TYPE_CASE:
-	// 	return interpreter.Evaluate(node)
-	// case parser.TYPE_NODE_STRING_LITERAL:
-	// 	return interpreter.Evaluate(node)
+	case parser.TYPE_NODE_SIMPLE_INVOCATION_EXPRESSION:
+		return interpreter.EvaluateSimpleInvocation(node, source)
+	case parser.TYPE_NODE_UNARY_EXPRESSION:
+		return interpreter.EvaluateUnaryExpression(node, source)
+	case parser.TYPE_NODE_BINARY_EXPRESSION:
+		return interpreter.EvaluateBinaryExpression(node, source)
+	case parser.TYPE_NODE_MEMBER_ACCESS:
+		return interpreter.EvaluateMemberAccess(node, source)
+	case parser.TYPE_NODE_TYPE_EXPRESSION:
+		return interpreter.EvaluateTypeExpression(node, source)
+	case parser.TYPE_NODE_STRING_LITERAL:
+		return interpreter.EvaluateStringLiteral(node, source)
 	// case parser.TYPE_NODE_ESCAPE_SEQUENCE:
 	// 	return interpreter.Evaluate(node)
-	// case parser.TYPE_NODE_GROUP_LITERAL:
-	// 	return interpreter.Evaluate(node)
+	case parser.TYPE_NODE_GROUP_LITERAL:
+		return interpreter.EvaluateGroup(node, source)
 	case parser.TYPE_NODE_NUMBER_LITERAL:
 		return interpreter.EvaluateNumberLiteral(node, source)
-	// case parser.TYPE_NODE_ARRAY_LITERAL:
-	// 	return interpreter.Evaluate(node)
-	// case parser.TYPE_NODE_FUNCTION_LITERAL:
-	// 	return interpreter.Evaluate(node)
+	case parser.TYPE_NODE_ARRAY_LITERAL:
+		return interpreter.EvaluateArrayLiteral(node, source)
+	case parser.TYPE_NODE_FUNCTION_LITERAL:
+		return interpreter.EvaluateFunctionLiteral(node, source)
 	// case parser.TYPE_NODE_PARAMETER_LIST:
 	// 	return interpreter.Evaluate(node)
 	case parser.TYPE_NODE_IDENTIFIER:
 		return interpreter.EvaluateIdentifier(node, source)
-	// case parser.TYPE_NODE_COMMENT:
-	// 	return interpreter.Evaluate(node)
+	case parser.TYPE_NODE_COMMENT:
+		return nil, nil
 	// case parser.TYPE_NODE_ENUM_CASE_REFERENCE:
 	// 	return interpreter.Evaluate(node)
 	// case parser.TYPE_NODE_ERROR:
@@ -274,6 +391,6 @@ func (interpreter *Interpreter) EvaluateNode(node *sitter.Node, source []byte) (
 	// case parser.TYPE_NODE_UNEXPECTED:
 	// 	return interpreter.Evaluate(node)
 	default:
-		return nil, nil
+		return nil, fmt.Errorf("unimplemented node type %s", node.Type())
 	}
 }

@@ -37,8 +37,8 @@ func runFile(filename string) error {
 		return err
 	}
 	script := string(scriptData)
-	runScript(script, interpreter.NewInterpreter())
-	return nil
+	_, err = runScript(script, interpreter.NewInterpreter())
+	return err
 }
 
 func runPrompt() error {

@@ -2,6 +2,7 @@ package interpreter
 
 import (
 	"fmt"
+	"reflect"
 )
 
 type Callable interface {
@@ -55,4 +56,47 @@ func (dataDecl DataDeclRuntimeValue) Call(arguments []*LazyRuntimeValue) (*LazyR
 		// error
 		return nil, fmt.Errorf("too many arguments")
 	}
+}
+
+func (typeExpr TypeExpression) Call(arguments []*LazyRuntimeValue) (*LazyRuntimeValue, error) {
+	if len(arguments) == 0 {
+		return NewConstantRuntimeValue(typeExpr), nil
+	}
+	lazyValueArgument := arguments[0]
+	valueArgument, err := lazyValueArgument.Evaluate()
+	if err != nil {
+		return nil, err
+	}
+	for caseName := range typeExpr.cases {
+		data, ok := valueArgument.(DataRuntimeValue)
+		if !ok {
+			continue
+		}
+		caseTypeValue, err := typeExpr.typeValue.cases[caseName].Evaluate()
+		if err != nil {
+			return nil, err
+		}
+		if caseDataType, ok := caseTypeValue.(DataDeclRuntimeValue); !ok || !reflect.DeepEqual(*data.typeValue, caseDataType) {
+			continue
+		}
+		switch specificDataType := caseTypeValue.(type) {
+		case DataDeclRuntimeValue:
+			reflect.DeepEqual(*data.typeValue, specificDataType)
+		case EnumDeclRuntimeValue:
+			return nil, fmt.Errorf("cannot use enum type as data type")
+		default:
+			return nil, fmt.Errorf("unexpected type %T", caseTypeValue)
+		}
+
+		intermediate, err := typeExpr.cases[caseName].Evaluate()
+		if err != nil {
+			return nil, err
+		}
+		callable, ok := intermediate.(Callable)
+		if !ok {
+			return nil, fmt.Errorf("case %s is not callable", caseName)
+		}
+		return callable.Call(arguments)
+	}
+	return nil, fmt.Errorf("no matching case")
 }

@@ -71,3 +71,8 @@ type EnumDeclRuntimeValue struct {
 	name  string
 	cases map[string]*LazyRuntimeValue
 }
+
+type TypeExpression struct {
+	typeValue EnumDeclRuntimeValue
+	cases     map[string]*LazyRuntimeValue
+}
