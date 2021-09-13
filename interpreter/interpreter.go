@@ -1,6 +1,7 @@
 package interpreter
 
 import (
+	"fmt"
 	"reflect"
 	"sort"
 	"strconv"
@@ -10,8 +11,9 @@ import (
 )
 
 type Interpreter struct {
-	path        []string
-	environment *Environment
+	path          []string
+	environment   *Environment
+	functionCount int
 }
 
 func NewInterpreter() *Interpreter {
@@ -83,8 +85,7 @@ func (interpreter *Interpreter) EvaluateLetDeclaration(letDecl *sitter.Node, sou
 func (interpreter *Interpreter) EvaluateFunctionDeclaration(funcDecl *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
 	name := funcDecl.ChildByFieldName("name").Content(source)
 	functionNode := funcDecl.ChildByFieldName("function")
-	function, err := interpreter.ParseFunctionLiteral(functionNode, source, interpreter.environment)
-	function.name = name
+	function, err := interpreter.ParseFunctionLiteral(functionNode, source, name)
 
 	if err != nil {
 		return nil, err
@@ -365,18 +366,17 @@ func (interpreter *Interpreter) EvaluateUnaryExpression(node *sitter.Node, sourc
 	return nil, SyntaxErrorf(node, source, "unimplemented")
 }
 
-func (interpreter *Interpreter) ParseFunctionLiteral(node *sitter.Node, source []byte, env *Environment) (Function, error) {
+func (interpreter *Interpreter) ParseFunctionLiteral(node *sitter.Node, source []byte, name string) (Function, error) {
 	parametersNode := node.ChildByFieldName("parameters")
 	bodyNode := node.ChildByFieldName("body")
 
-	closure := interpreter.ChildInterpreter("#func")
 	// TODO: both nodes are optional!
 	var (
 		params []string
 		err    error
 	)
 	if parametersNode != nil {
-		params, err = closure.ParseParamterList(parametersNode, source)
+		params, err = interpreter.ParseParamterList(parametersNode, source)
 		if err != nil {
 			return Function{}, err
 		}
@@ -384,9 +384,14 @@ func (interpreter *Interpreter) ParseFunctionLiteral(node *sitter.Node, source [
 		params = []string{}
 	}
 
+	if name == "" {
+		name = fmt.Sprintf("func#%d", interpreter.functionCount)
+		interpreter.functionCount += 1
+	}
 	return Function{
+		name:      name,
 		arguments: params,
-		closure:   closure,
+		closure:   interpreter.ChildInterpreter(name),
 		body: func(i *Interpreter) ([]*LazyRuntimeValue, error) {
 			var stmts []*LazyRuntimeValue
 			if bodyNode != nil {
@@ -403,7 +408,7 @@ func (interpreter *Interpreter) ParseFunctionLiteral(node *sitter.Node, source [
 }
 
 func (interpreter *Interpreter) EvaluateFunctionLiteral(node *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
-	function, err := interpreter.ParseFunctionLiteral(node, source, interpreter.environment)
+	function, err := interpreter.ParseFunctionLiteral(node, source, "")
 	if err != nil {
 		return nil, err
 	}

@@ -3,6 +3,7 @@ package interpreter
 import (
 	"fmt"
 	"reflect"
+	"strings"
 )
 
 type Callable interface {
@@ -20,6 +21,10 @@ type Function struct {
 	arguments []string
 	body      func(*Interpreter) ([]*LazyRuntimeValue, error)
 	closure   *Interpreter
+}
+
+func (f Function) String() string {
+	return fmt.Sprintf("{ %s => @(%s) }", strings.Join(f.arguments, ","), strings.Join(f.closure.path, "."))
 }
 
 func (Function) RuntimeType() RuntimeType {
@@ -124,9 +129,8 @@ func (f Function) Call(arguments []*LazyRuntimeValue) (*LazyRuntimeValue, error)
 			remainingArity: len(f.arguments) - len(arguments),
 		}), nil
 	}
-	closureInstance := f.closure.ChildInterpreter("()")
 	for i, argName := range f.arguments {
-		err := closureInstance.environment.Declare(argName, arguments[i])
+		err := f.closure.environment.Declare(argName, arguments[i])
 		if err != nil {
 			return nil, err
 		}
@@ -136,7 +140,7 @@ func (f Function) Call(arguments []*LazyRuntimeValue) (*LazyRuntimeValue, error)
 			lastValue RuntimeValue
 			err       error
 		)
-		statements, err := f.body(closureInstance)
+		statements, err := f.body(f.closure)
 		if err != nil {
 			return nil, err
 		}
