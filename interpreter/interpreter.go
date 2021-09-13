@@ -405,7 +405,7 @@ func (interpreter *Interpreter) ParseFunctionLiteral(node *sitter.Node, source [
 	return Function{
 		name:      name,
 		arguments: params,
-		closure:   interpreter.ChildInterpreter(name),
+		parent:    interpreter,
 		body: func(i *Interpreter) ([]*LazyRuntimeValue, error) {
 			var stmts []*LazyRuntimeValue
 			if bodyNode != nil {

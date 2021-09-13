@@ -19,11 +19,11 @@ type Function struct {
 	name      string
 	arguments []string
 	body      func(*Interpreter) ([]*LazyRuntimeValue, error)
-	closure   *Interpreter
+	parent    *Interpreter
 }
 
 func (f Function) String() string {
-	return fmt.Sprintf("{ %s => @(%s) }", strings.Join(f.arguments, ","), strings.Join(f.closure.path, "."))
+	return fmt.Sprintf("{ %s => @(%s) }", strings.Join(f.arguments, ","), strings.Join(f.parent.path, "."))
 }
 
 func (Function) RuntimeType() RuntimeType {
@@ -121,6 +121,7 @@ func (typeExpr TypeExpression) Call(arguments []*LazyRuntimeValue) (RuntimeValue
 }
 
 func (f Function) Call(arguments []*LazyRuntimeValue) (RuntimeValue, error) {
+	closure := f.parent.ChildInterpreter(f.name)
 	if len(arguments) < len(f.arguments) {
 		return CurriedCallable{
 			actual:         f,
@@ -129,7 +130,7 @@ func (f Function) Call(arguments []*LazyRuntimeValue) (RuntimeValue, error) {
 		}, nil
 	}
 	for i, argName := range f.arguments {
-		err := f.closure.environment.Declare(argName, arguments[i])
+		err := closure.environment.Declare(argName, arguments[i])
 		if err != nil {
 			return nil, err
 		}
@@ -139,7 +140,7 @@ func (f Function) Call(arguments []*LazyRuntimeValue) (RuntimeValue, error) {
 		lastValue RuntimeValue
 		err       error
 	)
-	statements, err := f.body(f.closure)
+	statements, err := f.body(closure)
 	if err != nil {
 		return nil, err
 	}

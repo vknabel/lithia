@@ -12,9 +12,9 @@ enum Bool {
   data False
 }
 
-// func just { x => Some x }
-
-// just 1
+func just { x => Some x }
+just 1
+just 1
 
 let x Variable 1
 x.accept "Hallo"
