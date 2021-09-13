@@ -12,6 +12,9 @@ enum Bool {
   data False
 }
 
+func just { x => Some x }
+
+just 1
 
 type Optional {
   Some: Some,

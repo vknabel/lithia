@@ -10,12 +10,21 @@ import (
 )
 
 type Interpreter struct {
-	root *Environment
+	path        []string
+	environment *Environment
 }
 
 func NewInterpreter() *Interpreter {
 	return &Interpreter{
-		root: NewEnvironment(nil),
+		path:        []string{},
+		environment: NewEnvironment(nil),
+	}
+}
+
+func (i *Interpreter) ChildInterpreter(name string) *Interpreter {
+	return &Interpreter{
+		path:        append(i.path, name),
+		environment: NewEnvironment(i.environment),
 	}
 }
 
@@ -65,7 +74,7 @@ func (interpreter *Interpreter) EvaluateLetDeclaration(letDecl *sitter.Node, sou
 	if err != nil {
 		return nil, err
 	}
-	err = interpreter.root.Declare(nameNode.Content([]byte(source)), lazyValue)
+	err = interpreter.environment.Declare(nameNode.Content([]byte(source)), lazyValue)
 	if err != nil {
 		return nil, err
 	}
@@ -74,14 +83,14 @@ func (interpreter *Interpreter) EvaluateLetDeclaration(letDecl *sitter.Node, sou
 func (interpreter *Interpreter) EvaluateFunctionDeclaration(funcDecl *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
 	name := funcDecl.ChildByFieldName("name").Content(source)
 	functionNode := funcDecl.ChildByFieldName("function")
-	function, err := interpreter.ParseFunctionLiteral(functionNode, source, interpreter.root)
+	function, err := interpreter.ParseFunctionLiteral(functionNode, source, interpreter.environment)
 	function.name = name
 
 	if err != nil {
 		return nil, err
 	}
 	impl := NewConstantRuntimeValue(function)
-	err = interpreter.root.Declare(name, impl)
+	err = interpreter.environment.Declare(name, impl)
 	if err != nil {
 		return nil, err
 	}
@@ -122,7 +131,7 @@ func (interpreter *Interpreter) EvaluateDataDeclaration(dataDecl *sitter.Node, s
 	}
 
 	constantValue := NewConstantRuntimeValue(data)
-	interpreter.root.Declare(name, constantValue)
+	interpreter.environment.Declare(name, constantValue)
 	return constantValue, nil
 }
 
@@ -193,6 +202,7 @@ func (interpreter *Interpreter) EvaluateEnumDeclaration(enumDecl *sitter.Node, s
 	casesNode := enumDecl.ChildByFieldName("cases")
 	if casesNode == nil {
 		enum := NewConstantRuntimeValue(EnumDeclRuntimeValue{name: name, cases: make(map[string]*LazyRuntimeValue)})
+		interpreter.environment.Declare(name, enum)
 		return enum, nil
 	}
 	caseCount := int(casesNode.ChildCount())
@@ -202,7 +212,7 @@ func (interpreter *Interpreter) EvaluateEnumDeclaration(enumDecl *sitter.Node, s
 		switch child.Type() {
 		case parser.TYPE_NODE_ENUM_CASE_REFERENCE:
 			caseName := child.Content(source)
-			lookedUp, _ := interpreter.root.Get(caseName)
+			lookedUp, _ := interpreter.environment.Get(caseName)
 			if lookedUp == nil {
 				return nil, RuntimeErrorf(child, source, "undefined enum case %s", caseName)
 			}
@@ -229,14 +239,14 @@ func (interpreter *Interpreter) EvaluateEnumDeclaration(enumDecl *sitter.Node, s
 		name:  name,
 		cases: cases,
 	})
-	interpreter.root.Declare(name, constantValue)
+	interpreter.environment.Declare(name, constantValue)
 	return constantValue, nil
 }
 
 func (interpreter *Interpreter) EvaluateIdentifier(node *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
 	string := node.Content(source)
 	return NewLazyRuntimeValue(func() (RuntimeValue, error) {
-		if value, ok := interpreter.root.Get(string); ok {
+		if value, ok := interpreter.environment.Get(string); ok {
 			return value.Evaluate()
 		} else {
 			return nil, RuntimeErrorf(node, source, "undefined identifier %s", string)
@@ -359,15 +369,14 @@ func (interpreter *Interpreter) ParseFunctionLiteral(node *sitter.Node, source [
 	parametersNode := node.ChildByFieldName("parameters")
 	bodyNode := node.ChildByFieldName("body")
 
-	closure := NewEnvironment(env)
+	closure := interpreter.ChildInterpreter("#func")
 	// TODO: both nodes are optional!
 	var (
 		params []string
 		err    error
-		stmts  []*LazyRuntimeValue
 	)
 	if parametersNode != nil {
-		params, err = interpreter.ParseParamterList(parametersNode, source)
+		params, err = closure.ParseParamterList(parametersNode, source)
 		if err != nil {
 			return Function{}, err
 		}
@@ -375,25 +384,26 @@ func (interpreter *Interpreter) ParseFunctionLiteral(node *sitter.Node, source [
 		params = []string{}
 	}
 
-	if bodyNode != nil {
-		stmts, err = interpreter.ParseStatementList(bodyNode, source)
-		if err != nil {
-			return Function{}, err
-		}
-	} else {
-		stmts = []*LazyRuntimeValue{}
-		return Function{}, RuntimeErrorf(node, source, "empty functions not implemented yet")
-	}
-
 	return Function{
 		arguments: params,
-		body:      stmts,
 		closure:   closure,
+		body: func(i *Interpreter) ([]*LazyRuntimeValue, error) {
+			var stmts []*LazyRuntimeValue
+			if bodyNode != nil {
+				stmts, err = i.ParseStatementList(bodyNode, source)
+				if err != nil {
+					return stmts, err
+				}
+			} else {
+				return nil, RuntimeErrorf(node, source, "empty functions not implemented yet")
+			}
+			return stmts, nil
+		},
 	}, nil
 }
 
 func (interpreter *Interpreter) EvaluateFunctionLiteral(node *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
-	function, err := interpreter.ParseFunctionLiteral(node, source, interpreter.root)
+	function, err := interpreter.ParseFunctionLiteral(node, source, interpreter.environment)
 	if err != nil {
 		return nil, err
 	}

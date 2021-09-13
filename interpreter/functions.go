@@ -18,8 +18,8 @@ type CurriedCallable struct {
 type Function struct {
 	name      string
 	arguments []string
-	body      []*LazyRuntimeValue
-	closure   *Environment
+	body      func(*Interpreter) ([]*LazyRuntimeValue, error)
+	closure   *Interpreter
 }
 
 func (Function) RuntimeType() RuntimeType {
@@ -124,9 +124,9 @@ func (f Function) Call(arguments []*LazyRuntimeValue) (*LazyRuntimeValue, error)
 			remainingArity: len(f.arguments) - len(arguments),
 		}), nil
 	}
-	closure := NewEnvironment(f.closure)
+	closureInstance := f.closure.ChildInterpreter("()")
 	for i, argName := range f.arguments {
-		err := closure.Declare(argName, arguments[i])
+		err := closureInstance.environment.Declare(argName, arguments[i])
 		if err != nil {
 			return nil, err
 		}
@@ -136,7 +136,11 @@ func (f Function) Call(arguments []*LazyRuntimeValue) (*LazyRuntimeValue, error)
 			lastValue RuntimeValue
 			err       error
 		)
-		for _, statement := range f.body {
+		statements, err := f.body(closureInstance)
+		if err != nil {
+			return nil, err
+		}
+		for _, statement := range statements {
 			lastValue, err = statement.Evaluate()
 			if err != nil {
 				return nil, err
