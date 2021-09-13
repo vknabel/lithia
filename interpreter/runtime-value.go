@@ -2,6 +2,7 @@ package interpreter
 
 import (
 	"fmt"
+	"reflect"
 	"strings"
 	"sync"
 )
@@ -46,6 +47,41 @@ func (l *LazyRuntimeValue) Evaluate() (RuntimeValue, error) {
 	return l.value, l.err
 }
 
+func RuntimeTypeValueIncludesValue(t RuntimeValue, v RuntimeValue) (bool, error) {
+	if _, ok := t.(PreludeAnyType); ok {
+		return true, nil
+	}
+	if enumDecl, ok := t.(EnumDeclRuntimeValue); ok {
+		for _, lazyValue := range enumDecl.cases {
+			value, err := lazyValue.Evaluate()
+			if err != nil {
+				return false, err
+			}
+			ok, err := value.RuntimeType().IncludesValue(v)
+			if err != nil {
+				return false, err
+			}
+			if ok {
+				return true, nil
+			}
+		}
+		return false, nil
+	} else {
+		if _, ok := t.(RuntimeType); ok {
+			t = *t.(RuntimeType).typeValue
+		}
+		valueType := *v.RuntimeType().typeValue
+		if _, ok := valueType.(RuntimeType); ok {
+			valueType = *valueType.(RuntimeType).typeValue
+		}
+		return reflect.DeepEqual(valueType, t), nil
+	}
+}
+
+func (t RuntimeType) IncludesValue(v RuntimeValue) (bool, error) {
+	return RuntimeTypeValueIncludesValue(t, v)
+}
+
 type DataDeclRuntimeValue struct {
 	name   string
 	fields []DataDeclField
@@ -66,7 +102,7 @@ type DataRuntimeValue struct {
 }
 
 func (d DataRuntimeValue) RuntimeType() RuntimeType {
-	var typeValue RuntimeValue = d.typeValue
+	var typeValue RuntimeValue = *d.typeValue
 	return RuntimeType{
 		name:      d.typeValue.name,
 		typeValue: &typeValue,

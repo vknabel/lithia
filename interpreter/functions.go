@@ -2,7 +2,6 @@ package interpreter
 
 import (
 	"fmt"
-	"reflect"
 	"strings"
 )
 
@@ -87,28 +86,20 @@ func (typeExpr TypeExpression) Call(arguments []*LazyRuntimeValue) (*LazyRuntime
 	if err != nil {
 		return nil, err
 	}
-	for caseName := range typeExpr.cases {
-		data, ok := valueArgument.(DataRuntimeValue)
-		if !ok {
-			continue
-		}
+	for caseName, lazyCaseImpl := range typeExpr.cases {
 		caseTypeValue, err := typeExpr.typeValue.cases[caseName].Evaluate()
 		if err != nil {
 			return nil, err
 		}
-		if caseDataType, ok := caseTypeValue.(DataDeclRuntimeValue); !ok || !reflect.DeepEqual(*data.typeValue, caseDataType) {
+		ok, err := RuntimeTypeValueIncludesValue(caseTypeValue, valueArgument)
+		if err != nil {
+			return nil, err
+		}
+		if !ok {
 			continue
 		}
-		switch specificDataType := caseTypeValue.(type) {
-		case DataDeclRuntimeValue:
-			reflect.DeepEqual(*data.typeValue, specificDataType)
-		case EnumDeclRuntimeValue:
-			return nil, fmt.Errorf("cannot use enum type as data type")
-		default:
-			return nil, fmt.Errorf("unexpected type %T", caseTypeValue)
-		}
 
-		intermediate, err := typeExpr.cases[caseName].Evaluate()
+		intermediate, err := lazyCaseImpl.Evaluate()
 		if err != nil {
 			return nil, err
 		}

@@ -5,6 +5,7 @@ import (
 	"reflect"
 	"sort"
 	"strconv"
+	"strings"
 
 	sitter "github.com/smacker/go-tree-sitter"
 	"github.com/vknabel/go-lithia/parser"
@@ -330,16 +331,23 @@ func (interpreter *Interpreter) EvaluateTypeExpression(node *sitter.Node, source
 		}
 		typeExpression := TypeExpression{typeValue: enumDecl, cases: typeCases}
 		if len(enumDecl.cases) != len(typeCases) {
-			return nil, RuntimeErrorf(node, source, "expected %d cases, got %d", len(enumDecl.cases), len(typeCases))
+			return nil, RuntimeErrorf(node, source, "expected %s cases, got %s", casesToString(enumDecl.cases), casesToString(typeCases))
 		}
 		for label := range typeCases {
 			if _, ok := enumDecl.cases[label]; !ok {
-				return nil, RuntimeErrorf(node, source, "undefined enum case %s", label)
+				return nil, RuntimeErrorf(node, source, "undefined enum case %s, expected %s", label, casesToString(enumDecl.cases))
 			}
 		}
 		return typeExpression, nil
 	})
 	return lazyCheckedTypeExpression, nil
+}
+func casesToString(cases map[string]*LazyRuntimeValue) string {
+	var labels []string
+	for label := range cases {
+		labels = append(labels, label)
+	}
+	return fmt.Sprintf("[%s]", strings.Join(labels, ", "))
 }
 
 func (interpreter *Interpreter) EvaluateGroup(node *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
