@@ -1,17 +1,22 @@
 package interpreter
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+)
 
 func NewPreludeEnvironment() *Environment {
 	env := NewEnvironment(nil)
-	env.Declare("Int", NewConstantRuntimeValue(PreludeInt(0).RuntimeType()))
-	env.Declare("Float", NewConstantRuntimeValue(PreludeFloat(0.0).RuntimeType()))
-	env.Declare("String", NewConstantRuntimeValue(PreludeString("").RuntimeType()))
-	env.Declare("Rune", NewConstantRuntimeValue(PreludeRune('r').RuntimeType()))
-	env.Declare("Function", NewConstantRuntimeValue(PreludeFunctionType{}.RuntimeType()))
-	env.Declare("Any", NewConstantRuntimeValue(PreludeAnyType{}.RuntimeType()))
+	env.Declare("Int", NewConstantRuntimeValue(PreludeInt(0)))
+	env.Declare("Float", NewConstantRuntimeValue(PreludeFloat(0.0)))
+	env.Declare("String", NewConstantRuntimeValue(PreludeString("")))
+	env.Declare("Rune", NewConstantRuntimeValue(PreludeRune('r')))
+	env.Declare("Function", NewConstantRuntimeValue(PreludeFunctionType{}))
+	env.Declare("Variable", NewConstantRuntimeValue(PreludeVariableType{}))
+	env.Declare("Any", NewConstantRuntimeValue(PreludeAnyType{}))
 
 	env.Declare("print", NewConstantRuntimeValue(builtinPrint))
+	env.Declare("osExit", NewConstantRuntimeValue(builtinOsExit))
 	return env
 }
 
@@ -38,6 +43,10 @@ type BuiltinFunction struct {
 
 func (f BuiltinFunction) RuntimeType() RuntimeType {
 	return PreludeFunctionType{}.RuntimeType()
+}
+
+func (f BuiltinFunction) Lookup(member string) (*LazyRuntimeValue, error) {
+	return nil, fmt.Errorf("function %s has no member %s", fmt.Sprint(f), member)
 }
 
 func (f BuiltinFunction) Call(arguments []*LazyRuntimeValue) (RuntimeValue, error) {
@@ -72,5 +81,22 @@ var builtinPrint = NewBuiltinFunction(
 		}
 		fmt.Print(value)
 		return value, nil
+	},
+)
+
+var builtinOsExit = NewBuiltinFunction(
+	"osExit",
+	[]string{"code"},
+	func(args []*LazyRuntimeValue) (RuntimeValue, error) {
+		value, err := args[0].Evaluate()
+		if err != nil {
+			return nil, err
+		}
+		if code, ok := value.(PreludeInt); ok {
+			os.Exit(int(code))
+			return value, nil
+		} else {
+			return nil, fmt.Errorf("%s is not an int", value)
+		}
 	},
 )

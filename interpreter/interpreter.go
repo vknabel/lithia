@@ -278,21 +278,21 @@ func (interpreter *Interpreter) EvaluateMemberAccess(node *sitter.Node, source [
 		keyPath[i-1] = child.Content(source)
 	}
 	lazyResult := NewLazyRuntimeValue(func() (RuntimeValue, error) {
-		objectValue, err := lazyObject.Evaluate()
+		object, err := lazyObject.Evaluate()
 		if err != nil {
 			return nil, err
 		}
 		for i := 0; i < len(keyPath); i++ {
-			object, ok := objectValue.(MemberAccessable)
-			if !ok {
-				return nil, RuntimeErrorf(node, source, "cannot access %s of %s", keyPath[i], objectValue)
+			lazyObject, err = object.Lookup(keyPath[i])
+			if err != nil {
+				return nil, err
 			}
-			objectValue, err = object.Lookup(keyPath[i])
+			object, err = lazyObject.Evaluate()
 			if err != nil {
 				return nil, err
 			}
 		}
-		return objectValue, nil
+		return object, nil
 	})
 	return lazyResult, nil
 }

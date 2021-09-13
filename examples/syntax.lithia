@@ -16,6 +16,10 @@ enum Bool {
 
 // just 1
 
+let x Variable 1
+x.accept "Hallo"
+print x.current
+
 type Optional {
   Some: { some => print some.value },
   None: { _ => print "None" }

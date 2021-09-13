@@ -30,8 +30,16 @@ func (Function) RuntimeType() RuntimeType {
 	return PreludeFunctionType{}.RuntimeType()
 }
 
+func (f Function) Lookup(member string) (*LazyRuntimeValue, error) {
+	return nil, fmt.Errorf("function %s has no member %s", f, member)
+}
+
 func (CurriedCallable) RuntimeType() RuntimeType {
 	return PreludeFunctionType{}.RuntimeType()
+}
+
+func (f CurriedCallable) Lookup(member string) (*LazyRuntimeValue, error) {
+	return nil, fmt.Errorf("function %s has no member %s", f, member)
 }
 
 func (c CurriedCallable) Call(arguments []*LazyRuntimeValue) (RuntimeValue, error) {

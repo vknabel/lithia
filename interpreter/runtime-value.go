@@ -9,6 +9,7 @@ import (
 
 type RuntimeValue interface {
 	RuntimeType() RuntimeType
+	Lookup(name string) (*LazyRuntimeValue, error)
 }
 
 type RuntimeType struct {
@@ -91,6 +92,10 @@ func (d DataDeclRuntimeValue) RuntimeType() RuntimeType {
 	return PreludeAnyType{}.RuntimeType()
 }
 
+func (f DataDeclRuntimeValue) Lookup(member string) (*LazyRuntimeValue, error) {
+	return nil, fmt.Errorf("data type %s has no member %s", f, member)
+}
+
 type DataDeclField struct {
 	name   string
 	params []string
@@ -132,6 +137,14 @@ func (EnumDeclRuntimeValue) RuntimeType() RuntimeType {
 	return PreludeAnyType{}.RuntimeType()
 }
 
+func (e EnumDeclRuntimeValue) Lookup(member string) (*LazyRuntimeValue, error) {
+	if typeDecl, ok := e.cases[member]; ok {
+		return typeDecl, nil
+	} else {
+		return nil, fmt.Errorf("enum type %s has no member %s", fmt.Sprint(e), member)
+	}
+}
+
 type TypeExpression struct {
 	typeValue EnumDeclRuntimeValue
 	cases     map[string]*LazyRuntimeValue
@@ -139,4 +152,53 @@ type TypeExpression struct {
 
 func (TypeExpression) RuntimeType() RuntimeType {
 	return PreludeFunctionType{}.RuntimeType()
+}
+
+func (t TypeExpression) Lookup(member string) (*LazyRuntimeValue, error) {
+	return nil, fmt.Errorf("function %s has no member %s", fmt.Sprint(t), member)
+}
+
+type RuntimeVariable struct {
+	lock    *sync.RWMutex
+	current RuntimeValue
+}
+
+func (*RuntimeVariable) RuntimeType() RuntimeType {
+	return PreludeVariableType{}.RuntimeType()
+}
+
+func (v *RuntimeVariable) Lookup(member string) (*LazyRuntimeValue, error) {
+	switch member {
+	case "accept":
+		return NewConstantRuntimeValue(NewBuiltinFunction(
+			"accept",
+			[]string{"value"},
+			func(args []*LazyRuntimeValue) (RuntimeValue, error) {
+				return v.Accept(args[0])
+			},
+		)), nil
+	case "current":
+		return NewLazyRuntimeValue(func() (RuntimeValue, error) {
+			return v.Current()
+		}), nil
+	default:
+		return nil, fmt.Errorf("variable %s has no member %s", fmt.Sprint(v), member)
+	}
+}
+
+func (v *RuntimeVariable) Accept(lazyValue *LazyRuntimeValue) (RuntimeValue, error) {
+	value, err := lazyValue.Evaluate()
+	if err != nil {
+		return nil, err
+	}
+	v.lock.Lock()
+	defer v.lock.Unlock()
+	v.current = value
+	return value, nil
+}
+
+func (v *RuntimeVariable) Current() (RuntimeValue, error) {
+	v.lock.RLock()
+	defer v.lock.RUnlock()
+	return v.current, nil
 }
