@@ -22,6 +22,14 @@ type Function struct {
 	closure   *Environment
 }
 
+func (Function) RuntimeType() RuntimeType {
+	return PreludeFunctionType{}.RuntimeType()
+}
+
+func (CurriedCallable) RuntimeType() RuntimeType {
+	return PreludeFunctionType{}.RuntimeType()
+}
+
 func (c CurriedCallable) Call(arguments []*LazyRuntimeValue) (*LazyRuntimeValue, error) {
 	allArgs := append(c.args, arguments...)
 	if len(arguments) < c.remainingArity {
@@ -138,7 +146,11 @@ func (f Function) Call(arguments []*LazyRuntimeValue) (*LazyRuntimeValue, error)
 		if len(arguments) == len(f.arguments) {
 			return lastValue, nil
 		} else if function, ok := lastValue.(Callable); ok {
-			return function.Call(arguments[len(f.arguments)-1:])
+			lazyResult, err := function.Call(arguments[len(f.arguments)-1:])
+			if err != nil {
+				return nil, err
+			}
+			return lazyResult.Evaluate()
 		} else {
 			return nil, fmt.Errorf("function %s returns %s, which is not callable", f.name, lastValue)
 		}

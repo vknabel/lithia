@@ -51,17 +51,17 @@ func runPrompt() error {
 			return nil
 		}
 		if err != nil {
-			reporting.ReportError(1, err.Error())
+			reporting.ReportErrorOrPanic(err)
 			continue
 		}
 		lazyValue, err := runScript(line, interpreter)
 		if err != nil {
-			reporting.ReportError(1, err.Error())
+			reporting.ReportErrorOrPanic(err)
 			continue
 		}
 		value, err := lazyValue.Evaluate()
 		if err != nil {
-			reporting.ReportError(1, err.Error())
+			reporting.ReportErrorOrPanic(err)
 			continue
 		}
 		if value != nil {

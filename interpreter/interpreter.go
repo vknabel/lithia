@@ -1,7 +1,6 @@
 package interpreter
 
 import (
-	"fmt"
 	"reflect"
 	"sort"
 	"strconv"
@@ -22,7 +21,7 @@ func NewInterpreter() *Interpreter {
 
 func (interpreter *Interpreter) Interpret(script *sitter.Tree, source []byte) (*LazyRuntimeValue, error) {
 	if script.RootNode().Type() != parser.TYPE_NODE_SOURCE_FILE {
-		return nil, fmt.Errorf("expected source file, got node of type %s", script.RootNode().Type())
+		return nil, SyntaxErrorf(script.RootNode(), source, "expected source file, got node of type %s", script.RootNode().Type())
 	}
 	return interpreter.EvaluateSourceFile(script.RootNode(), source)
 }
@@ -60,7 +59,7 @@ func (interpreter *Interpreter) EvaluateLetDeclaration(letDecl *sitter.Node, sou
 	nameNode := letDecl.ChildByFieldName("name")
 	valueNode := letDecl.ChildByFieldName("value")
 	if nameNode == nil || valueNode == nil {
-		return nil, fmt.Errorf("let declaration must have name and value")
+		return nil, SyntaxErrorf(letDecl, source, "let declaration must have name and value")
 	}
 	lazyValue, err := interpreter.EvaluateNode(valueNode, source)
 	if err != nil {
@@ -118,11 +117,11 @@ func (interpreter *Interpreter) EvaluateDataDeclaration(dataDecl *sitter.Node, s
 			}
 			data.fields[i] = DataDeclField{name: name, params: parameters}
 		default:
-			return nil, fmt.Errorf("unexpected node type %s", child.Type())
+			return nil, SyntaxErrorf(child, source, "unexpected node type %s", child.Type())
 		}
 	}
 
-	constantValue := NewConstantRuntimeValue((data))
+	constantValue := NewConstantRuntimeValue(data)
 	interpreter.root.Declare(name, constantValue)
 	return constantValue, nil
 }
@@ -169,7 +168,7 @@ func (interpreter *Interpreter) EvaluateComplexInvocationExpr(expr *sitter.Node,
 	}
 	function, ok := reflect.ValueOf(functionValue).Interface().(Callable)
 	if !ok {
-		return nil, fmt.Errorf("expected callable, got %T", functionValue)
+		return nil, RuntimeErrorf(expr, source, "expected callable, got %T", functionValue)
 	}
 
 	args := make([]*LazyRuntimeValue, expr.ChildCount()-1)
@@ -205,7 +204,7 @@ func (interpreter *Interpreter) EvaluateEnumDeclaration(enumDecl *sitter.Node, s
 			caseName := child.Content(source)
 			lookedUp, _ := interpreter.root.Get(caseName)
 			if lookedUp == nil {
-				return nil, fmt.Errorf("undefined enum case %s", caseName)
+				return nil, RuntimeErrorf(child, source, "undefined enum case %s", caseName)
 			}
 			cases[caseName] = lookedUp
 		case parser.TYPE_NODE_DATA_DECLARATION:
@@ -223,7 +222,7 @@ func (interpreter *Interpreter) EvaluateEnumDeclaration(enumDecl *sitter.Node, s
 			}
 			cases[caseName] = runtimeValue
 		default:
-			return nil, fmt.Errorf("unexpected node type %s", child.Type())
+			return nil, SyntaxErrorf(child, source, "unexpected node type %s", child.Type())
 		}
 	}
 	constantValue := NewConstantRuntimeValue(EnumDeclRuntimeValue{
@@ -240,14 +239,14 @@ func (interpreter *Interpreter) EvaluateIdentifier(node *sitter.Node, source []b
 		if value, ok := interpreter.root.Get(string); ok {
 			return value.Evaluate()
 		} else {
-			return nil, fmt.Errorf("undefined identifier %s", string)
+			return nil, RuntimeErrorf(node, source, "undefined identifier %s", string)
 		}
 	}), nil
 }
 
 func (interpreter *Interpreter) EvaluateMemberAccess(node *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
 	if node.NamedChildCount() < 2 {
-		return nil, fmt.Errorf("expected at least 2 children, got %d", node.ChildCount())
+		return nil, SyntaxErrorf(node, source, "expected at least 2 children, got %d", node.ChildCount())
 	}
 	literalNode := node.Child(0)
 	lazyObject, err := interpreter.EvaluateNode(literalNode, source)
@@ -268,7 +267,7 @@ func (interpreter *Interpreter) EvaluateMemberAccess(node *sitter.Node, source [
 		for i := 0; i < len(keyPath); i++ {
 			object, ok := objectValue.(MemberAccessable)
 			if !ok {
-				return nil, fmt.Errorf("cannot access %s of %s", keyPath[i], objectValue)
+				return nil, RuntimeErrorf(node, source, "cannot access %s of %s", keyPath[i], objectValue)
 			}
 			objectValue, err = object.Lookup(keyPath[i])
 			if err != nil {
@@ -284,7 +283,7 @@ func (interpreter *Interpreter) EvaluateTypeExpression(node *sitter.Node, source
 	typeNode := node.ChildByFieldName("type")
 	bodyNode := node.ChildByFieldName("body")
 	if typeNode == nil || bodyNode == nil {
-		return nil, fmt.Errorf("expected type and body")
+		return nil, SyntaxErrorf(node, source, "expected type and body")
 	}
 	lazyTypeValue, err := interpreter.EvaluateNode(typeNode, source)
 	if err != nil {
@@ -298,7 +297,7 @@ func (interpreter *Interpreter) EvaluateTypeExpression(node *sitter.Node, source
 		labelNode := typeCaseNode.ChildByFieldName("label")
 		bodyNode := typeCaseNode.ChildByFieldName("body")
 		if labelNode == nil || bodyNode == nil {
-			return nil, fmt.Errorf("expected label and body")
+			return nil, SyntaxErrorf(typeCaseNode, source, "expected label and body")
 		}
 		if err != nil {
 			return nil, err
@@ -316,15 +315,15 @@ func (interpreter *Interpreter) EvaluateTypeExpression(node *sitter.Node, source
 		}
 		enumDecl, ok := typeValue.(EnumDeclRuntimeValue)
 		if !ok {
-			return nil, fmt.Errorf("expected enum type, got %s", typeValue)
+			return nil, RuntimeErrorf(node, source, "expected enum type, got %s", typeValue)
 		}
 		typeExpression := TypeExpression{typeValue: enumDecl, cases: typeCases}
 		if len(enumDecl.cases) != len(typeCases) {
-			return nil, fmt.Errorf("expected %d cases, got %d", len(enumDecl.cases), len(typeCases))
+			return nil, RuntimeErrorf(node, source, "expected %d cases, got %d", len(enumDecl.cases), len(typeCases))
 		}
 		for label := range typeCases {
 			if _, ok := enumDecl.cases[label]; !ok {
-				return nil, fmt.Errorf("undefined enum case %s", label)
+				return nil, RuntimeErrorf(node, source, "undefined enum case %s", label)
 			}
 		}
 		return typeExpression, nil
@@ -335,7 +334,7 @@ func (interpreter *Interpreter) EvaluateTypeExpression(node *sitter.Node, source
 func (interpreter *Interpreter) EvaluateGroup(node *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
 	expressionNode := node.ChildByFieldName("expression")
 	if expressionNode == nil {
-		return nil, fmt.Errorf("expected expression")
+		return nil, SyntaxErrorf(node, source, "expected expression")
 	}
 	return interpreter.EvaluateNode(expressionNode, source)
 }
@@ -345,15 +344,15 @@ func (interpreter *Interpreter) EvaluateStringLiteral(node *sitter.Node, source 
 	if err != nil {
 		return nil, err
 	}
-	return NewConstantRuntimeValue(string), nil
+	return NewConstantRuntimeValue(PreludeString(string)), nil
 }
 
 func (interpreter *Interpreter) EvaluateBinaryExpression(node *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
-	return nil, fmt.Errorf("unimplemented %d:%d", node.StartPoint().Row, node.StartPoint().Column)
+	return nil, SyntaxErrorf(node, source, "unimplemented")
 }
 
 func (interpreter *Interpreter) EvaluateUnaryExpression(node *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
-	return nil, fmt.Errorf("unimplemented %d:%d", node.StartPoint().Row, node.StartPoint().Column)
+	return nil, SyntaxErrorf(node, source, "unimplemented")
 }
 
 func (interpreter *Interpreter) ParseFunctionLiteral(node *sitter.Node, source []byte, env *Environment) (Function, error) {
@@ -383,7 +382,7 @@ func (interpreter *Interpreter) ParseFunctionLiteral(node *sitter.Node, source [
 		}
 	} else {
 		stmts = []*LazyRuntimeValue{}
-		return Function{}, fmt.Errorf("empty functions not implemented yet")
+		return Function{}, RuntimeErrorf(node, source, "empty functions not implemented yet")
 	}
 
 	return Function{
@@ -402,12 +401,10 @@ func (interpreter *Interpreter) EvaluateFunctionLiteral(node *sitter.Node, sourc
 }
 
 func (interpreter *Interpreter) EvaluateArrayLiteral(node *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
-	return nil, fmt.Errorf("unimplemented %d:%d", node.StartPoint().Row, node.StartPoint().Column)
+	return nil, SyntaxErrorf(node, source, "unimplemented")
 }
 
 func (interpreter *Interpreter) EvaluateNode(node *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
-	fmt.Printf("evaluating node of type %s\n", node.Type())
-
 	switch node.Type() {
 	case parser.TYPE_NODE_SOURCE_FILE:
 		return interpreter.EvaluateSourceFile(node, source)
@@ -460,6 +457,6 @@ func (interpreter *Interpreter) EvaluateNode(node *sitter.Node, source []byte) (
 	// case parser.TYPE_NODE_UNEXPECTED:
 	// 	return interpreter.Evaluate(node)
 	default:
-		return nil, fmt.Errorf("unimplemented node type %s", node.Type())
+		return nil, SyntaxErrorf(node, source, "unimplemented node type %s", node.Type())
 	}
 }

@@ -6,7 +6,15 @@ import (
 	"sync"
 )
 
-type RuntimeValue interface{}
+type RuntimeValue interface {
+	RuntimeType() RuntimeType
+}
+
+type RuntimeType struct {
+	name       string
+	modulePath []string
+	typeValue  *RuntimeValue
+}
 
 type LazyRuntimeValue struct {
 	once  *sync.Once
@@ -43,6 +51,10 @@ type DataDeclRuntimeValue struct {
 	fields []DataDeclField
 }
 
+func (d DataDeclRuntimeValue) RuntimeType() RuntimeType {
+	return PreludeAnyType{}.RuntimeType()
+}
+
 type DataDeclField struct {
 	name   string
 	params []string
@@ -51,6 +63,14 @@ type DataDeclField struct {
 type DataRuntimeValue struct {
 	typeValue *DataDeclRuntimeValue
 	members   map[string]*LazyRuntimeValue
+}
+
+func (d DataRuntimeValue) RuntimeType() RuntimeType {
+	var typeValue RuntimeValue = d.typeValue
+	return RuntimeType{
+		name:      d.typeValue.name,
+		typeValue: &typeValue,
+	}
 }
 
 func (d DataRuntimeValue) String() string {
@@ -72,7 +92,15 @@ type EnumDeclRuntimeValue struct {
 	cases map[string]*LazyRuntimeValue
 }
 
+func (EnumDeclRuntimeValue) RuntimeType() RuntimeType {
+	return PreludeAnyType{}.RuntimeType()
+}
+
 type TypeExpression struct {
 	typeValue EnumDeclRuntimeValue
 	cases     map[string]*LazyRuntimeValue
+}
+
+func (TypeExpression) RuntimeType() RuntimeType {
+	return PreludeFunctionType{}.RuntimeType()
 }
