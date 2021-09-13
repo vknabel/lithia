@@ -11,6 +11,7 @@ var (
 	TYPE_NODE_LET_DECLARATION               = "let_declaration"
 	TYPE_NODE_FUNCTION_DECLARATION          = "function_declaration"
 	TYPE_NODE_DATA_DECLARATION              = "data_declaration"
+	TYPE_NODE_EXTERN_DECLARATION            = "extern_declaration"
 	TYPE_NODE_DATA_PROPERTY_LIST            = "data_property_list"
 	TYPE_NODE_DATA_PROPERTY_VALUE           = "data_property_value"
 	TYPE_NODE_DATA_PROPERTY_FUNCTION        = "data_property_function"

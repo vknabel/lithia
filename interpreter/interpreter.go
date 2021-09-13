@@ -20,7 +20,7 @@ type Interpreter struct {
 func NewInterpreter() *Interpreter {
 	return &Interpreter{
 		path:        []string{},
-		environment: NewEnvironment(nil),
+		environment: NewEnvironment(NewPreludeEnvironment()),
 	}
 }
 
@@ -137,6 +137,10 @@ func (interpreter *Interpreter) EvaluateDataDeclaration(dataDecl *sitter.Node, s
 	return constantValue, nil
 }
 
+func (interpreter *Interpreter) EvaluateExternDeclaration(externDecl *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
+	return interpreter.EvaluateIdentifier(externDecl.ChildByFieldName("name"), source)
+}
+
 func (interpreter *Interpreter) ParseParamterList(list *sitter.Node, source []byte) ([]string, error) {
 	params := make([]string, list.ChildCount())
 	for i := 0; i < int(list.ChildCount()); i++ {
@@ -147,9 +151,9 @@ func (interpreter *Interpreter) ParseParamterList(list *sitter.Node, source []by
 }
 
 func (interpreter *Interpreter) ParseStatementList(list *sitter.Node, source []byte) ([]*LazyRuntimeValue, error) {
-	stmts := make([]*LazyRuntimeValue, list.ChildCount())
-	for i := 0; i < int(list.ChildCount()); i++ {
-		child := list.Child(i)
+	stmts := make([]*LazyRuntimeValue, list.NamedChildCount())
+	for i := 0; i < int(list.NamedChildCount()); i++ {
+		child := list.NamedChild(i)
 		stmt, err := interpreter.EvaluateNode(child, source)
 		if err != nil {
 			return nil, err
@@ -173,26 +177,28 @@ func (interpreter *Interpreter) EvaluateComplexInvocationExpr(expr *sitter.Node,
 	if err != nil {
 		return nil, err
 	}
-	functionValue, err := lazyFunc.Evaluate()
-	if err != nil {
-		return nil, err
-	}
-	function, ok := reflect.ValueOf(functionValue).Interface().(Callable)
-	if !ok {
-		return nil, RuntimeErrorf(expr, source, "expected callable, got %T", functionValue)
-	}
-
-	args := make([]*LazyRuntimeValue, expr.ChildCount()-1)
-	for i := 0; i < int(expr.ChildCount()-1); i++ {
-		child := expr.Child(i + 1)
-		lazyValue, err := interpreter.EvaluateNode(child, source)
+	return NewLazyRuntimeValue(func() (RuntimeValue, error) {
+		functionValue, err := lazyFunc.Evaluate()
 		if err != nil {
 			return nil, err
 		}
-		args[i] = lazyValue
-	}
+		function, ok := reflect.ValueOf(functionValue).Interface().(Callable)
+		if !ok {
+			return nil, RuntimeErrorf(expr, source, "expected callable, got %T", functionValue)
+		}
 
-	return function.Call(args)
+		args := make([]*LazyRuntimeValue, expr.NamedChildCount()-1)
+		for i := 0; i < int(expr.NamedChildCount()-1); i++ {
+			child := expr.NamedChild(i + 1)
+			lazyValue, err := interpreter.EvaluateNode(child, source)
+			if err != nil {
+				return nil, err
+			}
+			args[i] = lazyValue
+		}
+
+		return function.Call(args)
+	}), nil
 }
 
 func (interpreter *Interpreter) EvaluateSimpleInvocation(expr *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
@@ -258,9 +264,9 @@ func (interpreter *Interpreter) EvaluateIdentifier(node *sitter.Node, source []b
 
 func (interpreter *Interpreter) EvaluateMemberAccess(node *sitter.Node, source []byte) (*LazyRuntimeValue, error) {
 	if node.NamedChildCount() < 2 {
-		return nil, SyntaxErrorf(node, source, "expected at least 2 children, got %d", node.ChildCount())
+		return nil, SyntaxErrorf(node, source, "expected at least 2 children, got %d", node.NamedChildCount())
 	}
-	literalNode := node.Child(0)
+	literalNode := node.NamedChild(0)
 	lazyObject, err := interpreter.EvaluateNode(literalNode, source)
 	if err != nil {
 		return nil, err
@@ -441,6 +447,8 @@ func (interpreter *Interpreter) EvaluateNode(node *sitter.Node, source []byte) (
 		return interpreter.EvaluateFunctionDeclaration(node, source)
 	case parser.TYPE_NODE_DATA_DECLARATION:
 		return interpreter.EvaluateDataDeclaration(node, source)
+	case parser.TYPE_NODE_EXTERN_DECLARATION:
+		return interpreter.EvaluateExternDeclaration(node, source)
 	case parser.TYPE_NODE_ENUM_DECLARATION:
 		return interpreter.EvaluateEnumDeclaration(node, source)
 	case parser.TYPE_NODE_COMPLEX_INVOCATION_EXPRESSION:

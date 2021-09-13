@@ -6,7 +6,7 @@ import (
 )
 
 type Callable interface {
-	Call(arguments []*LazyRuntimeValue) (*LazyRuntimeValue, error)
+	Call(arguments []*LazyRuntimeValue) (RuntimeValue, error)
 }
 
 type CurriedCallable struct {
@@ -34,7 +34,7 @@ func (CurriedCallable) RuntimeType() RuntimeType {
 	return PreludeFunctionType{}.RuntimeType()
 }
 
-func (c CurriedCallable) Call(arguments []*LazyRuntimeValue) (*LazyRuntimeValue, error) {
+func (c CurriedCallable) Call(arguments []*LazyRuntimeValue) (RuntimeValue, error) {
 	allArgs := append(c.args, arguments...)
 	if len(arguments) < c.remainingArity {
 		lazy := NewLazyRuntimeValue(func() (RuntimeValue, error) {
@@ -44,13 +44,13 @@ func (c CurriedCallable) Call(arguments []*LazyRuntimeValue) (*LazyRuntimeValue,
 				remainingArity: c.remainingArity - len(arguments),
 			}, nil
 		})
-		return lazy, nil
+		return lazy.Evaluate()
 	} else {
 		return c.actual.Call(allArgs)
 	}
 }
 
-func (dataDecl DataDeclRuntimeValue) Call(arguments []*LazyRuntimeValue) (*LazyRuntimeValue, error) {
+func (dataDecl DataDeclRuntimeValue) Call(arguments []*LazyRuntimeValue) (RuntimeValue, error) {
 	if len(arguments) < len(dataDecl.fields) {
 		lazy := NewLazyRuntimeValue(func() (RuntimeValue, error) {
 			return CurriedCallable{
@@ -59,7 +59,7 @@ func (dataDecl DataDeclRuntimeValue) Call(arguments []*LazyRuntimeValue) (*LazyR
 				remainingArity: len(dataDecl.fields) - len(arguments),
 			}, nil
 		})
-		return lazy, nil
+		return lazy.Evaluate()
 	} else if len(arguments) == len(dataDecl.fields) {
 		members := make(map[string]*LazyRuntimeValue, len(dataDecl.fields))
 		for i, field := range dataDecl.fields {
@@ -70,16 +70,16 @@ func (dataDecl DataDeclRuntimeValue) Call(arguments []*LazyRuntimeValue) (*LazyR
 			typeValue: &dataDecl,
 			members:   members,
 		}
-		return NewConstantRuntimeValue(instance), nil
+		return instance, nil
 	} else {
 		// error
 		return nil, fmt.Errorf("too many arguments")
 	}
 }
 
-func (typeExpr TypeExpression) Call(arguments []*LazyRuntimeValue) (*LazyRuntimeValue, error) {
+func (typeExpr TypeExpression) Call(arguments []*LazyRuntimeValue) (RuntimeValue, error) {
 	if len(arguments) == 0 {
-		return NewConstantRuntimeValue(typeExpr), nil
+		return typeExpr, nil
 	}
 	lazyValueArgument := arguments[0]
 	valueArgument, err := lazyValueArgument.Evaluate()
@@ -112,13 +112,13 @@ func (typeExpr TypeExpression) Call(arguments []*LazyRuntimeValue) (*LazyRuntime
 	return nil, fmt.Errorf("no matching case")
 }
 
-func (f Function) Call(arguments []*LazyRuntimeValue) (*LazyRuntimeValue, error) {
+func (f Function) Call(arguments []*LazyRuntimeValue) (RuntimeValue, error) {
 	if len(arguments) < len(f.arguments) {
-		return NewConstantRuntimeValue(CurriedCallable{
+		return CurriedCallable{
 			actual:         f,
 			args:           arguments,
 			remainingArity: len(f.arguments) - len(arguments),
-		}), nil
+		}, nil
 	}
 	for i, argName := range f.arguments {
 		err := f.closure.environment.Declare(argName, arguments[i])
@@ -126,32 +126,32 @@ func (f Function) Call(arguments []*LazyRuntimeValue) (*LazyRuntimeValue, error)
 			return nil, err
 		}
 	}
-	return NewLazyRuntimeValue(func() (RuntimeValue, error) {
-		var (
-			lastValue RuntimeValue
-			err       error
-		)
-		statements, err := f.body(f.closure)
+
+	var (
+		lastValue RuntimeValue
+		err       error
+	)
+	statements, err := f.body(f.closure)
+	if err != nil {
+		return nil, err
+	}
+	for _, statement := range statements {
+		lastValue, err = statement.Evaluate()
 		if err != nil {
 			return nil, err
 		}
-		for _, statement := range statements {
-			lastValue, err = statement.Evaluate()
-			if err != nil {
-				return nil, err
-			}
-		}
+	}
 
-		if len(arguments) == len(f.arguments) {
-			return lastValue, nil
-		} else if function, ok := lastValue.(Callable); ok {
-			lazyResult, err := function.Call(arguments[len(f.arguments)-1:])
-			if err != nil {
-				return nil, err
-			}
-			return lazyResult.Evaluate()
-		} else {
-			return nil, fmt.Errorf("function %s returns %s, which is not callable", f.name, lastValue)
+	if len(arguments) == len(f.arguments) {
+		return lastValue, nil
+	} else if function, ok := lastValue.(Callable); ok {
+		lazyResult, err := function.Call(arguments[len(f.arguments)-1:])
+		if err != nil {
+			return nil, err
 		}
-	}), nil
+		return lazyResult, nil
+	} else {
+		return nil, fmt.Errorf("function %s returns %s, which is not callable", f.name, lastValue)
+	}
+
 }
