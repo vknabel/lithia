@@ -12,12 +12,15 @@ import (
 )
 
 type Interpreter struct {
-	name                 string
-	mainExecutionContext *ExecutionContext
+	parser                  *parser.Parser
+	cachedExecutionContexts map[string]*ExecutionContext
 }
 
 func NewInterpreter() *Interpreter {
-	return &Interpreter{}
+	return &Interpreter{
+		parser:                  parser.NewParser(),
+		cachedExecutionContexts: make(map[string]*ExecutionContext),
+	}
 }
 
 type ExecutionContext struct {
@@ -64,12 +67,39 @@ func (i *ExecutionContext) ChildNodeExecutionContext(childNode *sitter.Node) *Ex
 	}
 }
 
-func (i *Interpreter) Interpret(fileName string, script *sitter.Tree, source []byte) (*LazyRuntimeValue, error) {
-	ex := NewExecutionContext(fileName, script.RootNode(), source)
-	if script.RootNode().Type() != parser.TYPE_NODE_SOURCE_FILE {
-		return nil, ex.SyntaxErrorf("expected source file, got node of type %s", script.RootNode().Type())
+func (inter *Interpreter) Interpret(fileName string, script string) (*LazyRuntimeValue, error) {
+	ex, err := inter.LoadContext(fileName, script)
+	if err != nil {
+		return nil, err
 	}
 	return ex.EvaluateSourceFile()
+}
+
+func (inter *Interpreter) LoadContext(fileName string, script string) (*ExecutionContext, error) {
+	tree, error := inter.parser.Parse(script)
+	if error != nil {
+		return nil, error
+	}
+	ex := NewExecutionContext(fileName, tree.RootNode(), []byte(script))
+	if context, ok := inter.cachedExecutionContexts[fileName]; ok {
+		ex.functionCount = context.functionCount
+		ex.environment = context.environment
+	}
+	inter.cachedExecutionContexts[fileName] = ex
+	return ex, nil
+}
+
+func (inter *Interpreter) LoadContextIfNeeded(fileName string, script string) (*ExecutionContext, error) {
+	if context, ok := inter.cachedExecutionContexts[fileName]; ok {
+		return context, nil
+	}
+	tree, error := inter.parser.Parse(script)
+	if error != nil {
+		return nil, error
+	}
+	ex := NewExecutionContext(fileName, tree.RootNode(), []byte(script))
+	inter.cachedExecutionContexts[fileName] = ex
+	return ex, nil
 }
 
 func (ex *ExecutionContext) EvaluateSourceFile() (*LazyRuntimeValue, error) {

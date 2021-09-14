@@ -6,9 +6,7 @@ import (
 	"io"
 	"os"
 
-	sitter "github.com/smacker/go-tree-sitter"
 	"github.com/vknabel/go-lithia/interpreter"
-	"github.com/vknabel/go-lithia/parser"
 	"github.com/vknabel/go-lithia/reporting"
 )
 
@@ -38,7 +36,7 @@ func runFile(fileName string) error {
 	}
 	inter := interpreter.NewInterpreter()
 	script := string(scriptData)
-	_, err = runScript(fileName, script, inter)
+	_, err = inter.Interpret(fileName, script)
 	return err
 }
 
@@ -55,7 +53,7 @@ func runPrompt() error {
 			reporting.ReportErrorOrPanic(err)
 			continue
 		}
-		lazyValue, err := runScript("prompt", line, inter)
+		lazyValue, err := inter.Interpret("prompt", line)
 		if err != nil {
 			reporting.ReportErrorOrPanic(err)
 			continue
@@ -69,22 +67,4 @@ func runPrompt() error {
 			fmt.Println(value)
 		}
 	}
-}
-
-func runScript(fileName string, script string, interpreter *interpreter.Interpreter) (*interpreter.LazyRuntimeValue, error) {
-	tree, err := parse(script)
-	if err != nil {
-		return nil, err
-	}
-	value, err := interpreter.Interpret(fileName, tree, []byte(script))
-	if err != nil {
-		return nil, err
-	}
-	return value, nil
-}
-
-func parse(script string) (*sitter.Tree, error) {
-	parser := parser.NewParser()
-	tree, error := parser.Parse(script)
-	return tree, error
 }
