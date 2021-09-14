@@ -29,7 +29,7 @@ func test { case, function =>
     testCases.accept (lists.append (TestCase case, function), testCases.current)
 }
 
-func runTests { testCases =>
+func runTests { =>
     print "TAP version 13"
     print strings.concat [
         "1..",

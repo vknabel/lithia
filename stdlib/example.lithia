@@ -39,4 +39,4 @@ tests.test "when true succeeds", { fail =>
 }
 
 
-when tests.enabled, tests.runTests tests.testCases
+when tests.enabled, tests.runTests
