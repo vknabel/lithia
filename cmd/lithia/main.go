@@ -36,7 +36,7 @@ func runFile(fileName string) error {
 		return err
 	}
 	inter := interpreter.NewInterpreter(path.Dir(fileName))
-	script := string(scriptData)
+	script := string(scriptData) + "\n"
 	_, err = inter.Interpret(fileName, script)
 	return err
 }

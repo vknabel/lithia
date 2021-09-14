@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	sitter "github.com/smacker/go-tree-sitter"
-	"github.com/vknabel/go-lithia/reporting"
 )
 
 type SyntaxError struct {
@@ -24,12 +23,7 @@ func (ex *ExecutionContext) SyntaxErrorf(format string, args ...interface{}) Syn
 }
 
 func (e SyntaxError) Error() string {
-	return fmt.Sprintf("%s syntax error: %s", e.SourceLocation(), e.Message)
-}
-
-func (e SyntaxError) SourceLocation() string {
-	var _ reporting.LocatableError = e
-	return fmt.Sprintf("%s:%d:%d", e.ModuleFile.name, e.Node.StartPoint().Row+1, e.Node.StartPoint().Column)
+	return FormatNodeErrorMessage("syntax error", e.Message, e.ModuleFile.name, e.Node, string(e.Source))
 }
 
 type RuntimeError struct {
@@ -49,10 +43,5 @@ func (ex *ExecutionContext) RuntimeErrorf(format string, args ...interface{}) Ru
 }
 
 func (e RuntimeError) Error() string {
-	return fmt.Sprintf("%s runtime error: %s", e.SourceLocation(), e.Message)
-}
-
-func (e RuntimeError) SourceLocation() string {
-	var _ reporting.LocatableError = e
-	return fmt.Sprintf("%s:%d:%d", e.ModuleFile.name, e.Node.StartPoint().Row+1, e.Node.StartPoint().Column)
+	return FormatNodeErrorMessage("runtime error", e.Message, e.ModuleFile.name, e.Node, string(e.Source))
 }

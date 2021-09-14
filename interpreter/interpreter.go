@@ -145,7 +145,7 @@ func (inter *Interpreter) LoadContext(fileName string, script string) (*Executio
 	}
 	tree, err := inter.parser.Parse(script)
 	if err != nil {
-		return nil, fmt.Errorf("%s: %s", fileName, err.Error())
+		return nil, inter.SyntaxParsingError(fileName, script, tree)
 	}
 	var module *Module
 	if existingModule, ok := inter.modules[moduleFile.module]; ok {

@@ -40,6 +40,7 @@ var (
 
 	// errors
 	TYPE_NODE_ERROR      = "ERROR"
+	TYPE_NODE_MISSING    = "MISSING"
 	TYPE_NODE_UNEXPECTED = "UNEXPECTED"
 )
 
@@ -78,6 +79,7 @@ type NodeVisitor interface {
 
 	// errors error
 	AcceptError(error *sitter.Node) (interface{}, error)
+	AcceptMissing(missing *sitter.Node) (interface{}, error)
 	AcceptUnexpected(unexpected *sitter.Node) (interface{}, error)
 	AcceptUnknown(unknown *sitter.Node) (interface{}, error)
 }
@@ -148,6 +150,8 @@ func Accept(visitor NodeVisitor, node *sitter.Node) (interface{}, error) {
 	// error
 	case TYPE_NODE_ERROR:
 		return visitor.AcceptError(node)
+	case TYPE_NODE_MISSING:
+		return visitor.AcceptMissing(node)
 	case TYPE_NODE_UNEXPECTED:
 		return visitor.AcceptUnexpected(node)
 

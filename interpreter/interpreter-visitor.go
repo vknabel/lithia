@@ -170,6 +170,10 @@ func (i *ExecutionContext) AcceptError(error *sitter.Node) (interface{}, error) 
 	return nil, nil
 }
 
+func (i *ExecutionContext) AcceptMissing(error *sitter.Node) (interface{}, error) {
+	return nil, nil
+}
+
 func (i *ExecutionContext) AcceptUnexpected(unexpected *sitter.Node) (interface{}, error) {
 	return nil, nil
 }
