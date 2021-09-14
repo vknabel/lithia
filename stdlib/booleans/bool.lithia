@@ -1,10 +1,6 @@
 package booleans
 
-let Bool = prelude.Bool
-let True = prelude.True
-let False = prelude.False
-
-package tests
+import tests
 
 describe "optional", { it =>
   it "can have some value", { _ =>

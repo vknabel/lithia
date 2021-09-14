@@ -5,18 +5,31 @@ import (
 	"os"
 )
 
-func NewPreludeEnvironment() *Environment {
+func (inter *Interpreter) NewPreludeEnvironment() *Environment {
+	if inter.prelude != nil {
+		return inter.prelude
+	}
 	env := NewEnvironment(nil)
+	inter.prelude = env
 	env.Declare("Int", NewConstantRuntimeValue(PreludeInt(0)))
 	env.Declare("Float", NewConstantRuntimeValue(PreludeFloat(0.0)))
 	env.Declare("String", NewConstantRuntimeValue(PreludeString("")))
 	env.Declare("Rune", NewConstantRuntimeValue(PreludeRune('r')))
 	env.Declare("Function", NewConstantRuntimeValue(PreludeFunctionType{}))
 	env.Declare("Variable", NewConstantRuntimeValue(PreludeVariableType{}))
+	env.Declare("Module", NewConstantRuntimeValue(PreludeModuleType{}))
 	env.Declare("Any", NewConstantRuntimeValue(PreludeAnyType{}))
 
 	env.Declare("print", NewConstantRuntimeValue(builtinPrint))
 	env.Declare("osExit", NewConstantRuntimeValue(builtinOsExit))
+
+	if module, err := inter.LoadModule(ModuleName{name: "prelude"}, "."); err == nil {
+		env.Parent = &Environment{Parent: nil, Scope: module.environment.Scope, Unexported: module.environment.Unexported}
+		// for member, value := range module.environment.Scope {
+		// 	env.Declare(member, value)
+		// }
+	}
+
 	return env
 }
 

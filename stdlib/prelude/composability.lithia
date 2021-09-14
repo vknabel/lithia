@@ -8,11 +8,11 @@ package prelude
  * @param initial
  * @param list
  */
-func reduceList { accumulator initial list =>
+func reduceList { accumulator, initial, list =>
     type List {
         Cons: { cons =>
-            let accumulatedRest = reduceList accumulator initial cons.tail
-            accumulator accumulatedRest cons.head
+            let accumulatedRest = (reduceList accumulator, initial, cons.tail)
+            accumulator accumulatedRest, cons.head
         },
         Nil: { nil => initial }
     }
@@ -25,8 +25,8 @@ func reduceList { accumulator initial list =>
  * @param functions
  * @param initial
  */
-func pipe { functions initial =>
-    reduceList { into next => next into } initial functions
+func pipe { functions, initial =>
+    reduceList { into, next => next into }, initial, functions
 }
 
 /**

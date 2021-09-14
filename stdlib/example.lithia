@@ -1,25 +1,5 @@
 package example
 
-import some.package
-import other.pack {
-    a, b, c
-}
+import monads
 
-enum Abc {
-    A
-    data B { }
-    enum C {
-        data D { }
-    }
-}
-data A {
-    a b, c
-    d
-}
-
-simple invocation
-complex invocation, with params
-
-import tests
-
-func mainTests { => tests.runAllTests }
+when True, print "Hello!"

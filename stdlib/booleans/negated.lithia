@@ -1,8 +1,8 @@
 package booleans
 
-func negated { =>
+func negated { flag =>
   type Bool {
     True: { _ => False },
     False: { _ => True }
-  }
+  } flag
 }

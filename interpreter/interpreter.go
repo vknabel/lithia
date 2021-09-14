@@ -17,6 +17,7 @@ type Interpreter struct {
 	importRoot string
 	parser     *parser.Parser
 	modules    map[ModuleName]*Module
+	prelude    *Environment
 }
 
 func NewInterpreter(importRoot string) *Interpreter {
@@ -48,6 +49,7 @@ type ExecutionContext struct {
 	path          []string
 	environment   *Environment
 	functionCount int
+	evaluatedNode *LazyRuntimeValue
 
 	node   *sitter.Node
 	source []byte
@@ -55,7 +57,7 @@ type ExecutionContext struct {
 
 func (inter *Interpreter) NewExecutionContext(moduleFile ModuleFile, node *sitter.Node, source []byte, environment *Environment) *ExecutionContext {
 	if environment == nil {
-		environment = NewEnvironment(NewPreludeEnvironment())
+		environment = NewEnvironment(inter.NewPreludeEnvironment())
 	}
 	return &ExecutionContext{
 		interpreter:   inter,
@@ -137,13 +139,13 @@ func (ex *ExecutionContext) ModuleName(modulePath []string) ModuleName {
 }
 
 func (inter *Interpreter) LoadContext(fileName string, script string) (*ExecutionContext, error) {
-	tree, error := inter.parser.Parse(script)
-	if error != nil {
-		return nil, error
-	}
 	moduleFile, err := inter.NormalizedModuleFile(fileName)
 	if err != nil {
 		return nil, err
+	}
+	tree, err := inter.parser.Parse(script)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %s", fileName, err.Error())
 	}
 	var module *Module
 	if existingModule, ok := inter.modules[moduleFile.module]; ok {
@@ -151,7 +153,7 @@ func (inter *Interpreter) LoadContext(fileName string, script string) (*Executio
 	} else {
 		module = &Module{
 			name:              moduleFile.module,
-			environment:       NewEnvironment(NewPreludeEnvironment()),
+			environment:       NewEnvironment(inter.NewPreludeEnvironment()),
 			executionContexts: make(map[ModuleFile]*ExecutionContext),
 		}
 		inter.modules[moduleFile.module] = module
@@ -211,34 +213,30 @@ func (ex *ExecutionContext) EvaluatePackage() (*LazyRuntimeValue, error) {
 	return runtimeModule, nil
 }
 
-func (ex *ExecutionContext) EvaluateImport() (*LazyRuntimeValue, error) {
-	importModuleNode := ex.node.ChildByFieldName("name")
-	modulePath := make([]string, importModuleNode.NamedChildCount())
-	for i := 0; i < int(importModuleNode.NamedChildCount()); i++ {
-		modulePath[i] = importModuleNode.NamedChild(i).Content(ex.source)
-	}
-	importMember := modulePath[len(modulePath)-1]
-	absoluteModuleName := ex.ModuleName(modulePath)
+func (inter *Interpreter) LoadModule(absoluteModuleName ModuleName, parentPath string) (*Module, error) {
+	childModulePath := filepath.Join(inter.importRoot, parentPath, absoluteModuleName.name)
 
-	childModulePath := filepath.Join(ex.interpreter.importRoot, ex.moduleFile.parentPath, absoluteModuleName.name)
+	if module, ok := inter.modules[absoluteModuleName]; ok {
+		return module, nil
+	}
 
 	if _, err := os.Stat(childModulePath); os.IsNotExist(err) {
 		// rootModulePath := path.Join(ex.interpreter.importRoot, childModulePath)
-		return nil, ex.SyntaxErrorf("root module import not implemented")
+		return nil, fmt.Errorf("root module import not implemented")
 	}
 	matches, err := filepath.Glob(filepath.Join(childModulePath, "*.lithia"))
 	if err != nil {
 		return nil, err
 	}
 	if len(matches) == 0 {
-		return nil, ex.SyntaxErrorf("root module import not implemented")
+		return nil, fmt.Errorf("root module import not implemented")
 	}
 	for _, match := range matches {
 		scriptData, err := os.ReadFile(match)
 		if err != nil {
 			return nil, err
 		}
-		childContext, err := ex.interpreter.LoadContextIfNeeded(match, string(scriptData))
+		childContext, err := inter.LoadContextIfNeeded(match, string(scriptData))
 		if err != nil {
 			return nil, err
 		}
@@ -251,12 +249,30 @@ func (ex *ExecutionContext) EvaluateImport() (*LazyRuntimeValue, error) {
 			return nil, err
 		}
 	}
-	importedModule := ex.interpreter.modules[absoluteModuleName]
+	importedModule := inter.modules[absoluteModuleName]
 	if importedModule == nil {
-		return nil, ex.SyntaxErrorf("module imported but not found")
+		return nil, fmt.Errorf("module imported but not found")
+	}
+	return importedModule, nil
+}
+
+func (ex *ExecutionContext) EvaluateImport() (*LazyRuntimeValue, error) {
+	importModuleNode := ex.node.ChildByFieldName("name")
+	modulePath := make([]string, importModuleNode.NamedChildCount())
+	for i := 0; i < int(importModuleNode.NamedChildCount()); i++ {
+		modulePath[i] = importModuleNode.NamedChild(i).Content(ex.source)
+	}
+	importMember := modulePath[len(modulePath)-1]
+	absoluteModuleName := ex.ModuleName(modulePath)
+	importedModule, err := ex.interpreter.LoadModule(absoluteModuleName, ex.moduleFile.parentPath)
+	if err != nil {
+		return nil, ex.SyntaxErrorf("error importing module %s: %s", absoluteModuleName, err.Error())
 	}
 	runtimeModule := NewConstantRuntimeValue(RuntimeModule{module: importedModule})
-	ex.environment.DeclareUnexported(importMember, runtimeModule)
+	err = ex.environment.DeclareUnexported(importMember, runtimeModule)
+	if err != nil {
+		return nil, err
+	}
 	return runtimeModule, nil
 }
 
@@ -445,12 +461,34 @@ func (ex *ExecutionContext) EvaluateEnumDeclaration() (*LazyRuntimeValue, error)
 }
 
 func (ex *ExecutionContext) EvaluateIdentifier() (*LazyRuntimeValue, error) {
-	string := ex.node.Content(ex.source)
+	content := ex.node.Content(ex.source)
 	return NewLazyRuntimeValue(func() (RuntimeValue, error) {
-		if value, ok := ex.environment.Get(string); ok {
-			return value.Evaluate()
+		if lazyValue, ok := ex.environment.Get(content); ok {
+			value, err := lazyValue.Evaluate()
+			if err != nil {
+				return nil, err
+			}
+			switch value := value.(type) {
+			case DataDeclRuntimeValue:
+				if len(value.fields) == 0 {
+					return DataRuntimeValue{
+						typeValue: &value,
+						members:   make(map[string]*LazyRuntimeValue),
+					}, nil
+				} else {
+					return value, nil
+				}
+			case Function:
+				if len(value.arguments) == 0 {
+					return value.Call(nil)
+				} else {
+					return value, nil
+				}
+			default:
+				return value, nil
+			}
 		} else {
-			return nil, ex.RuntimeErrorf("undefined identifier %s", string)
+			return nil, ex.RuntimeErrorf("undefined identifier %s", content)
 		}
 	}), nil
 }

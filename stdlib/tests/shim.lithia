@@ -1,11 +1,6 @@
 package tests
 
 import strings
-import rx
-
-let latestTestNumber = rx.variable 0
-
-let latestHarness = rx.variable []
 
 data Harness {
     testCases

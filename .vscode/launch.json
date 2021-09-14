@@ -5,6 +5,16 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "Launch lithia stdlib",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/cmd/lithia/main.go",
+            "args": [
+                "${workspaceFolder}/stdlib/example.lithia"
+            ]
+        },
+        {
             "name": "Launch lithia",
             "type": "go",
             "request": "launch",
