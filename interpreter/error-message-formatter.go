@@ -14,6 +14,6 @@ func FormatNodeErrorMessage(kind string, message string, fileName string, node *
 	errorPrefix := strings.Repeat(" ", int(node.StartPoint().Column))
 	currentError += fmt.Sprintln(minErrorPrefix + lines[node.StartPoint().Row])
 	currentError += fmt.Sprintln(minErrorPrefix + errorPrefix + "^")
-	currentError += fmt.Sprintln(errorPrefix + message)
+	currentError += fmt.Sprintln(minErrorPrefix + message)
 	return currentError
 }
