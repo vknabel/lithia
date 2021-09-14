@@ -1,6 +1,8 @@
 package example
 
 import tests
+import lists
+import strings
 
 tests.test "booleans are cool", { fail =>
     with True, type Bool {
@@ -12,7 +14,7 @@ tests.test "booleans are cool", { fail =>
 }
 
 tests.test "strings.concat rocks", { fail =>
-    fail "not implemented"
+    fail strings.concat ["oops there are no ", "comparisions"]
 }
 
 when tests.enabled, tests.runTests tests.testCases

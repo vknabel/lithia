@@ -1,0 +1,7 @@
+package strings
+
+import lists
+
+func concat { listOfStrings =>
+    lists.reduce { into, next => into.append next }, "", listOfStrings
+}

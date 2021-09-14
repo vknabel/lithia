@@ -697,7 +697,56 @@ func (ex *ExecutionContext) EvaluateFunctionLiteral() (*LazyRuntimeValue, error)
 }
 
 func (ex *ExecutionContext) EvaluateArrayLiteral() (*LazyRuntimeValue, error) {
-	return nil, ex.SyntaxErrorf("unimplemented")
+	numberOfElements := int(ex.node.NamedChildCount())
+	elements := make([]*LazyRuntimeValue, numberOfElements)
+	for i := 0; i < numberOfElements; i++ {
+		elementNode := ex.node.NamedChild(i)
+		lazyElement, err := ex.ChildNodeExecutionContext(elementNode).EvaluateNode()
+		if err != nil {
+			return nil, err
+		}
+		elements[i] = lazyElement
+	}
+	return NewLazyRuntimeValue(func() (RuntimeValue, error) {
+		var (
+			cons       DataDeclRuntimeValue
+			runtimeNil DataDeclRuntimeValue
+		)
+		if lazyConsValue, ok := ex.environment.Get("Cons"); ok {
+			consValue, err := lazyConsValue.Evaluate()
+			if err != nil {
+				return nil, err
+			}
+			cons = consValue.(DataDeclRuntimeValue)
+		}
+		if lazyNilValue, ok := ex.environment.Get("Nil"); ok {
+			nilValue, err := lazyNilValue.Evaluate()
+			if err != nil {
+				return nil, err
+			}
+			runtimeNil = nilValue.(DataDeclRuntimeValue)
+		}
+		return SliceToList(cons, runtimeNil, elements), nil
+	}), nil
+}
+
+func SliceToList(consDecl DataDeclRuntimeValue, nilDecl DataDeclRuntimeValue, slice []*LazyRuntimeValue) RuntimeValue {
+	if len(slice) == 0 {
+		return DataRuntimeValue{
+			typeValue: &nilDecl,
+			members:   make(map[string]*LazyRuntimeValue),
+		}
+	} else {
+		return DataRuntimeValue{
+			typeValue: &consDecl,
+			members: map[string]*LazyRuntimeValue{
+				"head": slice[0],
+				"tail": NewLazyRuntimeValue(func() (RuntimeValue, error) {
+					return SliceToList(consDecl, nilDecl, slice[1:]), nil
+				}),
+			},
+		}
+	}
 }
 
 func (ex *ExecutionContext) EvaluateNode() (*LazyRuntimeValue, error) {
