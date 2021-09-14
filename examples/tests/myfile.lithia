@@ -1,0 +1,7 @@
+package tests
+
+func test { message, case =>
+    print "TAP"
+    print message
+    case
+}

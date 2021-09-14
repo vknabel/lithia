@@ -3,7 +3,6 @@ package interpreter
 import (
 	"fmt"
 	"os"
-	"path"
 	"path/filepath"
 	"reflect"
 	"sort"
@@ -15,22 +14,37 @@ import (
 )
 
 type Interpreter struct {
-	importRoot              string
-	parser                  *parser.Parser
-	cachedExecutionContexts map[string]*ExecutionContext
+	importRoot string
+	parser     *parser.Parser
+	modules    map[ModuleName]*Module
 }
 
 func NewInterpreter(importRoot string) *Interpreter {
 	return &Interpreter{
-		importRoot:              importRoot,
-		parser:                  parser.NewParser(),
-		cachedExecutionContexts: make(map[string]*ExecutionContext),
+		importRoot: importRoot,
+		parser:     parser.NewParser(),
+		modules:    make(map[ModuleName]*Module),
 	}
+}
+
+type ModuleName struct {
+	name string
+}
+type ModuleFile struct {
+	name       string
+	parentPath string
+	module     ModuleName
+}
+
+type Module struct {
+	name              ModuleName
+	environment       *Environment
+	executionContexts map[ModuleFile]*ExecutionContext
 }
 
 type ExecutionContext struct {
 	interpreter   *Interpreter
-	fileName      string
+	moduleFile    ModuleFile
 	path          []string
 	environment   *Environment
 	functionCount int
@@ -39,12 +53,15 @@ type ExecutionContext struct {
 	source []byte
 }
 
-func (inter *Interpreter) NewExecutionContext(fileName string, node *sitter.Node, source []byte) *ExecutionContext {
+func (inter *Interpreter) NewExecutionContext(moduleFile ModuleFile, node *sitter.Node, source []byte, environment *Environment) *ExecutionContext {
+	if environment == nil {
+		environment = NewEnvironment(NewPreludeEnvironment())
+	}
 	return &ExecutionContext{
 		interpreter:   inter,
-		fileName:      fileName,
+		moduleFile:    moduleFile,
 		path:          []string{},
-		environment:   NewEnvironment(NewPreludeEnvironment()),
+		environment:   environment,
 		functionCount: 0,
 
 		node:   node,
@@ -54,7 +71,8 @@ func (inter *Interpreter) NewExecutionContext(fileName string, node *sitter.Node
 
 func (i *ExecutionContext) NestedExecutionContext(name string) *ExecutionContext {
 	return &ExecutionContext{
-		fileName:      i.fileName,
+		interpreter:   i.interpreter,
+		moduleFile:    i.moduleFile,
 		path:          append(i.path, name),
 		environment:   NewEnvironment(i.environment),
 		functionCount: 0,
@@ -65,7 +83,8 @@ func (i *ExecutionContext) NestedExecutionContext(name string) *ExecutionContext
 
 func (i *ExecutionContext) ChildNodeExecutionContext(childNode *sitter.Node) *ExecutionContext {
 	return &ExecutionContext{
-		fileName:      i.fileName,
+		interpreter:   i.interpreter,
+		moduleFile:    i.moduleFile,
 		path:          i.path,
 		environment:   i.environment,
 		functionCount: i.functionCount,
@@ -86,31 +105,72 @@ func (inter *Interpreter) Interpret(fileName string, script string) (RuntimeValu
 	return lazyValue.Evaluate()
 }
 
+func (inter *Interpreter) NormalizedModuleFile(fileName string) (ModuleFile, error) {
+	name := filepath.Dir(fileName)
+	relativeModulePath, err := filepath.Rel(inter.importRoot, name)
+	if err != nil {
+		// TODO: Might be unrelated later
+		return ModuleFile{}, err
+	}
+	modulePath := filepath.SplitList(relativeModulePath)
+	return ModuleFile{
+		name:       name,
+		parentPath: relativeModulePath,
+		module: ModuleName{
+			name: strings.Join(modulePath, "."),
+		},
+	}, nil
+}
+
+func (ex *ExecutionContext) ModuleName(modulePath []string) ModuleName {
+	relativePath := append([]string{ex.moduleFile.module.name}, modulePath...)
+	relative := ModuleName{
+		name: strings.Join(relativePath, "."),
+	}
+	if ex.interpreter.modules[relative] != nil {
+		return relative
+	} else {
+		return ModuleName{
+			name: strings.Join(modulePath, "."),
+		}
+	}
+}
+
 func (inter *Interpreter) LoadContext(fileName string, script string) (*ExecutionContext, error) {
 	tree, error := inter.parser.Parse(script)
 	if error != nil {
 		return nil, error
 	}
-	ex := inter.NewExecutionContext(fileName, tree.RootNode(), []byte(script))
-	if context, ok := inter.cachedExecutionContexts[fileName]; ok {
-		ex.functionCount = context.functionCount
-		ex.environment = context.environment
+	moduleFile, err := inter.NormalizedModuleFile(fileName)
+	if err != nil {
+		return nil, err
 	}
-	inter.cachedExecutionContexts[fileName] = ex
+	var module *Module
+	if existingModule, ok := inter.modules[moduleFile.module]; ok {
+		module = existingModule
+	} else {
+		module = &Module{
+			name:              moduleFile.module,
+			environment:       NewEnvironment(NewPreludeEnvironment()),
+			executionContexts: make(map[ModuleFile]*ExecutionContext),
+		}
+		inter.modules[moduleFile.module] = module
+	}
+	ex := inter.NewExecutionContext(moduleFile, tree.RootNode(), []byte(script), module.environment.Private())
 	return ex, nil
 }
 
 func (inter *Interpreter) LoadContextIfNeeded(fileName string, script string) (*ExecutionContext, error) {
-	if context, ok := inter.cachedExecutionContexts[fileName]; ok {
-		return context, nil
+	moduleFile, err := inter.NormalizedModuleFile(fileName)
+	if err != nil {
+		return nil, err
 	}
-	tree, error := inter.parser.Parse(script)
-	if error != nil {
-		return nil, error
+	if module, ok := inter.modules[moduleFile.module]; ok {
+		if ex, ok := module.executionContexts[moduleFile]; ok {
+			return ex, nil
+		}
 	}
-	ex := inter.NewExecutionContext(fileName, tree.RootNode(), []byte(script))
-	inter.cachedExecutionContexts[fileName] = ex
-	return ex, nil
+	return inter.LoadContext(fileName, script)
 }
 
 func (ex *ExecutionContext) EvaluateSourceFile() (*LazyRuntimeValue, error) {
@@ -144,14 +204,23 @@ func (ex *ExecutionContext) EvaluateSourceFile() (*LazyRuntimeValue, error) {
 	}), nil
 }
 
+func (ex *ExecutionContext) EvaluatePackage() (*LazyRuntimeValue, error) {
+	internalName := ex.node.ChildByFieldName("name").Content(ex.source)
+	runtimeModule := NewConstantRuntimeValue(RuntimeModule{module: ex.interpreter.modules[ex.moduleFile.module]})
+	ex.environment.DeclareUnexported(internalName, runtimeModule)
+	return runtimeModule, nil
+}
+
 func (ex *ExecutionContext) EvaluateImport() (*LazyRuntimeValue, error) {
 	importModuleNode := ex.node.ChildByFieldName("name")
 	modulePath := make([]string, importModuleNode.NamedChildCount())
 	for i := 0; i < int(importModuleNode.NamedChildCount()); i++ {
 		modulePath[i] = importModuleNode.NamedChild(i).Content(ex.source)
 	}
+	importMember := modulePath[len(modulePath)-1]
+	absoluteModuleName := ex.ModuleName(modulePath)
 
-	childModulePath := path.Join(path.Dir(ex.fileName), path.Join(modulePath...))
+	childModulePath := filepath.Join(ex.interpreter.importRoot, ex.moduleFile.parentPath, absoluteModuleName.name)
 
 	if _, err := os.Stat(childModulePath); os.IsNotExist(err) {
 		// rootModulePath := path.Join(ex.interpreter.importRoot, childModulePath)
@@ -165,19 +234,30 @@ func (ex *ExecutionContext) EvaluateImport() (*LazyRuntimeValue, error) {
 		return nil, ex.SyntaxErrorf("root module import not implemented")
 	}
 	for _, match := range matches {
-		if strings.HasSuffix(match, ".lithia") {
-			scriptData, err := os.ReadFile(match)
-			if err != nil {
-				return nil, err
-			}
-			context, err := ex.interpreter.LoadContextIfNeeded(match, string(scriptData))
-			if err != nil {
-				return nil, err
-			}
-			return context.EvaluateNode()
+		scriptData, err := os.ReadFile(match)
+		if err != nil {
+			return nil, err
+		}
+		childContext, err := ex.interpreter.LoadContextIfNeeded(match, string(scriptData))
+		if err != nil {
+			return nil, err
+		}
+		source, err := childContext.EvaluateNode()
+		if err != nil {
+			return nil, err
+		}
+		_, err = source.Evaluate()
+		if err != nil {
+			return nil, err
 		}
 	}
-	return nil, ex.SyntaxErrorf("child module import not implemented")
+	importedModule := ex.interpreter.modules[absoluteModuleName]
+	if importedModule == nil {
+		return nil, ex.SyntaxErrorf("module imported but not found")
+	}
+	runtimeModule := NewConstantRuntimeValue(RuntimeModule{module: importedModule})
+	ex.environment.DeclareUnexported(importMember, runtimeModule)
+	return runtimeModule, nil
 }
 
 func (ex *ExecutionContext) EvaluateLetDeclaration() (*LazyRuntimeValue, error) {
@@ -497,7 +577,6 @@ func (ex *ExecutionContext) ParseFunctionLiteral(name string) (Function, error) 
 	parametersNode := ex.node.ChildByFieldName("parameters")
 	bodyNode := ex.node.ChildByFieldName("body")
 
-	// TODO: both nodes are optional!
 	var (
 		params []string
 		err    error
@@ -526,8 +605,6 @@ func (ex *ExecutionContext) ParseFunctionLiteral(name string) (Function, error) 
 				if err != nil {
 					return stmts, err
 				}
-			} else {
-				return nil, ex.RuntimeErrorf("empty functions not implemented yet")
 			}
 			return stmts, nil
 		},
@@ -550,8 +627,8 @@ func (ex *ExecutionContext) EvaluateNode() (*LazyRuntimeValue, error) {
 	switch ex.node.Type() {
 	case parser.TYPE_NODE_SOURCE_FILE:
 		return ex.EvaluateSourceFile()
-	// case parser.TYPE_NODE_PACKAGE_DECLARATION:
-	// 	return interpreter.Evaluate(node)
+	case parser.TYPE_NODE_PACKAGE_DECLARATION:
+		return ex.EvaluatePackage()
 	case parser.TYPE_NODE_IMPORT_DECLARATION:
 		return ex.EvaluateImport()
 	case parser.TYPE_NODE_LET_DECLARATION:

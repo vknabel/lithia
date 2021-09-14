@@ -1,4 +1,6 @@
-// let a = 1
+import tests
+
+let a = 1
 
 enum Optional {
   data Some {
@@ -25,21 +27,23 @@ type Optional {
   None: { _ => print "None" }
 } Some 1
 
-// func if { condition, then, else =>
-//   switch Bool {
-//     True: { a => then },
-//     False: { a => else }
-//   }, condition
-// }
+tests.test "it runs", print "good"
 
-// func and { lhs, rhs =>
-//   if lhs, (if rhs, True, False), False
-// }
+func if { condition, then, else =>
+  type Bool {
+    True: { a => then },
+    False: { a => else }
+  } condition
+}
 
-// func or { lhs, rhs =>
-//   if lhs, True, rhs
-// }
+func and { lhs, rhs =>
+  if lhs, (if rhs, True, False), False
+}
 
-// func not { flag =>
-//   if flag, False, True
-// }
+func or { lhs, rhs =>
+  if lhs, True, rhs
+}
+
+func not { flag =>
+  if flag, False, True
+}

@@ -19,6 +19,8 @@ github.com/vknabel/tree-sitter-lithia v0.0.0-20210913202507-6d26773bbedd h1:TvFg
 github.com/vknabel/tree-sitter-lithia v0.0.0-20210913202507-6d26773bbedd/go.mod h1:/UywjzJ0Jf623Jj+XWOSepHZ182EUBoyttg+MpS6MbE=
 github.com/vknabel/tree-sitter-lithia v0.0.0-20210914052758-d52f1c1f6b6f h1:Uo+ycQO3XFN4MlajPQmbJfOBr2otHkO+t6yq8uhKVus=
 github.com/vknabel/tree-sitter-lithia v0.0.0-20210914052758-d52f1c1f6b6f/go.mod h1:/UywjzJ0Jf623Jj+XWOSepHZ182EUBoyttg+MpS6MbE=
+github.com/vknabel/tree-sitter-lithia v0.0.0-20210914091207-ee066ae2b817 h1:BgQemHvk134yii/sX/THSHNsRIIw7DjCu8Dz+lkulw0=
+github.com/vknabel/tree-sitter-lithia v0.0.0-20210914091207-ee066ae2b817/go.mod h1:/UywjzJ0Jf623Jj+XWOSepHZ182EUBoyttg+MpS6MbE=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/yaml.v2 v2.2.2/go.mod h1:hI93XBmqTisBFMUTm0b8Fm+jr3Dg1NNxqwp+5A1VGuI=
 gopkg.in/yaml.v2 v2.4.0 h1:D8xgwECY7CYvx+Y2n4sBz93Jn9JRvxdiyyo8CTfuKaY=

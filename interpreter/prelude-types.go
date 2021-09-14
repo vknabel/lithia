@@ -11,6 +11,7 @@ type PreludeString string
 type PreludeRune rune
 type PreludeFunctionType struct{}
 type PreludeVariableType struct{}
+type PreludeModuleType struct{}
 type PreludeAnyType struct{}
 
 func (PreludeInt) RuntimeType() RuntimeType {
@@ -89,6 +90,17 @@ func (v PreludeVariableType) Call(arguments []*LazyRuntimeValue) (RuntimeValue, 
 		return nil, err
 	}
 	return &RuntimeVariable{current: value, lock: &sync.RWMutex{}}, nil
+}
+
+func (PreludeModuleType) RuntimeType() RuntimeType {
+	return RuntimeType{
+		name:       "Module",
+		modulePath: []string{"prelude"},
+	}
+}
+
+func (a PreludeModuleType) Lookup(member string) (*LazyRuntimeValue, error) {
+	return nil, fmt.Errorf("module type %s has no member %s", a, member)
 }
 
 func (PreludeAnyType) RuntimeType() RuntimeType {
