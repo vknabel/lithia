@@ -38,7 +38,7 @@ As data types don’t have any methods, you simply declare global functions that
 
 ```
 func greet { person =>
-  print (strings.append "Hello " person.name)
+  print (strings.append "Hello ", person.name)
 }
 ```
 
