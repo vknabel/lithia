@@ -6,3 +6,10 @@ func when { condition, then =>
         False: { _ => }
     }
 }
+
+func unless { condition, then =>
+    with condition, type Bool {
+        True: { _ => },
+        False: { _ => then }
+    }
+}

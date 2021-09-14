@@ -17,4 +17,29 @@ tests.test "strings.concat rocks", { fail =>
     fail strings.concat ["oops there are no ", "comparisions"]
 }
 
+tests.test "any in enums matches all types", { fail =>
+    enum AnyEnum {
+        Int
+        Any
+    }
+
+    // sadly a with "", type X {} fails
+    let isCorrect = type AnyEnum {
+        Int: { _ => False },
+        Any: { _ => True }
+    } "should be any"
+    unless isCorrect, fail "should not be the case"
+}
+
+tests.test "when true succeeds", { fail =>
+    let isTrue = (when True, True)
+    
+    with isTrue, type Bool {
+        True: { true => "" },
+        False: { false => fail "should be True" }
+    }
+    None
+}
+
+
 when tests.enabled, tests.runTests tests.testCases

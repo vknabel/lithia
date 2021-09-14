@@ -367,14 +367,18 @@ func (ex *ExecutionContext) ParseParamterList() ([]string, error) {
 }
 
 func (ex *ExecutionContext) ParseStatementList() ([]*LazyRuntimeValue, error) {
-	stmts := make([]*LazyRuntimeValue, ex.node.NamedChildCount())
+	stmts := make([]*LazyRuntimeValue, 0, ex.node.NamedChildCount())
 	for i := 0; i < int(ex.node.NamedChildCount()); i++ {
 		child := ex.node.NamedChild(i)
 		stmt, err := ex.ChildNodeExecutionContext(child).EvaluateNode()
 		if err != nil {
 			return nil, err
 		}
-		stmts[i] = stmt
+		if stmt == nil {
+			// TODO: comments are evil, but they shouldn't
+			continue
+		}
+		stmts = append(stmts, stmt)
 	}
 	return stmts, nil
 }
@@ -676,12 +680,14 @@ func (ex *ExecutionContext) ParseFunctionLiteral(name string) (Function, error) 
 		arguments: params,
 		parent:    ex,
 		body: func(i *ExecutionContext) ([]*LazyRuntimeValue, error) {
-			var stmts []*LazyRuntimeValue
-			if bodyNode != nil {
-				stmts, err = i.ChildNodeExecutionContext(bodyNode).ParseStatementList()
-				if err != nil {
-					return stmts, err
-				}
+			if bodyNode == nil {
+				return []*LazyRuntimeValue{
+					NewConstantRuntimeValue(PreludeString("TODO: WHY IS THIS NIL?" + name)),
+				}, nil
+			}
+			stmts, err := i.ChildNodeExecutionContext(bodyNode).ParseStatementList()
+			if err != nil {
+				return nil, err
 			}
 			return stmts, nil
 		},

@@ -150,6 +150,9 @@ func (f Function) Call(arguments []*LazyRuntimeValue) (RuntimeValue, error) {
 		return nil, err
 	}
 	for _, statement := range statements {
+		if statement == nil {
+			continue
+		}
 		lastValue, err = statement.Evaluate()
 		if err != nil {
 			return nil, err
