@@ -18,8 +18,8 @@ type CurriedCallable struct {
 type Function struct {
 	name      string
 	arguments []string
-	body      func(*Interpreter) ([]*LazyRuntimeValue, error)
-	parent    *Interpreter
+	body      func(*ExecutionContext) ([]*LazyRuntimeValue, error)
+	parent    *ExecutionContext
 }
 
 func (f Function) String() string {
@@ -121,7 +121,7 @@ func (typeExpr TypeExpression) Call(arguments []*LazyRuntimeValue) (RuntimeValue
 }
 
 func (f Function) Call(arguments []*LazyRuntimeValue) (RuntimeValue, error) {
-	closure := f.parent.ChildInterpreter(f.name)
+	closure := f.parent.NestedExecutionContext(f.name)
 	if len(arguments) < len(f.arguments) {
 		return CurriedCallable{
 			actual:         f,

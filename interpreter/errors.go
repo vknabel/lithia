@@ -13,11 +13,11 @@ type SyntaxError struct {
 	Source  []byte
 }
 
-func SyntaxErrorf(node *sitter.Node, source []byte, format string, args ...interface{}) SyntaxError {
+func (ex *ExecutionContext) SyntaxErrorf(format string, args ...interface{}) SyntaxError {
 	return SyntaxError{
 		Message: fmt.Sprintf(format, args...),
-		Node:    node,
-		Source:  source,
+		Node:    ex.node,
+		Source:  ex.source,
 	}
 }
 
@@ -36,11 +36,11 @@ type RuntimeError struct {
 	Source  []byte
 }
 
-func RuntimeErrorf(node *sitter.Node, source []byte, format string, args ...interface{}) RuntimeError {
+func (ex *ExecutionContext) RuntimeErrorf(format string, args ...interface{}) RuntimeError {
 	return RuntimeError{
 		Message: fmt.Sprintf(format, args...),
-		Node:    node,
-		Source:  source,
+		Node:    ex.node,
+		Source:  ex.source,
 	}
 }
 

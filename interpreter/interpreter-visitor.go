@@ -7,7 +7,7 @@ import (
 	"github.com/vknabel/go-lithia/parser"
 )
 
-func (interpreter *Interpreter) AcceptSourceFile(sourceFile *sitter.Node) (interface{}, error) {
+func (interpreter *ExecutionContext) AcceptSourceFile(sourceFile *sitter.Node) (interface{}, error) {
 	count := sourceFile.ChildCount()
 	children := make([]*sitter.Node, count)
 	for i := uint32(0); i < count; i++ {
@@ -52,128 +52,128 @@ func priority(nodeType string) int {
 	}
 }
 
-func (i *Interpreter) AcceptPackageDeclaration(packageDeclaration *sitter.Node) (interface{}, error) {
+func (i *ExecutionContext) AcceptPackageDeclaration(packageDeclaration *sitter.Node) (interface{}, error) {
 	return nil, nil
 }
 
-func (i *Interpreter) AcceptImportDeclaration(importDeclaration *sitter.Node) (interface{}, error) {
+func (i *ExecutionContext) AcceptImportDeclaration(importDeclaration *sitter.Node) (interface{}, error) {
 	return nil, nil
 }
 
-func (i *Interpreter) AcceptLetDeclaration(letDeclaration *sitter.Node) (interface{}, error) {
+func (i *ExecutionContext) AcceptLetDeclaration(letDeclaration *sitter.Node) (interface{}, error) {
 	return nil, nil
 }
 
-func (i *Interpreter) AcceptFunctionDeclaration(functionDeclaration *sitter.Node) (interface{}, error) {
+func (i *ExecutionContext) AcceptFunctionDeclaration(functionDeclaration *sitter.Node) (interface{}, error) {
 	return nil, nil
 }
 
-func (i *Interpreter) AcceptDataDeclaration(dataDeclaration *sitter.Node) (interface{}, error) {
+func (i *ExecutionContext) AcceptDataDeclaration(dataDeclaration *sitter.Node) (interface{}, error) {
 	return nil, nil
 }
 
-func (i *Interpreter) AcceptDataPropertyList(dataPropertyList *sitter.Node) (interface{}, error) {
+func (i *ExecutionContext) AcceptDataPropertyList(dataPropertyList *sitter.Node) (interface{}, error) {
 	return nil, nil
 }
 
-func (i *Interpreter) AcceptDataPropertyValue(dataPropertyValue *sitter.Node) (interface{}, error) {
+func (i *ExecutionContext) AcceptDataPropertyValue(dataPropertyValue *sitter.Node) (interface{}, error) {
 	return nil, nil
 }
 
-func (i *Interpreter) AcceptDataPropertyFunction(dataPropertyFunction *sitter.Node) (interface{}, error) {
+func (i *ExecutionContext) AcceptDataPropertyFunction(dataPropertyFunction *sitter.Node) (interface{}, error) {
 	return nil, nil
 }
 
-func (i *Interpreter) AcceptEnumDeclaration(enumDeclaration *sitter.Node) (interface{}, error) {
+func (i *ExecutionContext) AcceptEnumDeclaration(enumDeclaration *sitter.Node) (interface{}, error) {
 	return nil, nil
 }
 
-func (i *Interpreter) AcceptEnumCaseList(enumCaseList *sitter.Node) (interface{}, error) {
+func (i *ExecutionContext) AcceptEnumCaseList(enumCaseList *sitter.Node) (interface{}, error) {
 	return nil, nil
 }
 
-func (i *Interpreter) AcceptComplexInvocationExpression(complexInvocationExpression *sitter.Node) (interface{}, error) {
+func (i *ExecutionContext) AcceptComplexInvocationExpression(complexInvocationExpression *sitter.Node) (interface{}, error) {
 	return nil, nil
 }
 
-func (i *Interpreter) AcceptSimpleInvocationExpression(simpleInvocationExpression *sitter.Node) (interface{}, error) {
+func (i *ExecutionContext) AcceptSimpleInvocationExpression(simpleInvocationExpression *sitter.Node) (interface{}, error) {
 	return nil, nil
 }
 
-func (i *Interpreter) AcceptUnaryExpression(unaryExpression *sitter.Node) (interface{}, error) {
+func (i *ExecutionContext) AcceptUnaryExpression(unaryExpression *sitter.Node) (interface{}, error) {
 	return nil, nil
 }
 
-func (i *Interpreter) AcceptBinaryExpression(binaryExpression *sitter.Node) (interface{}, error) {
+func (i *ExecutionContext) AcceptBinaryExpression(binaryExpression *sitter.Node) (interface{}, error) {
 	return nil, nil
 }
 
-func (i *Interpreter) AcceptMemberAccess(memberAccess *sitter.Node) (interface{}, error) {
+func (i *ExecutionContext) AcceptMemberAccess(memberAccess *sitter.Node) (interface{}, error) {
 	return nil, nil
 }
 
-func (i *Interpreter) AcceptTypeExpression(typeExpression *sitter.Node) (interface{}, error) {
+func (i *ExecutionContext) AcceptTypeExpression(typeExpression *sitter.Node) (interface{}, error) {
 	return nil, nil
 }
 
-func (i *Interpreter) AcceptTypeBody(typeBody *sitter.Node) (interface{}, error) {
+func (i *ExecutionContext) AcceptTypeBody(typeBody *sitter.Node) (interface{}, error) {
 	return nil, nil
 }
 
-func (i *Interpreter) AcceptTypeCase(typeCase *sitter.Node) (interface{}, error) {
+func (i *ExecutionContext) AcceptTypeCase(typeCase *sitter.Node) (interface{}, error) {
 	return nil, nil
 }
 
-func (i *Interpreter) AcceptStringLiteral(stringLiteral *sitter.Node) (interface{}, error) {
+func (i *ExecutionContext) AcceptStringLiteral(stringLiteral *sitter.Node) (interface{}, error) {
 	return nil, nil
 }
 
-func (i *Interpreter) AcceptEscapeSequence(escapeSequence *sitter.Node) (interface{}, error) {
+func (i *ExecutionContext) AcceptEscapeSequence(escapeSequence *sitter.Node) (interface{}, error) {
 	return nil, nil
 }
 
-func (i *Interpreter) AcceptGroupLiteral(groupLiteral *sitter.Node) (interface{}, error) {
+func (i *ExecutionContext) AcceptGroupLiteral(groupLiteral *sitter.Node) (interface{}, error) {
 	return nil, nil
 }
 
-func (i *Interpreter) AcceptNumberLiteral(numberLiteral *sitter.Node) (interface{}, error) {
+func (i *ExecutionContext) AcceptNumberLiteral(numberLiteral *sitter.Node) (interface{}, error) {
 	return nil, nil
 }
 
-func (i *Interpreter) AcceptArrayLiteral(arrayLiteral *sitter.Node) (interface{}, error) {
+func (i *ExecutionContext) AcceptArrayLiteral(arrayLiteral *sitter.Node) (interface{}, error) {
 	return nil, nil
 }
 
-func (i *Interpreter) AcceptFunctionLiteral(functionLiteral *sitter.Node) (interface{}, error) {
+func (i *ExecutionContext) AcceptFunctionLiteral(functionLiteral *sitter.Node) (interface{}, error) {
 	return nil, nil
 }
 
-func (i *Interpreter) AcceptParameterList(parameterList *sitter.Node) (interface{}, error) {
+func (i *ExecutionContext) AcceptParameterList(parameterList *sitter.Node) (interface{}, error) {
 	return nil, nil
 }
 
-func (i *Interpreter) AcceptIdentifier(identifier *sitter.Node) (interface{}, error) {
+func (i *ExecutionContext) AcceptIdentifier(identifier *sitter.Node) (interface{}, error) {
 	return nil, nil
 }
 
-func (i *Interpreter) AcceptComment(comment *sitter.Node) (interface{}, error) {
+func (i *ExecutionContext) AcceptComment(comment *sitter.Node) (interface{}, error) {
 	return nil, nil
 }
 
 // alias
-func (i *Interpreter) AcceptEnumCaseReference(enumCaseReference *sitter.Node) (interface{}, error) {
+func (i *ExecutionContext) AcceptEnumCaseReference(enumCaseReference *sitter.Node) (interface{}, error) {
 	return nil, nil
 }
 
 // errors
-func (i *Interpreter) AcceptError(error *sitter.Node) (interface{}, error) {
+func (i *ExecutionContext) AcceptError(error *sitter.Node) (interface{}, error) {
 	return nil, nil
 }
 
-func (i *Interpreter) AcceptUnexpected(unexpected *sitter.Node) (interface{}, error) {
+func (i *ExecutionContext) AcceptUnexpected(unexpected *sitter.Node) (interface{}, error) {
 	return nil, nil
 }
 
-func (i *Interpreter) AcceptUnknown(unknown *sitter.Node) (interface{}, error) {
+func (i *ExecutionContext) AcceptUnknown(unknown *sitter.Node) (interface{}, error) {
 	return nil, nil
 }

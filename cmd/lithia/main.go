@@ -31,19 +31,20 @@ func main() {
 	}
 }
 
-func runFile(filename string) error {
-	scriptData, err := os.ReadFile(filename)
+func runFile(fileName string) error {
+	scriptData, err := os.ReadFile(fileName)
 	if err != nil {
 		return err
 	}
+	inter := interpreter.NewInterpreter()
 	script := string(scriptData)
-	_, err = runScript(script, interpreter.NewInterpreter())
+	_, err = runScript(fileName, script, inter)
 	return err
 }
 
 func runPrompt() error {
 	reader := bufio.NewReader(os.Stdin)
-	interpreter := interpreter.NewInterpreter()
+	inter := interpreter.NewInterpreter()
 	for {
 		fmt.Print("> ")
 		line, err := reader.ReadString('\n')
@@ -54,7 +55,7 @@ func runPrompt() error {
 			reporting.ReportErrorOrPanic(err)
 			continue
 		}
-		lazyValue, err := runScript(line, interpreter)
+		lazyValue, err := runScript("prompt", line, inter)
 		if err != nil {
 			reporting.ReportErrorOrPanic(err)
 			continue
@@ -70,12 +71,12 @@ func runPrompt() error {
 	}
 }
 
-func runScript(script string, interpreter *interpreter.Interpreter) (*interpreter.LazyRuntimeValue, error) {
+func runScript(fileName string, script string, interpreter *interpreter.Interpreter) (*interpreter.LazyRuntimeValue, error) {
 	tree, err := parse(script)
 	if err != nil {
 		return nil, err
 	}
-	value, err := interpreter.Interpret(tree, []byte(script))
+	value, err := interpreter.Interpret(fileName, tree, []byte(script))
 	if err != nil {
 		return nil, err
 	}
