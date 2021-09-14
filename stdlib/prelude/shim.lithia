@@ -5,7 +5,10 @@ extern osExit // code
 
 extern Int
 extern Float
-extern String
+extern String {
+    length
+    append str
+}
 extern Rune
 extern Function
 extern Variable {

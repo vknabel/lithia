@@ -8,16 +8,18 @@ import (
 )
 
 type SyntaxError struct {
-	Message string
-	Node    *sitter.Node
-	Source  []byte
+	Message    string
+	Node       *sitter.Node
+	Source     []byte
+	ModuleFile ModuleFile
 }
 
 func (ex *ExecutionContext) SyntaxErrorf(format string, args ...interface{}) SyntaxError {
 	return SyntaxError{
-		Message: fmt.Sprintf(format, args...),
-		Node:    ex.node,
-		Source:  ex.source,
+		Message:    fmt.Sprintf(format, args...),
+		Node:       ex.node,
+		Source:     ex.source,
+		ModuleFile: ex.moduleFile,
 	}
 }
 
@@ -27,20 +29,22 @@ func (e SyntaxError) Error() string {
 
 func (e SyntaxError) SourceLocation() string {
 	var _ reporting.LocatableError = e
-	return fmt.Sprintf(":%d:%d", e.Node.StartPoint().Row, e.Node.StartPoint().Column)
+	return fmt.Sprintf("%s:%d:%d", e.ModuleFile.name, e.Node.StartPoint().Row+1, e.Node.StartPoint().Column)
 }
 
 type RuntimeError struct {
-	Message string
-	Node    *sitter.Node
-	Source  []byte
+	Message    string
+	Node       *sitter.Node
+	Source     []byte
+	ModuleFile ModuleFile
 }
 
 func (ex *ExecutionContext) RuntimeErrorf(format string, args ...interface{}) RuntimeError {
 	return RuntimeError{
-		Message: fmt.Sprintf(format, args...),
-		Node:    ex.node,
-		Source:  ex.source,
+		Message:    fmt.Sprintf(format, args...),
+		Node:       ex.node,
+		Source:     ex.source,
+		ModuleFile: ex.moduleFile,
 	}
 }
 
@@ -50,5 +54,5 @@ func (e RuntimeError) Error() string {
 
 func (e RuntimeError) SourceLocation() string {
 	var _ reporting.LocatableError = e
-	return fmt.Sprintf(":%d:%d", e.Node.StartPoint().Row, e.Node.StartPoint().Column)
+	return fmt.Sprintf("%s:%d:%d", e.ModuleFile.name, e.Node.StartPoint().Row+1, e.Node.StartPoint().Column)
 }

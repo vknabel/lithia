@@ -1,0 +1,19 @@
+package lists
+
+/**
+ * Recursively walk a tree of nodes, calling a function on each node.
+ * The given accumulator function merges each element into a new one for the next call.
+ *
+ * @param accumulator into, next
+ * @param initial
+ * @param list
+ */
+func reduce { accumulator, initial =>
+    type List {
+        Cons: { cons =>
+            let next = (accumulator initial, cons.head)
+            reduce accumulator, next, cons.tail
+        },
+        Nil: { nil => initial }
+    }
+}

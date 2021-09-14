@@ -1,24 +1,6 @@
 package prelude
 
 /**
- * Recursively walk a tree of nodes, calling a function on each node.
- * The given accumulator function merges each element into a new one for the next call.
- *
- * @param accumulator into, next
- * @param initial
- * @param list
- */
-func reduceList { accumulator, initial, list =>
-    type List {
-        Cons: { cons =>
-            let accumulatedRest = (reduceList accumulator, initial, cons.tail)
-            accumulator accumulatedRest, cons.head
-        },
-        Nil: { nil => initial }
-    }
-}
-
-/**
  * Pipes a given value through a list of functions.
  * The first function is applied to the value, the second to the result of the first, etc.
  * 

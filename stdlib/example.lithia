@@ -1,27 +1,8 @@
 package example
 
-func test { case, function => 
-    let failure = Variable None
-    function { message => failure.accept Some message }
+import tests
 
-    with failure.current, type Optional {
-        Some: { some => 
-            print "not ok"
-            print case
-            print "error:"
-            print some.value 
-            osExit 1
-        },
-        None: { _ => 
-            print "ok"
-            print case
-        }
-    }
-}
-
-print "TAP version 13"
-
-test "booleans are cool", { fail =>
+tests.test "booleans are cool", { fail =>
     with True, type Bool {
         True: { _ => },
         False: { _ =>
@@ -29,6 +10,9 @@ test "booleans are cool", { fail =>
         }
     }
 }
-test "strings.concat rocks", { fail =>
+
+tests.test "strings.concat rocks", { fail =>
     fail "not implemented"
 }
+
+when tests.enabled, tests.runTests tests.testCases

@@ -1,0 +1,8 @@
+package lists
+
+func append { element =>
+    type List {
+        Cons: { list => Cons list.head, (append element, list.tail) },
+        Nil: { _ => Cons element, Nil }
+    }
+}

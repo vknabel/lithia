@@ -7,6 +7,7 @@ import (
 
 type Callable interface {
 	Call(arguments []*LazyRuntimeValue) (RuntimeValue, error)
+	String() string
 }
 
 type CurriedCallable struct {
@@ -23,7 +24,7 @@ type Function struct {
 }
 
 func (f Function) String() string {
-	return fmt.Sprintf("{ %s => @(%s) }", strings.Join(f.arguments, ","), strings.Join(f.parent.path, "."))
+	return fmt.Sprintf("{ %s => @(%s) }", strings.Join(f.arguments, ","), f.name)
 }
 
 func (Function) RuntimeType() RuntimeType {
@@ -40,6 +41,10 @@ func (CurriedCallable) RuntimeType() RuntimeType {
 
 func (f CurriedCallable) Lookup(member string) (*LazyRuntimeValue, error) {
 	return nil, fmt.Errorf("function %s has no member %s", f, member)
+}
+
+func (f CurriedCallable) String() string {
+	return fmt.Sprintf("{ -%d => @(%s) }", len(f.args), f.actual)
 }
 
 func (c CurriedCallable) Call(arguments []*LazyRuntimeValue) (RuntimeValue, error) {
@@ -117,7 +122,7 @@ func (typeExpr TypeExpression) Call(arguments []*LazyRuntimeValue) (RuntimeValue
 		}
 		return callable.Call(arguments)
 	}
-	return nil, fmt.Errorf("no matching case")
+	return nil, fmt.Errorf("no %s has no matching case for value %s of type %s", typeExpr.typeValue.name, fmt.Sprint(valueArgument), fmt.Sprint(valueArgument.RuntimeType().name))
 }
 
 func (f Function) Call(arguments []*LazyRuntimeValue) (RuntimeValue, error) {
@@ -154,7 +159,7 @@ func (f Function) Call(arguments []*LazyRuntimeValue) (RuntimeValue, error) {
 	if len(arguments) == len(f.arguments) {
 		return lastValue, nil
 	} else if function, ok := lastValue.(Callable); ok {
-		lazyResult, err := function.Call(arguments[len(f.arguments)-1:])
+		lazyResult, err := function.Call(arguments[len(f.arguments):])
 		if err != nil {
 			return nil, err
 		}

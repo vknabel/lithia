@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Launch lithia stdlib",
+            "name": "Run example stdlib",
             "type": "go",
             "request": "launch",
             "mode": "auto",
@@ -13,6 +13,19 @@
             "args": [
                 "${workspaceFolder}/stdlib/example.lithia"
             ]
+        },
+        {
+            "name": "Test example stdlib",
+            "type": "go",
+            "request": "launch",
+            "mode": "auto",
+            "program": "${workspaceFolder}/cmd/lithia/main.go",
+            "args": [
+                "${workspaceFolder}/stdlib/example.lithia"
+            ],
+            "env": {
+                "LITHIA_TEST": "1"
+            }
         },
         {
             "name": "Launch lithia",

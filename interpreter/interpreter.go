@@ -116,7 +116,7 @@ func (inter *Interpreter) NormalizedModuleFile(fileName string) (ModuleFile, err
 	}
 	modulePath := filepath.SplitList(relativeModulePath)
 	return ModuleFile{
-		name:       name,
+		name:       fileName,
 		parentPath: relativeModulePath,
 		module: ModuleName{
 			name: strings.Join(modulePath, "."),
@@ -215,18 +215,25 @@ func (ex *ExecutionContext) EvaluatePackage() (*LazyRuntimeValue, error) {
 
 func (inter *Interpreter) LoadModule(absoluteModuleName ModuleName, parentPath string) (*Module, error) {
 	childModulePath := filepath.Join(inter.importRoot, parentPath, absoluteModuleName.name)
-
 	if module, ok := inter.modules[absoluteModuleName]; ok {
 		return module, nil
 	}
 
+	var matches []string
 	if _, err := os.Stat(childModulePath); os.IsNotExist(err) {
-		// rootModulePath := path.Join(ex.interpreter.importRoot, childModulePath)
-		return nil, fmt.Errorf("root module import not implemented")
-	}
-	matches, err := filepath.Glob(filepath.Join(childModulePath, "*.lithia"))
-	if err != nil {
-		return nil, err
+		rootModulePath := filepath.Join(inter.importRoot, absoluteModuleName.name)
+		if module, ok := inter.modules[absoluteModuleName]; ok {
+			return module, nil
+		}
+		matches, err = filepath.Glob(filepath.Join(rootModulePath, "*.lithia"))
+		if err != nil {
+			return nil, err
+		}
+	} else {
+		matches, err = filepath.Glob(filepath.Join(childModulePath, "*.lithia"))
+		if err != nil {
+			return nil, err
+		}
 	}
 	if len(matches) == 0 {
 		return nil, fmt.Errorf("root module import not implemented")
@@ -604,7 +611,39 @@ func (ex *ExecutionContext) EvaluateStringLiteral() (*LazyRuntimeValue, error) {
 }
 
 func (ex *ExecutionContext) EvaluateBinaryExpression() (*LazyRuntimeValue, error) {
-	return nil, ex.SyntaxErrorf("unimplemented")
+	if ex.node.NamedChildCount() != 2 {
+		return nil, ex.SyntaxErrorf("expected 2 children, got %d", ex.node.NamedChildCount())
+	}
+	lazyLeft, err := ex.ChildNodeExecutionContext(ex.node.NamedChild(0)).EvaluateNode()
+	if err != nil {
+		return nil, err
+	}
+	lazyRight, err := ex.ChildNodeExecutionContext(ex.node.NamedChild(1)).EvaluateNode()
+	if err != nil {
+		return nil, err
+	}
+	lazyResult := NewLazyRuntimeValue(func() (RuntimeValue, error) {
+		left, err := lazyLeft.Evaluate()
+		if err != nil {
+			return nil, err
+		}
+		switch left := left.(type) {
+		case PreludeInt:
+			right, err := lazyRight.Evaluate()
+			if err != nil {
+				return nil, err
+			}
+			switch right := right.(type) {
+			case PreludeInt:
+				return PreludeInt(left + right), nil
+			default:
+				return nil, ex.RuntimeErrorf("expected int, got %s", right)
+			}
+		default:
+			return nil, ex.RuntimeErrorf("expected int, got %s", left)
+		}
+	})
+	return lazyResult, nil
 }
 
 func (ex *ExecutionContext) EvaluateUnaryExpression() (*LazyRuntimeValue, error) {

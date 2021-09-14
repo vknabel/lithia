@@ -71,6 +71,9 @@ func RuntimeTypeValueIncludesValue(t RuntimeValue, v RuntimeValue) (bool, error)
 		if _, ok := t.(RuntimeType); ok {
 			t = *t.(RuntimeType).typeValue
 		}
+		if v.RuntimeType().typeValue == nil {
+			return false, nil
+		}
 		valueType := *v.RuntimeType().typeValue
 		if _, ok := valueType.(RuntimeType); ok {
 			valueType = *valueType.(RuntimeType).typeValue
@@ -86,6 +89,10 @@ func (t RuntimeType) IncludesValue(v RuntimeValue) (bool, error) {
 type DataDeclRuntimeValue struct {
 	name   string
 	fields []DataDeclField
+}
+
+func (d DataDeclRuntimeValue) String() string {
+	return fmt.Sprintf("data %d { %s }", d.fields)
 }
 
 func (d DataDeclRuntimeValue) RuntimeType() RuntimeType {
@@ -152,6 +159,9 @@ type TypeExpression struct {
 
 func (TypeExpression) RuntimeType() RuntimeType {
 	return PreludeFunctionType{}.RuntimeType()
+}
+func (t TypeExpression) String() string {
+	return fmt.Sprintf("{ value => type %s }", t.typeValue.name)
 }
 
 func (t TypeExpression) Lookup(member string) (*LazyRuntimeValue, error) {
