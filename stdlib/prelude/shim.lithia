@@ -1,3 +1,16 @@
 package prelude
 
-func print { message => }
+extern print // message
+extern osExit // code
+
+extern Int
+extern Float
+extern String
+extern Rune
+extern Function
+extern Variable {
+    accept value
+    current
+}
+extern Module
+extern Any

@@ -11,6 +11,7 @@ func (inter *Interpreter) NewPreludeEnvironment() *Environment {
 	}
 	env := NewEnvironment(nil)
 	inter.prelude = env
+
 	env.Declare("Int", NewConstantRuntimeValue(PreludeInt(0)))
 	env.Declare("Float", NewConstantRuntimeValue(PreludeFloat(0.0)))
 	env.Declare("String", NewConstantRuntimeValue(PreludeString("")))
@@ -24,10 +25,8 @@ func (inter *Interpreter) NewPreludeEnvironment() *Environment {
 	env.Declare("osExit", NewConstantRuntimeValue(builtinOsExit))
 
 	if module, err := inter.LoadModule(ModuleName{name: "prelude"}, "."); err == nil {
+		// These declares override the ones in the prelude.
 		env.Parent = &Environment{Parent: nil, Scope: module.environment.Scope, Unexported: module.environment.Unexported}
-		// for member, value := range module.environment.Scope {
-		// 	env.Declare(member, value)
-		// }
 	}
 
 	return env
@@ -92,7 +91,7 @@ var builtinPrint = NewBuiltinFunction(
 		if err != nil {
 			return nil, err
 		}
-		fmt.Print(value)
+		fmt.Println(value)
 		return value, nil
 	},
 )

@@ -1,5 +1,34 @@
 package example
 
-import monads
+func test { case, function => 
+    let failure = Variable None
+    function { message => failure.accept Some message }
 
-when True, print "Hello!"
+    with failure.current, type Optional {
+        Some: { some => 
+            print "not ok"
+            print case
+            print "error:"
+            print some.value 
+            osExit 1
+        },
+        None: { _ => 
+            print "ok"
+            print case
+        }
+    }
+}
+
+print "TAP version 13"
+
+test "booleans are cool", { fail =>
+    with True, type Bool {
+        True: { _ => },
+        False: { _ =>
+            fail "type switch not working for Bool"
+        }
+    }
+}
+test "strings.concat rocks", { fail =>
+    fail "not implemented"
+}
