@@ -94,7 +94,7 @@ data Account {
 }
 
 func withdraw { debit, account =>
-  Account(amount: account.balance - debit)
+  Account account.balance - debit
 }
 ```
 
@@ -103,12 +103,12 @@ import accounts {
   Account
 }
 
-accounts.withdraw 500, Account(balance: 1000)
+accounts.withdraw 500, Account 1000
 
-pipe [
+with Account 150, pipe [
   accounts.withdraw 100,
   accounts.withdraw 50,
-], Account(balance: 150)
+]
 ```
 
 ### Why no Interfaces?
