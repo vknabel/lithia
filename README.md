@@ -122,11 +122,10 @@ data Greetable {
   greeting ofValue
 }
 
-let shortPersonGreetable = Greetable(
-  greeting: { person =>
-    strings.append "Hi " person.name
-  }
-)
+let shortPersonGreetable = Greetable { person =>
+  strings.append "Hi " person.name
+}
+
 
 func greet { greetable, object =>
   print greetable.greeting object
@@ -139,11 +138,9 @@ greet shortPersonGreetable, someone
 The benefit of using witnesses instead of plain interface lies in flexibility as one can define multiple implementations of the protocol.
 
 ```
-let longPersonGreetable = Greetable(
-  greeting: { person =>
-    strings.prepend "Hello " person.name
-  }
-)
+let longPersonGreetable = Greetable { person =>
+  strings.prepend "Hello " person.name
+}
 ```
 
 And when it comes to composition, this approach really shines! That way we can define our own map or similar functions to transform existing witnesses.
@@ -152,11 +149,9 @@ And when it comes to composition, this approach really shines! That way we can d
 import strings
 
 func map { transform, witness =>
-  Greetable(
-    greeting: { object =>
-      transform witness.greeting object
-    }
-  )
+  Greetable { object =>
+    transform witness.greeting object
+  }
 }
 
 let uppercased = map strings.uppercased
