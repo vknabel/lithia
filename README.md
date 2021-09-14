@@ -21,12 +21,11 @@ As you might expect there aren’t a lot language features to cover:
 - Currying
 - Imports
 
-On the other hand we explicitly opted out a pretty long list of features: mutability, interfaces, classes, inheritance, type extensions, methods, generics, custom operators, null, instance checks, importing all members of a module, exceptions and tuples.
+On the other hand we explicitly opted out a pretty long list of features: mutability by default, interfaces, classes, inheritance, type extensions, methods, generics, custom operators, null, instance checks, importing all members of a module, exceptions and tuples.
 
 ### Data Types
 
 are structured data with named properties. In most other languages they are called `struct`.
-As all types they must always start with a capital letter. 
 
 ```
 data Person {
@@ -44,6 +43,40 @@ func greet { person =>
 ```
 
 ### Enum Types
+
+in Lithia are a little bit different than you might know them from other languages. 
+Some languages define enums just as a list of constant values. Others allow associated values for each named case.
+Though in Lithia, an enum is an enumeration of types.
+
+To make it easier to use for the value enumeration use case, there is a special syntax to directly declare an enum case and the associated type.
+
+```
+enum JuristicPerson {
+  Person
+  data Company {
+    name
+    corporateForm
+  }
+}
+```
+
+Instead of a classic switch-case statement, there is a `type`-expression instead. 
+It requires you to list all types of the enum type. It returns a function which takes a valid enum type. 
+
+```
+import strings
+
+let nameOf = type JuristicPerson {
+  Person: { person => person.name },
+  Company: { company =>
+    strings.concat [
+      company.name, " ", company.corporateForm
+    ]
+  }
+}
+
+nameOf you
+```
 
 ## Why is this feature missing?
 
