@@ -261,9 +261,46 @@ As seen above, we can easily rely on existing implementations, compose them and 
 
 ### Why no class inheritance?
 
-::Overriding methods = patching witness::
-::Calling super = delegate to other witness::
-::Adding properties = copy::
+Classes and inheritance have their use cases and benefits, but as Lithia separates data from behavior,  inheritance doesn’t serve us well anymore.
+
+For data we have two options:
+1.  Copying all members to another data. Though enums must also include this new data type.
+2. Nesting the data. Especially useful if the data is only used outside the default context. This is especially great if you need to combine many different witnesses or data types as with multi-inheritance. 
+
+```
+data Base { value }
+
+// copying
+data CopiedBase {
+  value
+  other
+}
+
+// nesting
+data NestedBase {
+  base
+  other
+}
+```
+
+When regarding witnesses, we have a third option: modules. We create our witnesses and bind each data value directly to the module itself.
+
+```
+module strings
+
+let map = functor.map
+let flatMap = monad.flatMap
+let reduce = foldable.reduce
+
+doSomething strings, ""
+```
+
+As witnesses aren’t typically used in enums (and one could also add a `Module`  case), we can simply import a whole module and use it as a replacement for multiple witnesses at once.
+
+Though the defaults should be used wisely: for example the `Result` type has two different, but valid implementations of `map`! On the other hand `List` only has one valid implementation.
+
+One additional feature of class inheritance is calling functionality of the super class. In Lithia the approach looks different, but in fact behaves similar:
+We simply create a  whole new witness, which calls the initial one under the hood.
 
 ### Why no dynamic type tests?
 
