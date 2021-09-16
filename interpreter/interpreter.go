@@ -24,14 +24,14 @@ func defaultImportRootPaths() []string {
 	roots := []string{}
 	if path, ok := os.LookupEnv("LITHIA_LOCALS"); ok {
 		roots = append(roots, path)
-	} else {
-		roots = append(roots, "/usr/local/opt/lithia/stdlib")
 	}
 	if path, ok := os.LookupEnv("LITHIA_PACKAGES"); ok {
 		roots = append(roots, path)
 	}
-	if path, ok := os.LookupEnv("LITHIA_PRELUDE"); ok {
+	if path, ok := os.LookupEnv("LITHIA_STDLIB"); ok {
 		roots = append(roots, path)
+	} else {
+		roots = append(roots, "/usr/local/opt/lithia/stdlib")
 	}
 	return roots
 }
