@@ -49,7 +49,6 @@ add 1, 2 // 3
 // with currying
 let incr = add 1 // { r => 1 + r }
 incr 2 // 3
-
 ```
 
 As parameters of a function call are comma separated, you can compose single arguments.
@@ -64,6 +63,12 @@ when False, print "won't be printed"
 
 // parens required
 when (incr 1) == 2, print "will be printed"
+
+// when needed, single parameter calls can be nested
+// fun (a (b (c d)
+fun a b c d
+// fun (a b), (c d)
+fun a b, c d
 ```
 
 ### Data Types
