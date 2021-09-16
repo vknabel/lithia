@@ -39,3 +39,4 @@ brews:
       name: homebrew-lithia
     commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
     license: "MIT"
+    folder: Formula
