@@ -14,29 +14,47 @@ import (
 )
 
 type Interpreter struct {
-	importRoot string
-	parser     *parser.Parser
-	modules    map[ModuleName]*Module
-	prelude    *Environment
+	importRoots []string
+	parser      *parser.Parser
+	modules     map[ModuleName]*Module
+	prelude     *Environment
 }
 
-func NewInterpreter(importRoot string) *Interpreter {
-	if !filepath.IsAbs(importRoot) {
-		absolute, err := filepath.Abs(importRoot)
+func defaultImportRootPaths() []string {
+	roots := []string{}
+	if path, ok := os.LookupEnv("LITHIA_LOCALS"); ok {
+		roots = append(roots, path)
+	} else {
+		roots = append(roots, "/usr/local/opt/lithia/stdlib")
+	}
+	if path, ok := os.LookupEnv("LITHIA_PACKAGES"); ok {
+		roots = append(roots, path)
+	}
+	if path, ok := os.LookupEnv("LITHIA_PRELUDE"); ok {
+		roots = append(roots, path)
+	}
+	return roots
+}
+
+func NewInterpreter(importRoots ...string) *Interpreter {
+	importRoots = append(importRoots, defaultImportRootPaths()...)
+	absoluteImportRoots := make([]string, len(importRoots))
+	for i, root := range importRoots {
+		absolute, err := filepath.Abs(root)
 		if err == nil {
-			importRoot = absolute
+			absoluteImportRoots[i] = absolute
+		} else {
+			absoluteImportRoots[i] = root
 		}
 	}
 	return &Interpreter{
-		importRoot: importRoot,
-		parser:     parser.NewParser(),
-		modules:    make(map[ModuleName]*Module),
+		importRoots: absoluteImportRoots,
+		parser:      parser.NewParser(),
+		modules:     make(map[ModuleName]*Module),
 	}
 }
 
-type ModuleName struct {
-	name string
-}
+type ModuleName string
 type ModuleFile struct {
 	name       string
 	parentPath string
@@ -51,7 +69,8 @@ type Module struct {
 
 type EvaluationContext struct {
 	interpreter   *Interpreter
-	moduleFile    ModuleFile
+	file          string
+	module        *Module
 	path          []string
 	environment   *Environment
 	functionCount int
@@ -60,13 +79,14 @@ type EvaluationContext struct {
 	source []byte
 }
 
-func (inter *Interpreter) NewEvaluationContext(moduleFile ModuleFile, node *sitter.Node, source []byte, environment *Environment) *EvaluationContext {
+func (inter *Interpreter) NewEvaluationContext(file string, module *Module, node *sitter.Node, source []byte, environment *Environment) *EvaluationContext {
 	if environment == nil {
 		environment = NewEnvironment(inter.NewPreludeEnvironment())
 	}
 	return &EvaluationContext{
 		interpreter:   inter,
-		moduleFile:    moduleFile,
+		file:          file,
+		module:        module,
 		path:          []string{},
 		environment:   environment,
 		functionCount: 0,
@@ -79,7 +99,8 @@ func (inter *Interpreter) NewEvaluationContext(moduleFile ModuleFile, node *sitt
 func (i *EvaluationContext) NestedExecutionContext(name string) *EvaluationContext {
 	return &EvaluationContext{
 		interpreter:   i.interpreter,
-		moduleFile:    i.moduleFile,
+		file:          i.file,
+		module:        i.module,
 		path:          append(i.path, name),
 		environment:   NewEnvironment(i.environment),
 		functionCount: 0,
@@ -91,7 +112,8 @@ func (i *EvaluationContext) NestedExecutionContext(name string) *EvaluationConte
 func (i *EvaluationContext) ChildNodeExecutionContext(childNode *sitter.Node) *EvaluationContext {
 	return &EvaluationContext{
 		interpreter:   i.interpreter,
-		moduleFile:    i.moduleFile,
+		file:          i.file,
+		module:        i.module,
 		path:          i.path,
 		environment:   i.environment,
 		functionCount: i.functionCount,
@@ -100,8 +122,19 @@ func (i *EvaluationContext) ChildNodeExecutionContext(childNode *sitter.Node) *E
 	}
 }
 
+func (inter *Interpreter) NewModule(name ModuleName) *Module {
+	module := &Module{
+		name:              name,
+		environment:       NewEnvironment(inter.NewPreludeEnvironment()),
+		executionContexts: make(map[ModuleFile]*EvaluationContext),
+	}
+	inter.modules[name] = module
+	return module
+}
 func (inter *Interpreter) Interpret(fileName string, script string) (RuntimeValue, error) {
-	ex, err := inter.LoadContext(fileName, script)
+	moduleName := ModuleName(strings.ReplaceAll(filepath.Base(fileName), ".", "_"))
+	module := inter.NewModule(moduleName)
+	ex, err := inter.LoadFileIntoModule(module, fileName, script)
 	if err != nil {
 		return nil, err
 	}
@@ -112,72 +145,13 @@ func (inter *Interpreter) Interpret(fileName string, script string) (RuntimeValu
 	return lazyValue.Evaluate()
 }
 
-func (inter *Interpreter) NormalizedModuleFile(fileName string) (ModuleFile, error) {
-	name := filepath.Dir(fileName)
-	var relativeModulePath string
-	relativeModulePath, err := filepath.Rel(inter.importRoot, name)
-	if err != nil {
-		relativeModulePath = name
-	}
-	modulePath := filepath.SplitList(relativeModulePath)
-	return ModuleFile{
-		name:       fileName,
-		parentPath: relativeModulePath,
-		module: ModuleName{
-			name: strings.Join(modulePath, "."),
-		},
-	}, nil
-}
-
-func (ex *EvaluationContext) ModuleName(modulePath []string) ModuleName {
-	relativePath := append([]string{ex.moduleFile.module.name}, modulePath...)
-	relative := ModuleName{
-		name: strings.Join(relativePath, "."),
-	}
-	if ex.interpreter.modules[relative] != nil {
-		return relative
-	} else {
-		return ModuleName{
-			name: strings.Join(modulePath, "."),
-		}
-	}
-}
-
-func (inter *Interpreter) LoadContext(fileName string, script string) (*EvaluationContext, error) {
-	moduleFile, err := inter.NormalizedModuleFile(fileName)
-	if err != nil {
-		return nil, err
-	}
+func (inter *Interpreter) LoadFileIntoModule(module *Module, fileName string, script string) (*EvaluationContext, error) {
 	tree, err := inter.parser.Parse(script)
 	if err != nil {
 		return nil, inter.SyntaxParsingError(fileName, script, tree)
 	}
-	var module *Module
-	if existingModule, ok := inter.modules[moduleFile.module]; ok {
-		module = existingModule
-	} else {
-		module = &Module{
-			name:              moduleFile.module,
-			environment:       NewEnvironment(inter.NewPreludeEnvironment()),
-			executionContexts: make(map[ModuleFile]*EvaluationContext),
-		}
-		inter.modules[moduleFile.module] = module
-	}
-	ex := inter.NewEvaluationContext(moduleFile, tree.RootNode(), []byte(script), module.environment.Private())
+	ex := inter.NewEvaluationContext(fileName, module, tree.RootNode(), []byte(script), module.environment.Private())
 	return ex, nil
-}
-
-func (inter *Interpreter) LoadContextIfNeeded(fileName string, script string) (*EvaluationContext, error) {
-	moduleFile, err := inter.NormalizedModuleFile(fileName)
-	if err != nil {
-		return nil, err
-	}
-	if module, ok := inter.modules[moduleFile.module]; ok {
-		if ex, ok := module.executionContexts[moduleFile]; ok {
-			return ex, nil
-		}
-	}
-	return inter.LoadContext(fileName, script)
 }
 
 func (ex *EvaluationContext) EvaluateSourceFile() (*LazyRuntimeValue, error) {
@@ -232,59 +206,63 @@ func priority(nodeType string) int {
 
 func (ex *EvaluationContext) EvaluatePackage() (*LazyRuntimeValue, error) {
 	internalName := ex.node.ChildByFieldName("name").Content(ex.source)
-	runtimeModule := NewConstantRuntimeValue(RuntimeModule{module: ex.interpreter.modules[ex.moduleFile.module]})
+	runtimeModule := NewConstantRuntimeValue(RuntimeModule{module: ex.module})
 	ex.environment.DeclareUnexported(internalName, runtimeModule)
 	return runtimeModule, nil
 }
 
-func (inter *Interpreter) LoadModule(absoluteModuleName ModuleName, parentPath string) (*Module, error) {
-	childModulePath := filepath.Join(inter.importRoot, parentPath, absoluteModuleName.name)
-	if module, ok := inter.modules[absoluteModuleName]; ok {
+func (inter *Interpreter) LoadModuleIfNeeded(moduleName ModuleName) (*Module, error) {
+	if module, ok := inter.modules[moduleName]; ok {
 		return module, nil
 	}
+	for _, root := range inter.importRoots {
+		relativeModulePath := strings.ReplaceAll(string(moduleName), ".", string(filepath.Separator))
+		modulePath := filepath.Join(root, relativeModulePath)
+		matches, err := filepath.Glob(filepath.Join(modulePath, "*.lithia"))
+		if err != nil {
+			continue
+		}
+		if len(matches) == 0 {
+			continue
+		}
 
-	var matches []string
-	if _, err := os.Stat(childModulePath); os.IsNotExist(err) {
-		rootModulePath := filepath.Join(inter.importRoot, absoluteModuleName.name)
-		if module, ok := inter.modules[absoluteModuleName]; ok {
-			return module, nil
+		module := &Module{
+			name:              moduleName,
+			environment:       NewEnvironment(inter.NewPreludeEnvironment()),
+			executionContexts: make(map[ModuleFile]*EvaluationContext),
 		}
-		matches, err = filepath.Glob(filepath.Join(rootModulePath, "*.lithia"))
+		inter.modules[moduleName] = module
+
+		err = inter.LoadFilesIntoModule(module, matches)
 		if err != nil {
-			return nil, err
+			return module, err
 		}
-	} else {
-		matches, err = filepath.Glob(filepath.Join(childModulePath, "*.lithia"))
-		if err != nil {
-			return nil, err
-		}
+
+		return module, nil
 	}
-	if len(matches) == 0 {
-		return nil, fmt.Errorf("root module import not implemented")
-	}
-	for _, match := range matches {
-		scriptData, err := os.ReadFile(match)
+	return nil, fmt.Errorf("module %s not found", moduleName)
+}
+
+func (inter *Interpreter) LoadFilesIntoModule(module *Module, files []string) error {
+	for _, file := range files {
+		scriptData, err := os.ReadFile(file)
 		if err != nil {
-			return nil, err
+			return err
 		}
-		childContext, err := inter.LoadContextIfNeeded(match, string(scriptData))
+		childContext, err := inter.LoadFileIntoModule(module, file, string(scriptData))
 		if err != nil {
-			return nil, err
+			return err
 		}
 		source, err := childContext.EvaluateNode()
 		if err != nil {
-			return nil, err
+			return err
 		}
 		_, err = source.Evaluate()
 		if err != nil {
-			return nil, err
+			return err
 		}
 	}
-	importedModule := inter.modules[absoluteModuleName]
-	if importedModule == nil {
-		return nil, fmt.Errorf("module imported but not found")
-	}
-	return importedModule, nil
+	return nil
 }
 
 func (ex *EvaluationContext) EvaluateImport() (*LazyRuntimeValue, error) {
@@ -294,12 +272,12 @@ func (ex *EvaluationContext) EvaluateImport() (*LazyRuntimeValue, error) {
 		modulePath[i] = importModuleNode.NamedChild(i).Content(ex.source)
 	}
 	importMember := modulePath[len(modulePath)-1]
-	absoluteModuleName := ex.ModuleName(modulePath)
-	importedModule, err := ex.interpreter.LoadModule(absoluteModuleName, ex.moduleFile.parentPath)
+	moduleName := ModuleName(strings.Join(modulePath, "."))
+	module, err := ex.interpreter.LoadModuleIfNeeded(moduleName)
 	if err != nil {
-		return nil, ex.SyntaxErrorf("error importing module %s: %s", absoluteModuleName, err.Error())
+		return nil, ex.SyntaxErrorf("error importing module %s: %s", moduleName, err.Error())
 	}
-	runtimeModule := NewConstantRuntimeValue(RuntimeModule{module: importedModule})
+	runtimeModule := NewConstantRuntimeValue(RuntimeModule{module: module})
 	err = ex.environment.DeclareUnexported(importMember, runtimeModule)
 	if err != nil {
 		return nil, err

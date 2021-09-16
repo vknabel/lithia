@@ -13,6 +13,16 @@ No. Unless you want to play around with new language concepts for some local non
 
 > Currently Lithia is just an early proof of concept. Most basic language features exist, but the current tooling and standard libraries are far from being feature complete or stable.
 
+## Installation
+
+If you want to give Lithia a try, the easiest way to get started is using Homebrew. By default Lithia is now ready to go.
+
+```bash
+$ brew install vknabel/lithia/lithia
+```
+
+To get syntax highlighting, download and install the latest version of [Syntax Highlighter with Lithia](https://github.com/vknabel/syntax-highlighter/releases) for VS Code.
+
 ## Which features does Lithia provide?
 
 Lithia is built around the belief, that a language is not only defined by its features, but also by the features it lacks, how it instead approaches these cases and by its ecosystem. And that every feature comes with its own tradeoffs.
@@ -46,7 +56,7 @@ func greet { person =>
 
 ### Enum Types
 
-in Lithia are a little bit different than you might know them from other languages. 
+in Lithia are a little bit different than you might know them from other languages.
 Some languages define enums just as a list of constant values. Others allow associated values for each named case.
 Though in Lithia, an enum is an enumeration of types.
 
@@ -62,8 +72,8 @@ enum JuristicPerson {
 }
 ```
 
-Instead of a classic switch-case statement, there is a `type`-expression instead. 
-It requires you to list all types of the enum type. It returns a function which takes a valid enum type. 
+Instead of a classic switch-case statement, there is a `type`-expression instead.
+It requires you to list all types of the enum type. It returns a function which takes a valid enum type.
 
 ```
 import strings

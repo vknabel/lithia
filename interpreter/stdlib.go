@@ -26,9 +26,9 @@ func (inter *Interpreter) NewPreludeEnvironment() *Environment {
 	env.Declare("debug", NewConstantRuntimeValue(builtinDebug))
 	env.Declare("osExit", NewConstantRuntimeValue(builtinOsExit))
 
-	module, err := inter.LoadModule(ModuleName{name: "prelude"}, ".")
+	module, err := inter.LoadModuleIfNeeded(ModuleName("prelude"))
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "warning: prelude not loaded\n    %s\n", err)
+		fmt.Fprintf(os.Stderr, "error: prelude not loaded\n    %s\n", err)
 	}
 	// These declares override the ones in the prelude.
 	env.Parent = &Environment{Parent: nil, Scope: module.environment.Scope, Unexported: module.environment.Unexported}
