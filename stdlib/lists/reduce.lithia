@@ -1,4 +1,4 @@
-package lists
+module lists
 
 /**
  * Recursively walk a tree of nodes, calling a function on each node.

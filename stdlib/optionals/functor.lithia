@@ -1,4 +1,4 @@
-package optionals
+module optionals
 
 import monads
 import booleans

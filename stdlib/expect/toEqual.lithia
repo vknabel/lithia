@@ -1,4 +1,4 @@
-package expect
+module expect
 
 import strings
 import comparables

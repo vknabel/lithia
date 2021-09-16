@@ -1,4 +1,4 @@
-package prelude
+module prelude
 
 func when { condition, then =>
     with condition, type Bool {

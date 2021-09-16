@@ -11,7 +11,7 @@
             "mode": "auto",
             "program": "${workspaceFolder}/cmd/lithia/main.go",
             "args": [
-                "${workspaceFolder}/stdlib/example.lithia"
+                "${workspaceFolder}/stdlib/stdlib-tests.lithia"
             ]
         },
         {
@@ -21,7 +21,7 @@
             "mode": "auto",
             "program": "${workspaceFolder}/cmd/lithia/main.go",
             "args": [
-                "${workspaceFolder}/stdlib/example.lithia"
+                "${workspaceFolder}/stdlib/stdlib-tests.lithia"
             ],
             "env": {
                 "LITHIA_TEST": "1"

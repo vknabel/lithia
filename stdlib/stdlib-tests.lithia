@@ -1,4 +1,4 @@
-package example
+module example
 
 import tests
 import strings
@@ -57,6 +57,9 @@ tests.test "int comparisions", { fail =>
     when 42 < 42, fail "42 < 42"
 
     unless 1 * 1 == 1, fail "1 * 1 == 1"
+
+    func incr { i => i + 1 }
+    unless (incr 1) == 2, fail "(incr 1) == 2"
 }
 
 func main { =>

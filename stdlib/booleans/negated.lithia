@@ -1,4 +1,4 @@
-package booleans
+module booleans
 
 func negated { flag =>
   type Bool {

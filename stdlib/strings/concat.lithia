@@ -1,4 +1,4 @@
-package strings
+module strings
 
 import lists
 

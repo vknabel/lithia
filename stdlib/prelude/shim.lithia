@@ -1,4 +1,4 @@
-package prelude
+module prelude
 
 extern print message
 extern osExit code

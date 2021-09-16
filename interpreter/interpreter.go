@@ -187,7 +187,7 @@ func (ex *EvaluationContext) EvaluateSourceFile() (*LazyRuntimeValue, error) {
 
 func priority(nodeType string) int {
 	switch nodeType {
-	case parser.TYPE_NODE_PACKAGE_DECLARATION:
+	case parser.TYPE_NODE_MODULE_DECLARATION:
 		return 19
 	case parser.TYPE_NODE_IMPORT_DECLARATION:
 		return 17
@@ -204,7 +204,7 @@ func priority(nodeType string) int {
 	}
 }
 
-func (ex *EvaluationContext) EvaluatePackage() (*LazyRuntimeValue, error) {
+func (ex *EvaluationContext) EvaluateModule() (*LazyRuntimeValue, error) {
 	internalName := ex.node.ChildByFieldName("name").Content(ex.source)
 	runtimeModule := NewConstantRuntimeValue(RuntimeModule{module: ex.module})
 	ex.environment.DeclareUnexported(internalName, runtimeModule)
@@ -748,8 +748,8 @@ func (ex *EvaluationContext) EvaluateNode() (*LazyRuntimeValue, error) {
 	switch ex.node.Type() {
 	case parser.TYPE_NODE_SOURCE_FILE:
 		return ex.EvaluateSourceFile()
-	case parser.TYPE_NODE_PACKAGE_DECLARATION:
-		return ex.EvaluatePackage()
+	case parser.TYPE_NODE_MODULE_DECLARATION:
+		return ex.EvaluateModule()
 	case parser.TYPE_NODE_IMPORT_DECLARATION:
 		return ex.EvaluateImport()
 	case parser.TYPE_NODE_LET_DECLARATION:

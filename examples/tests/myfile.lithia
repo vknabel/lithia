@@ -1,4 +1,4 @@
-package tests
+module tests
 
 func test { message, case =>
     print "TAP"

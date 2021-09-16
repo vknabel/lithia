@@ -1,4 +1,4 @@
-package tests
+module tests
 
 import lists
 import strings

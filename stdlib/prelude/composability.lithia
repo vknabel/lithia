@@ -1,4 +1,4 @@
-package prelude
+module prelude
 
 /**
  * Pipes a given value through a list of functions.

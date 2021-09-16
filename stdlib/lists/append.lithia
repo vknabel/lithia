@@ -1,4 +1,4 @@
-package lists
+module lists
 
 func append { element =>
     type List {

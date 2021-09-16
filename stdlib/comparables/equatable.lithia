@@ -1,4 +1,4 @@
-package comparables
+module comparables
 
 let Equatable = prelude.Equatable
 

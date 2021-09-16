@@ -1,4 +1,4 @@
-package prelude
+module prelude
 
 data Equatable {
   equal lhs, rhs

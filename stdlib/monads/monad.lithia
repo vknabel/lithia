@@ -1,4 +1,4 @@
-package monads
+module monads
 
 // Left-Identity: (pipe [pure, flatMap f], value) == f value
 // Right-Identity: (pipe [pure, flatMap { x => x }], value) == pure value

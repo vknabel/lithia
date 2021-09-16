@@ -2,7 +2,7 @@ package parser
 
 var (
 	TYPE_NODE_SOURCE_FILE                   = "source_file"
-	TYPE_NODE_PACKAGE_DECLARATION           = "package_declaration"
+	TYPE_NODE_MODULE_DECLARATION            = "module_declaration"
 	TYPE_NODE_IMPORT_DECLARATION            = "import_declaration"
 	TYPE_NODE_LET_DECLARATION               = "let_declaration"
 	TYPE_NODE_FUNCTION_DECLARATION          = "function_declaration"

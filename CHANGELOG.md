@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.0.3
+
+- `module` instead of `package` to avoid confusion
+
 ## v0.0.2
 
 - Absolute modules and multiple roots #7
