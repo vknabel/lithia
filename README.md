@@ -31,9 +31,40 @@ As you might expect there aren’t a lot language features to cover:
 - Data and enum types
 - First-class modules and functions
 - Currying
-- Imports
+- Module imports
 
 On the other hand we explicitly opted out a pretty long list of features: mutability by default, interfaces, classes, inheritance, type extensions, methods, generics, custom operators, null, instance checks, importing all members of a module, exceptions and tuples.
+
+### Functions
+
+Lithia supports currying and lazy evaluation: functions can be called parameter by parameter. But only if all parameters have been provided and the value will actually be used, the functions itself will be called.
+
+To reflect this behavior, functions are called braceless. Every parameter is separated by a comma.
+
+```
+func add { l, r => l + r }
+
+add 1, 2 // 3
+
+// with currying
+let incr = add 1 // { r => 1 + r }
+incr 2 // 3
+
+```
+
+As parameters of a function call are comma separated, you can compose single arguments.
+Also all operators bind stronger than parameters and function calls.
+
+```
+when True, print "will be printed"
+
+// here you can see lazy evaluation in action:
+// print will never be executed.
+when False, print "won't be printed"
+
+// parens required
+when (incr 1) == 2, print "will be printed"
+```
 
 ### Data Types
 
@@ -89,6 +120,56 @@ let nameOf = type JuristicPerson {
 
 nameOf you
 ```
+
+> **\*Nice to know:** If the given value is not valid, your programm will crash. If you might have arbitrary values, you can add an `Any` case. As it matches all values, make sure it is always the last value.\*
+
+### Modules
+
+are simply defined by the folder structure. Once there is a folder with Lithia files in it, you can import it. No additional configuration overhead required.
+
+```
+import strings
+
+strings.join " ", []
+```
+
+Or alternatively, import members directly. But use this sparingly: it might lead to name collisions.
+
+```
+import strings {
+  join
+}
+
+join " ", []
+```
+
+### Current module
+
+Sometimes you might want to pass the whole module as parameter, or to avoid naming collisions.
+
+```
+module current
+
+let map = functor.map
+
+doSomeStuff current
+```
+
+As shown, a common use case is to pass the module itself instead of multiple witnesses, if all members are also defined on the module itself.
+
+### Module resolution
+
+Lithia will search for a folder containing source files at the following locations:
+
+- when executing a file, relative to it
+- when in REPL, inside the current working directory
+- at `$LITHIA_LOCALS` if set
+- at `$LITHIA_PACKAGES` if set
+- at `$LITHIA_STDLIB` or `/usr/local/opt/lithia/stdlib`
+
+> **\*Nice to know:** there is a special module which will always be imported implicitly, called `prelude`. It contains types like `Bool` or `List`. As Lithia treats the `prelude` as any other module. Therefore you can even override and update the standard library.\*
+
+Modules and their members can be treated like any other value. Just pass them around as parameters.
 
 ## Why is this feature missing?
 
