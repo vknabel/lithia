@@ -26,11 +26,13 @@ func (inter *Interpreter) NewPreludeEnvironment() *Environment {
 	env.Declare("debug", NewConstantRuntimeValue(builtinDebug))
 	env.Declare("osExit", NewConstantRuntimeValue(builtinOsExit))
 
-	if module, err := inter.LoadModule(ModuleName{name: "prelude"}, "."); err == nil {
-		// These declares override the ones in the prelude.
-		env.Parent = &Environment{Parent: nil, Scope: module.environment.Scope, Unexported: module.environment.Unexported}
-		env.Declare("osEnv", NewConstantRuntimeValue(builtinOsEnv(env)))
+	module, err := inter.LoadModule(ModuleName{name: "prelude"}, ".")
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "warning: prelude not loaded\n    %s\n", err)
 	}
+	// These declares override the ones in the prelude.
+	env.Parent = &Environment{Parent: nil, Scope: module.environment.Scope, Unexported: module.environment.Unexported}
+	env.Declare("osEnv", NewConstantRuntimeValue(builtinOsEnv(env)))
 
 	return env
 }
@@ -144,35 +146,13 @@ func builtinOsEnv(prelude *Environment) BuiltinFunction {
 			}
 			if key, ok := value.(PreludeString); ok {
 				if env, ok := os.LookupEnv(string(key)); ok {
-					if lazySome, ok := prelude.Get("Some"); ok {
-						someValue, err := lazySome.Evaluate()
-						if err != nil {
-							return nil, err
-						}
-						if someType, ok := someValue.(DataDeclRuntimeValue); ok {
-							members := make(map[string]*LazyRuntimeValue)
-							members["value"] = NewConstantRuntimeValue(PreludeString(env))
-							return DataRuntimeValue{typeValue: &someType, members: members}, nil
-						} else {
-							return nil, fmt.Errorf("%s is not a data type", someValue)
-						}
-					} else {
-						return nil, fmt.Errorf("prelude not found")
-					}
-				}
-				if lazyNone, ok := prelude.Get("None"); ok {
-					noneValue, err := lazyNone.Evaluate()
-					if err != nil {
-						return nil, err
-					}
-					if noneType, ok := noneValue.(DataDeclRuntimeValue); ok {
-						members := make(map[string]*LazyRuntimeValue)
-						return DataRuntimeValue{typeValue: &noneType, members: members}, nil
-					} else {
-						return nil, fmt.Errorf("%s is not a data type", noneType)
-					}
+					return prelude.MakeDataRuntimeValue("Some", map[string]*LazyRuntimeValue{
+						"value": NewConstantRuntimeValue(PreludeString(env)),
+					})
 				} else {
-					return nil, fmt.Errorf("prelude not found")
+					return prelude.MakeDataRuntimeValue("Some", map[string]*LazyRuntimeValue{
+						"value": NewConstantRuntimeValue(PreludeString(env)),
+					})
 				}
 			} else {
 				return nil, fmt.Errorf("%s is not a string", value)

@@ -151,5 +151,5 @@ func (t RuntimeType) RuntimeType() RuntimeType {
 }
 
 func (t RuntimeType) Lookup(member string) (*LazyRuntimeValue, error) {
-	return nil, fmt.Errorf("type %s has no member %s", t, member)
+	return nil, fmt.Errorf("type %s has no member %s", t.name, member)
 }

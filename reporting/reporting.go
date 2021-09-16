@@ -22,5 +22,6 @@ func report(line int, where string, message string) {
 }
 
 type LocatableError interface {
+	error
 	SourceLocation() string
 }

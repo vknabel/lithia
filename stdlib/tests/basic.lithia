@@ -16,14 +16,10 @@ data TestSummary {
     failedTests
 }
 
-func detectIfTestsAreEnabled { env => 
-    with (osEnv "LITHIA_TEST"), type Optional {
-        Some: { _ => True },
-        None: { _ => False }
-    }
+let enabled = with osEnv "LITHIA_TEST", type Optional {
+    Some: { _ => True },
+    None: { _ => False }
 }
-
-let enabled = detectIfTestsAreEnabled (osEnv "LITHIA_TEST")
 
 func test { case, function =>
     testCases.accept (lists.append (TestCase case, function), testCases.current)

@@ -39,8 +39,25 @@ tests.test "when true succeeds", { fail =>
     }
 }
 
+tests.test "int comparisions", { fail =>
+    unless 1 == 1, fail "1 == 1"
+    unless 0 == 0, fail "0 == 0"
+    unless 0 != 42, fail "0 != 42"
+    unless 13 != 42, fail "13 != 42"
+    when 1 == 2, fail "!(1 == 2)"
+
+    unless 1 + 1 == 2, fail "1 + 1 == 2"
+    unless 3 * 2 + 1 == 7, fail "3 * 2 + 1 == 7"
+
+    unless 42 - 1 < 42, fail "42 - 1 < 42"
+    when 42 < 42, fail "42 < 42"
+
+    unless 1 * 1 == 1, fail "1 * 1 == 1"
+}
+
 func main { =>
-    print "Hello World!"
+    print "main called"
+    osExit 1
 }
 
 when tests.enabled, tests.runTests

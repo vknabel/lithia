@@ -92,7 +92,14 @@ type DataDeclRuntimeValue struct {
 }
 
 func (d DataDeclRuntimeValue) String() string {
-	return fmt.Sprintf("data %d { %s }", d.fields)
+	fieldNames := make([]string, len(d.fields))
+	for i, field := range d.fields {
+		fieldNames[i] = field.name
+		if len(field.params) > 0 {
+			fieldNames[i] += " " + strings.Join(field.params, ", ")
+		}
+	}
+	return fmt.Sprintf("data %s { %s }", d.name, strings.Join(fieldNames, "; "))
 }
 
 func (d DataDeclRuntimeValue) RuntimeType() RuntimeType {

@@ -21,6 +21,12 @@ type Interpreter struct {
 }
 
 func NewInterpreter(importRoot string) *Interpreter {
+	if !filepath.IsAbs(importRoot) {
+		absolute, err := filepath.Abs(importRoot)
+		if err == nil {
+			importRoot = absolute
+		}
+	}
 	return &Interpreter{
 		importRoot: importRoot,
 		parser:     parser.NewParser(),
@@ -49,7 +55,6 @@ type ExecutionContext struct {
 	path          []string
 	environment   *Environment
 	functionCount int
-	evaluatedNode *LazyRuntimeValue
 
 	node   *sitter.Node
 	source []byte
@@ -109,10 +114,10 @@ func (inter *Interpreter) Interpret(fileName string, script string) (RuntimeValu
 
 func (inter *Interpreter) NormalizedModuleFile(fileName string) (ModuleFile, error) {
 	name := filepath.Dir(fileName)
+	var relativeModulePath string
 	relativeModulePath, err := filepath.Rel(inter.importRoot, name)
 	if err != nil {
-		// TODO: Might be unrelated later
-		return ModuleFile{}, err
+		relativeModulePath = name
 	}
 	modulePath := filepath.SplitList(relativeModulePath)
 	return ModuleFile{
@@ -626,28 +631,15 @@ func (ex *ExecutionContext) EvaluateBinaryExpression() (*LazyRuntimeValue, error
 	if err != nil {
 		return nil, err
 	}
-	lazyResult := NewLazyRuntimeValue(func() (RuntimeValue, error) {
-		left, err := lazyLeft.Evaluate()
-		if err != nil {
-			return nil, err
-		}
-		switch left := left.(type) {
-		case PreludeInt:
-			right, err := lazyRight.Evaluate()
-			if err != nil {
-				return nil, err
-			}
-			switch right := right.(type) {
-			case PreludeInt:
-				return PreludeInt(left + right), nil
-			default:
-				return nil, ex.RuntimeErrorf("expected int, got %s", right)
-			}
-		default:
-			return nil, ex.RuntimeErrorf("expected int, got %s", left)
-		}
-	})
-	return lazyResult, nil
+	operator := ex.node.ChildByFieldName("operator").Content(ex.source)
+
+	impl, err := ex.BinaryOperatorFunction(operator)
+	if err != nil {
+		return nil, err
+	}
+	return NewLazyRuntimeValue(func() (RuntimeValue, error) {
+		return impl(lazyLeft, lazyRight)
+	}), nil
 }
 
 func (ex *ExecutionContext) EvaluateUnaryExpression() (*LazyRuntimeValue, error) {

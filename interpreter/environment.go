@@ -74,3 +74,31 @@ func (env *Environment) Contains(name string) bool {
 	}
 	return false
 }
+
+func (env *Environment) LookupRuntimeValue(key string) (RuntimeValue, error) {
+	if lazyValue, ok := env.Get(key); ok {
+		value, err := lazyValue.Evaluate()
+		if err != nil {
+			return nil, err
+		}
+		return value, nil
+	} else {
+		return nil, fmt.Errorf("undefined %s", key)
+	}
+}
+
+func (env *Environment) MakeDataRuntimeValue(dataDeclName string, members map[string]*LazyRuntimeValue) (RuntimeValue, error) {
+	value, err := env.LookupRuntimeValue(dataDeclName)
+	if err != nil {
+		return nil, err
+	}
+	if someType, ok := value.(DataDeclRuntimeValue); ok {
+		return DataRuntimeValue{typeValue: &someType, members: members}, nil
+	} else {
+		return nil, fmt.Errorf("%s is not a data type", value)
+	}
+}
+
+func (env *Environment) MakeEmptyDataRuntimeValue(dataDeclName string) (RuntimeValue, error) {
+	return env.MakeDataRuntimeValue(dataDeclName, make(map[string]*LazyRuntimeValue))
+}
