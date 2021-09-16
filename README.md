@@ -11,6 +11,8 @@ Lithia is designed around a few core concepts in mind all language features cont
 
 No. Unless you want to play around with new language concepts for some local non-production projects with a proof of concept programming language. If so, I’d be very happy to hear your feedback!
 
+> Currently Lithia is just an early proof of concept. Most basic language features exist, but the current tooling and standard libraries are far from being feature complete or stable.
+
 ## Which features does Lithia provide?
 
 Lithia is built around the belief, that a language is not only defined by its features, but also by the features it lacks, how it instead approaches these cases and by its ecosystem. And that every feature comes with its own tradeoffs.
