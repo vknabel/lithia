@@ -42,3 +42,6 @@ brews:
     commit_msg_template: "Brew formula update for {{ .ProjectName }} version {{ .Tag }}"
     license: "MIT"
     folder: Formula
+    install: |
+      bin.install "lithia"
+      prefix.install "./stdlib"
