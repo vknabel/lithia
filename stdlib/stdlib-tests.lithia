@@ -18,6 +18,10 @@ tests.test "strings.concat rocks", { fail =>
     when expected != actual, fail actual
 }
 
+tests.test "string comparisions", { fail =>
+    when "" != "", fail "empty strings are not equal"
+}
+
 tests.test "any in enums matches all types", { fail =>
     enum AnyEnum {
         Int
