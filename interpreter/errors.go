@@ -13,7 +13,7 @@ type SyntaxError struct {
 	ModuleFile ModuleFile
 }
 
-func (ex *ExecutionContext) SyntaxErrorf(format string, args ...interface{}) SyntaxError {
+func (ex *EvaluationContext) SyntaxErrorf(format string, args ...interface{}) SyntaxError {
 	return SyntaxError{
 		Message:    fmt.Sprintf(format, args...),
 		Node:       ex.node,
@@ -33,7 +33,7 @@ type RuntimeError struct {
 	ModuleFile ModuleFile
 }
 
-func (ex *ExecutionContext) RuntimeErrorf(format string, args ...interface{}) RuntimeError {
+func (ex *EvaluationContext) RuntimeErrorf(format string, args ...interface{}) RuntimeError {
 	return RuntimeError{
 		Message:    fmt.Sprintf(format, args...),
 		Node:       ex.node,

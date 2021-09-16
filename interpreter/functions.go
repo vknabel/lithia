@@ -19,8 +19,8 @@ type CurriedCallable struct {
 type Function struct {
 	name      string
 	arguments []string
-	body      func(*ExecutionContext) ([]*LazyRuntimeValue, error)
-	parent    *ExecutionContext
+	body      func(*EvaluationContext) ([]*LazyRuntimeValue, error)
+	parent    *EvaluationContext
 }
 
 func (f Function) String() string {

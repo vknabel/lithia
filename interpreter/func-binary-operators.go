@@ -2,7 +2,7 @@ package interpreter
 
 import "reflect"
 
-func (ex *ExecutionContext) BinaryOperatorFunction(operator string) (func(*LazyRuntimeValue, *LazyRuntimeValue) (RuntimeValue, error), error) {
+func (ex *EvaluationContext) BinaryOperatorFunction(operator string) (func(*LazyRuntimeValue, *LazyRuntimeValue) (RuntimeValue, error), error) {
 	switch operator {
 	case "==":
 		return func(lazyLeft, lazyRight *LazyRuntimeValue) (RuntimeValue, error) {
@@ -105,7 +105,7 @@ func (ex *ExecutionContext) BinaryOperatorFunction(operator string) (func(*LazyR
 	}
 }
 
-func (ex *ExecutionContext) genericGreedyComparision(
+func (ex *EvaluationContext) genericGreedyComparision(
 	lazyLeft, lazyRight *LazyRuntimeValue,
 	compare func(RuntimeValue, RuntimeValue) bool,
 ) (RuntimeValue, error) {
@@ -124,7 +124,7 @@ func (ex *ExecutionContext) genericGreedyComparision(
 	}
 }
 
-func (ex *ExecutionContext) numericGreedyComparision(
+func (ex *EvaluationContext) numericGreedyComparision(
 	lazyLeft, lazyRight *LazyRuntimeValue,
 	compareInt func(PreludeInt, PreludeInt) bool,
 	compareFloat func(PreludeFloat, PreludeFloat) bool,
@@ -165,7 +165,7 @@ func (ex *ExecutionContext) numericGreedyComparision(
 	}
 }
 
-func (ex *ExecutionContext) numericGreedyOperation(
+func (ex *EvaluationContext) numericGreedyOperation(
 	lazyLeft, lazyRight *LazyRuntimeValue,
 	combineInt func(PreludeInt, PreludeInt) PreludeInt,
 	combineFloat func(PreludeFloat, PreludeFloat) PreludeFloat,
@@ -206,7 +206,7 @@ func (ex *ExecutionContext) numericGreedyOperation(
 	}
 }
 
-func (ex *ExecutionContext) lazyLogicComparision(
+func (ex *EvaluationContext) lazyLogicComparision(
 	lazyLeft, lazyRight *LazyRuntimeValue,
 	compare func(bool, func() (bool, error)) (bool, error),
 ) (RuntimeValue, error) {

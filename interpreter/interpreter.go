@@ -46,10 +46,10 @@ type ModuleFile struct {
 type Module struct {
 	name              ModuleName
 	environment       *Environment
-	executionContexts map[ModuleFile]*ExecutionContext
+	executionContexts map[ModuleFile]*EvaluationContext
 }
 
-type ExecutionContext struct {
+type EvaluationContext struct {
 	interpreter   *Interpreter
 	moduleFile    ModuleFile
 	path          []string
@@ -60,11 +60,11 @@ type ExecutionContext struct {
 	source []byte
 }
 
-func (inter *Interpreter) NewExecutionContext(moduleFile ModuleFile, node *sitter.Node, source []byte, environment *Environment) *ExecutionContext {
+func (inter *Interpreter) NewEvaluationContext(moduleFile ModuleFile, node *sitter.Node, source []byte, environment *Environment) *EvaluationContext {
 	if environment == nil {
 		environment = NewEnvironment(inter.NewPreludeEnvironment())
 	}
-	return &ExecutionContext{
+	return &EvaluationContext{
 		interpreter:   inter,
 		moduleFile:    moduleFile,
 		path:          []string{},
@@ -76,8 +76,8 @@ func (inter *Interpreter) NewExecutionContext(moduleFile ModuleFile, node *sitte
 	}
 }
 
-func (i *ExecutionContext) NestedExecutionContext(name string) *ExecutionContext {
-	return &ExecutionContext{
+func (i *EvaluationContext) NestedExecutionContext(name string) *EvaluationContext {
+	return &EvaluationContext{
 		interpreter:   i.interpreter,
 		moduleFile:    i.moduleFile,
 		path:          append(i.path, name),
@@ -88,8 +88,8 @@ func (i *ExecutionContext) NestedExecutionContext(name string) *ExecutionContext
 	}
 }
 
-func (i *ExecutionContext) ChildNodeExecutionContext(childNode *sitter.Node) *ExecutionContext {
-	return &ExecutionContext{
+func (i *EvaluationContext) ChildNodeExecutionContext(childNode *sitter.Node) *EvaluationContext {
+	return &EvaluationContext{
 		interpreter:   i.interpreter,
 		moduleFile:    i.moduleFile,
 		path:          i.path,
@@ -129,7 +129,7 @@ func (inter *Interpreter) NormalizedModuleFile(fileName string) (ModuleFile, err
 	}, nil
 }
 
-func (ex *ExecutionContext) ModuleName(modulePath []string) ModuleName {
+func (ex *EvaluationContext) ModuleName(modulePath []string) ModuleName {
 	relativePath := append([]string{ex.moduleFile.module.name}, modulePath...)
 	relative := ModuleName{
 		name: strings.Join(relativePath, "."),
@@ -143,7 +143,7 @@ func (ex *ExecutionContext) ModuleName(modulePath []string) ModuleName {
 	}
 }
 
-func (inter *Interpreter) LoadContext(fileName string, script string) (*ExecutionContext, error) {
+func (inter *Interpreter) LoadContext(fileName string, script string) (*EvaluationContext, error) {
 	moduleFile, err := inter.NormalizedModuleFile(fileName)
 	if err != nil {
 		return nil, err
@@ -159,15 +159,15 @@ func (inter *Interpreter) LoadContext(fileName string, script string) (*Executio
 		module = &Module{
 			name:              moduleFile.module,
 			environment:       NewEnvironment(inter.NewPreludeEnvironment()),
-			executionContexts: make(map[ModuleFile]*ExecutionContext),
+			executionContexts: make(map[ModuleFile]*EvaluationContext),
 		}
 		inter.modules[moduleFile.module] = module
 	}
-	ex := inter.NewExecutionContext(moduleFile, tree.RootNode(), []byte(script), module.environment.Private())
+	ex := inter.NewEvaluationContext(moduleFile, tree.RootNode(), []byte(script), module.environment.Private())
 	return ex, nil
 }
 
-func (inter *Interpreter) LoadContextIfNeeded(fileName string, script string) (*ExecutionContext, error) {
+func (inter *Interpreter) LoadContextIfNeeded(fileName string, script string) (*EvaluationContext, error) {
 	moduleFile, err := inter.NormalizedModuleFile(fileName)
 	if err != nil {
 		return nil, err
@@ -180,7 +180,7 @@ func (inter *Interpreter) LoadContextIfNeeded(fileName string, script string) (*
 	return inter.LoadContext(fileName, script)
 }
 
-func (ex *ExecutionContext) EvaluateSourceFile() (*LazyRuntimeValue, error) {
+func (ex *EvaluationContext) EvaluateSourceFile() (*LazyRuntimeValue, error) {
 	count := ex.node.ChildCount()
 	children := make([]*sitter.Node, count)
 	for i := uint32(0); i < count; i++ {
@@ -211,7 +211,26 @@ func (ex *ExecutionContext) EvaluateSourceFile() (*LazyRuntimeValue, error) {
 	}), nil
 }
 
-func (ex *ExecutionContext) EvaluatePackage() (*LazyRuntimeValue, error) {
+func priority(nodeType string) int {
+	switch nodeType {
+	case parser.TYPE_NODE_PACKAGE_DECLARATION:
+		return 19
+	case parser.TYPE_NODE_IMPORT_DECLARATION:
+		return 17
+	case parser.TYPE_NODE_DATA_DECLARATION:
+		return 15
+	case parser.TYPE_NODE_ENUM_DECLARATION:
+		return 13
+	case parser.TYPE_NODE_FUNCTION_DECLARATION:
+		return 7
+	case parser.TYPE_NODE_LET_DECLARATION:
+		return 3
+	default:
+		return 0
+	}
+}
+
+func (ex *EvaluationContext) EvaluatePackage() (*LazyRuntimeValue, error) {
 	internalName := ex.node.ChildByFieldName("name").Content(ex.source)
 	runtimeModule := NewConstantRuntimeValue(RuntimeModule{module: ex.interpreter.modules[ex.moduleFile.module]})
 	ex.environment.DeclareUnexported(internalName, runtimeModule)
@@ -268,7 +287,7 @@ func (inter *Interpreter) LoadModule(absoluteModuleName ModuleName, parentPath s
 	return importedModule, nil
 }
 
-func (ex *ExecutionContext) EvaluateImport() (*LazyRuntimeValue, error) {
+func (ex *EvaluationContext) EvaluateImport() (*LazyRuntimeValue, error) {
 	importModuleNode := ex.node.ChildByFieldName("name")
 	modulePath := make([]string, importModuleNode.NamedChildCount())
 	for i := 0; i < int(importModuleNode.NamedChildCount()); i++ {
@@ -288,7 +307,7 @@ func (ex *ExecutionContext) EvaluateImport() (*LazyRuntimeValue, error) {
 	return runtimeModule, nil
 }
 
-func (ex *ExecutionContext) EvaluateLetDeclaration() (*LazyRuntimeValue, error) {
+func (ex *EvaluationContext) EvaluateLetDeclaration() (*LazyRuntimeValue, error) {
 	nameNode := ex.node.ChildByFieldName("name")
 	valueNode := ex.node.ChildByFieldName("value")
 	if nameNode == nil || valueNode == nil {
@@ -304,7 +323,7 @@ func (ex *ExecutionContext) EvaluateLetDeclaration() (*LazyRuntimeValue, error) 
 	}
 	return lazyValue, nil
 }
-func (ex *ExecutionContext) EvaluateFunctionDeclaration() (*LazyRuntimeValue, error) {
+func (ex *EvaluationContext) EvaluateFunctionDeclaration() (*LazyRuntimeValue, error) {
 	name := ex.node.ChildByFieldName("name").Content(ex.source)
 	functionNode := ex.node.ChildByFieldName("function")
 	function, err := ex.ChildNodeExecutionContext(functionNode).ParseFunctionLiteral(name)
@@ -319,7 +338,7 @@ func (ex *ExecutionContext) EvaluateFunctionDeclaration() (*LazyRuntimeValue, er
 	}
 	return impl, nil
 }
-func (ex *ExecutionContext) EvaluateDataDeclaration() (*LazyRuntimeValue, error) {
+func (ex *EvaluationContext) EvaluateDataDeclaration() (*LazyRuntimeValue, error) {
 	name := ex.node.ChildByFieldName("name").Content(ex.source)
 	propertiesNode := ex.node.ChildByFieldName("properties")
 
@@ -358,11 +377,11 @@ func (ex *ExecutionContext) EvaluateDataDeclaration() (*LazyRuntimeValue, error)
 	return constantValue, nil
 }
 
-func (ex *ExecutionContext) EvaluateExternDeclaration() (*LazyRuntimeValue, error) {
+func (ex *EvaluationContext) EvaluateExternDeclaration() (*LazyRuntimeValue, error) {
 	return ex.ChildNodeExecutionContext(ex.node.ChildByFieldName("name")).EvaluateIdentifier()
 }
 
-func (ex *ExecutionContext) ParseParamterList() ([]string, error) {
+func (ex *EvaluationContext) ParseParamterList() ([]string, error) {
 	params := make([]string, ex.node.ChildCount())
 	for i := 0; i < int(ex.node.ChildCount()); i++ {
 		child := ex.node.Child(i)
@@ -371,7 +390,7 @@ func (ex *ExecutionContext) ParseParamterList() ([]string, error) {
 	return params, nil
 }
 
-func (ex *ExecutionContext) ParseStatementList() ([]*LazyRuntimeValue, error) {
+func (ex *EvaluationContext) ParseStatementList() ([]*LazyRuntimeValue, error) {
 	stmts := make([]*LazyRuntimeValue, 0, ex.node.NamedChildCount())
 	for i := 0; i < int(ex.node.NamedChildCount()); i++ {
 		child := ex.node.NamedChild(i)
@@ -388,7 +407,7 @@ func (ex *ExecutionContext) ParseStatementList() ([]*LazyRuntimeValue, error) {
 	return stmts, nil
 }
 
-func (ex *ExecutionContext) EvaluateNumberLiteral() (*LazyRuntimeValue, error) {
+func (ex *EvaluationContext) EvaluateNumberLiteral() (*LazyRuntimeValue, error) {
 	literal := ex.node.Content(ex.source)
 	integer, err := strconv.ParseInt(literal, 10, 64)
 	if err != nil {
@@ -396,7 +415,7 @@ func (ex *ExecutionContext) EvaluateNumberLiteral() (*LazyRuntimeValue, error) {
 	}
 	return NewConstantRuntimeValue(PreludeInt(integer)), nil
 }
-func (ex *ExecutionContext) EvaluateComplexInvocationExpr() (*LazyRuntimeValue, error) {
+func (ex *EvaluationContext) EvaluateComplexInvocationExpr() (*LazyRuntimeValue, error) {
 	functionNode := ex.node.ChildByFieldName("function")
 	lazyFunc, err := ex.ChildNodeExecutionContext(functionNode).EvaluateNode()
 	if err != nil {
@@ -426,11 +445,11 @@ func (ex *ExecutionContext) EvaluateComplexInvocationExpr() (*LazyRuntimeValue, 
 	}), nil
 }
 
-func (ex *ExecutionContext) EvaluateSimpleInvocation() (*LazyRuntimeValue, error) {
+func (ex *EvaluationContext) EvaluateSimpleInvocation() (*LazyRuntimeValue, error) {
 	return ex.EvaluateComplexInvocationExpr()
 }
 
-func (ex *ExecutionContext) EvaluateEnumDeclaration() (*LazyRuntimeValue, error) {
+func (ex *EvaluationContext) EvaluateEnumDeclaration() (*LazyRuntimeValue, error) {
 	name := ex.node.ChildByFieldName("name").Content(ex.source)
 	casesNode := ex.node.ChildByFieldName("cases")
 	if casesNode == nil {
@@ -476,7 +495,7 @@ func (ex *ExecutionContext) EvaluateEnumDeclaration() (*LazyRuntimeValue, error)
 	return constantValue, nil
 }
 
-func (ex *ExecutionContext) EvaluateIdentifier() (*LazyRuntimeValue, error) {
+func (ex *EvaluationContext) EvaluateIdentifier() (*LazyRuntimeValue, error) {
 	content := ex.node.Content(ex.source)
 	return NewLazyRuntimeValue(func() (RuntimeValue, error) {
 		if lazyValue, ok := ex.environment.Get(content); ok {
@@ -509,7 +528,7 @@ func (ex *ExecutionContext) EvaluateIdentifier() (*LazyRuntimeValue, error) {
 	}), nil
 }
 
-func (ex *ExecutionContext) EvaluateMemberAccess() (*LazyRuntimeValue, error) {
+func (ex *EvaluationContext) EvaluateMemberAccess() (*LazyRuntimeValue, error) {
 	if ex.node.NamedChildCount() < 2 {
 		return nil, ex.SyntaxErrorf("expected at least 2 children, got %d", ex.node.NamedChildCount())
 	}
@@ -544,7 +563,7 @@ func (ex *ExecutionContext) EvaluateMemberAccess() (*LazyRuntimeValue, error) {
 	return lazyResult, nil
 }
 
-func (ex *ExecutionContext) EvaluateTypeExpression() (*LazyRuntimeValue, error) {
+func (ex *EvaluationContext) EvaluateTypeExpression() (*LazyRuntimeValue, error) {
 	typeNode := ex.node.ChildByFieldName("type")
 	bodyNode := ex.node.ChildByFieldName("body")
 	if typeNode == nil || bodyNode == nil {
@@ -603,7 +622,7 @@ func casesToString(cases map[string]*LazyRuntimeValue) string {
 	return fmt.Sprintf("[%s]", strings.Join(labels, ", "))
 }
 
-func (ex *ExecutionContext) EvaluateGroup() (*LazyRuntimeValue, error) {
+func (ex *EvaluationContext) EvaluateGroup() (*LazyRuntimeValue, error) {
 	expressionNode := ex.node.ChildByFieldName("expression")
 	if expressionNode == nil {
 		return nil, ex.SyntaxErrorf("expected expression")
@@ -611,7 +630,7 @@ func (ex *ExecutionContext) EvaluateGroup() (*LazyRuntimeValue, error) {
 	return ex.ChildNodeExecutionContext(expressionNode).EvaluateNode()
 }
 
-func (ex *ExecutionContext) EvaluateStringLiteral() (*LazyRuntimeValue, error) {
+func (ex *EvaluationContext) EvaluateStringLiteral() (*LazyRuntimeValue, error) {
 	string, err := strconv.Unquote(ex.node.Content(ex.source))
 	if err != nil {
 		return nil, err
@@ -619,7 +638,7 @@ func (ex *ExecutionContext) EvaluateStringLiteral() (*LazyRuntimeValue, error) {
 	return NewConstantRuntimeValue(PreludeString(string)), nil
 }
 
-func (ex *ExecutionContext) EvaluateBinaryExpression() (*LazyRuntimeValue, error) {
+func (ex *EvaluationContext) EvaluateBinaryExpression() (*LazyRuntimeValue, error) {
 	if ex.node.NamedChildCount() != 2 {
 		return nil, ex.SyntaxErrorf("expected 2 children, got %d", ex.node.NamedChildCount())
 	}
@@ -642,11 +661,11 @@ func (ex *ExecutionContext) EvaluateBinaryExpression() (*LazyRuntimeValue, error
 	}), nil
 }
 
-func (ex *ExecutionContext) EvaluateUnaryExpression() (*LazyRuntimeValue, error) {
+func (ex *EvaluationContext) EvaluateUnaryExpression() (*LazyRuntimeValue, error) {
 	return nil, ex.SyntaxErrorf("unimplemented")
 }
 
-func (ex *ExecutionContext) ParseFunctionLiteral(name string) (Function, error) {
+func (ex *EvaluationContext) ParseFunctionLiteral(name string) (Function, error) {
 	parametersNode := ex.node.ChildByFieldName("parameters")
 	bodyNode := ex.node.ChildByFieldName("body")
 
@@ -671,7 +690,7 @@ func (ex *ExecutionContext) ParseFunctionLiteral(name string) (Function, error) 
 		name:      name,
 		arguments: params,
 		parent:    ex,
-		body: func(i *ExecutionContext) ([]*LazyRuntimeValue, error) {
+		body: func(i *EvaluationContext) ([]*LazyRuntimeValue, error) {
 			if bodyNode == nil {
 				return []*LazyRuntimeValue{
 					NewConstantRuntimeValue(PreludeString("TODO: WHY IS THIS NIL?" + name)),
@@ -686,7 +705,7 @@ func (ex *ExecutionContext) ParseFunctionLiteral(name string) (Function, error) 
 	}, nil
 }
 
-func (ex *ExecutionContext) EvaluateFunctionLiteral() (*LazyRuntimeValue, error) {
+func (ex *EvaluationContext) EvaluateFunctionLiteral() (*LazyRuntimeValue, error) {
 	function, err := ex.ParseFunctionLiteral("")
 	if err != nil {
 		return nil, err
@@ -694,7 +713,7 @@ func (ex *ExecutionContext) EvaluateFunctionLiteral() (*LazyRuntimeValue, error)
 	return NewConstantRuntimeValue(function), nil
 }
 
-func (ex *ExecutionContext) EvaluateArrayLiteral() (*LazyRuntimeValue, error) {
+func (ex *EvaluationContext) EvaluateArrayLiteral() (*LazyRuntimeValue, error) {
 	numberOfElements := int(ex.node.NamedChildCount())
 	elements := make([]*LazyRuntimeValue, numberOfElements)
 	for i := 0; i < numberOfElements; i++ {
@@ -747,7 +766,7 @@ func SliceToList(consDecl DataDeclRuntimeValue, nilDecl DataDeclRuntimeValue, sl
 	}
 }
 
-func (ex *ExecutionContext) EvaluateNode() (*LazyRuntimeValue, error) {
+func (ex *EvaluationContext) EvaluateNode() (*LazyRuntimeValue, error) {
 	switch ex.node.Type() {
 	case parser.TYPE_NODE_SOURCE_FILE:
 		return ex.EvaluateSourceFile()
