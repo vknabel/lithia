@@ -144,6 +144,22 @@ func (inter *Interpreter) Interpret(fileName string, script string) (RuntimeValu
 	}
 	return lazyValue.Evaluate()
 }
+func (inter *Interpreter) InterpretEmbed(fileName string, script string) (RuntimeValue, error) {
+	moduleName := ModuleName(strings.ReplaceAll(filepath.Base(fileName), ".", "_"))
+	module := inter.modules[moduleName]
+	if module == nil {
+		module = inter.NewModule(moduleName)
+	}
+	ex, err := inter.EmbedFileIntoModule(module, fileName, script)
+	if err != nil {
+		return nil, err
+	}
+	lazyValue, err := ex.EvaluateNode()
+	if err != nil {
+		return nil, err
+	}
+	return lazyValue.Evaluate()
+}
 
 func (inter *Interpreter) LoadFileIntoModule(module *Module, fileName string, script string) (*EvaluationContext, error) {
 	tree, err := inter.parser.Parse(script)
@@ -151,6 +167,15 @@ func (inter *Interpreter) LoadFileIntoModule(module *Module, fileName string, sc
 		return nil, inter.SyntaxParsingError(fileName, script, tree)
 	}
 	ex := inter.NewEvaluationContext(fileName, module, tree.RootNode(), []byte(script), module.environment.Private())
+	return ex, nil
+}
+
+func (inter *Interpreter) EmbedFileIntoModule(module *Module, fileName string, script string) (*EvaluationContext, error) {
+	tree, err := inter.parser.Parse(script)
+	if err != nil {
+		return nil, inter.SyntaxParsingError(fileName, script, tree)
+	}
+	ex := inter.NewEvaluationContext(fileName, module, tree.RootNode(), []byte(script), module.environment)
 	return ex, nil
 }
 

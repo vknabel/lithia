@@ -24,7 +24,7 @@
                 "${workspaceFolder}/stdlib/stdlib-tests.lithia"
             ],
             "env": {
-                "LITHIA_TEST": "1"
+                "LITHIA_TESTS": "1"
             }
         },
         {

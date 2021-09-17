@@ -22,7 +22,7 @@ archives:
       386: i386
       amd64: x86_64
     files: 
-      - stdlib/**/*.lithia
+      - stdlib
 checksum:
   name_template: 'checksums.txt'
 snapshot:

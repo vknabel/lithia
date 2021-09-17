@@ -58,7 +58,7 @@ func runPrompt() error {
 			reporting.ReportErrorOrPanic(err)
 			continue
 		}
-		value, err := inter.Interpret("prompt", line)
+		value, err := inter.InterpretEmbed("prompt", line)
 		if err != nil {
 			reporting.ReportErrorOrPanic(err)
 			continue
