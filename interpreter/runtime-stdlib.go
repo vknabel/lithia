@@ -3,7 +3,6 @@ package interpreter
 import (
 	"fmt"
 	"os"
-	"strings"
 )
 
 func (inter *Interpreter) NewPreludeEnvironment() *Environment {
@@ -35,61 +34,6 @@ func (inter *Interpreter) NewPreludeEnvironment() *Environment {
 	env.Declare("osEnv", NewConstantRuntimeValue(builtinOsEnv(env)))
 
 	return env
-}
-
-func NewBuiltinFunction(
-	name string,
-	args []string,
-	impl func(args []*LazyRuntimeValue) (RuntimeValue, error),
-) BuiltinFunction {
-	f := BuiltinFunction{
-		name: name,
-		args: args,
-		impl: impl,
-	}
-	var _ RuntimeValue = f
-	var _ Callable = f
-	return f
-}
-
-type BuiltinFunction struct {
-	name string
-	args []string
-	impl func(args []*LazyRuntimeValue) (RuntimeValue, error)
-}
-
-func (f BuiltinFunction) RuntimeType() RuntimeType {
-	return PreludeFunctionType{}.RuntimeType()
-}
-
-func (f BuiltinFunction) Lookup(member string) (*LazyRuntimeValue, error) {
-	return nil, fmt.Errorf("function %s has no member %s", fmt.Sprint(f), member)
-}
-
-func (f BuiltinFunction) String() string {
-	return fmt.Sprintf("{ %s => @(%s) }", strings.Join(f.args, ","), f.name)
-}
-
-func (f BuiltinFunction) Call(arguments []*LazyRuntimeValue) (RuntimeValue, error) {
-	if len(arguments) < len(f.args) {
-		return CurriedCallable{
-			actual:         f,
-			args:           arguments,
-			remainingArity: len(f.args) - len(arguments),
-		}, nil
-	}
-	intermediate, err := f.impl(arguments[:len(f.args)])
-	if err != nil {
-		return nil, err
-	}
-	if len(arguments) == len(f.args) {
-		return intermediate, nil
-	}
-	if g, ok := intermediate.(Callable); ok {
-		return g.Call(arguments[len(f.args):])
-	} else {
-		return nil, fmt.Errorf("%s is not callable", g)
-	}
 }
 
 var builtinDebug = NewBuiltinFunction(

@@ -57,10 +57,6 @@ func (e SyntaxParsingError) ErrorNodes(node *sitter.Node) []*sitter.Node {
 		partial = append(partial, node)
 	}
 
-	// if !node.HasError() {
-	// 	return []*sitter.Node{}
-	// }
-
 	for i := 0; i < int(node.ChildCount()); i++ {
 		child := node.Child(i)
 		partial = append(partial, e.ErrorNodes(child)...)
