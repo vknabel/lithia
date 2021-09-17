@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- stdlib: renamed `Rune` to `Char`
 - improved printing of values
 - stdlib: `Variable` now moved to `rx.Variable`
 - stdlib: `osEnv` and `osExit` now moved to `os.env` and `os.exit`

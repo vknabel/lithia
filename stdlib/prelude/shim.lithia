@@ -9,7 +9,7 @@ extern String {
     length
     append str
 }
-extern Rune
+extern Char
 extern Function
 extern Module
 extern Any
