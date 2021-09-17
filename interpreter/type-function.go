@@ -5,6 +5,9 @@ import (
 	"strings"
 )
 
+var _ RuntimeValue = Function{}
+var _ Callable = Function{}
+
 type Function struct {
 	name      string
 	arguments []string
