@@ -2,23 +2,23 @@ package interpreter
 
 import "reflect"
 
-func (ex *EvaluationContext) BinaryOperatorFunction(operator string) (func(*LazyRuntimeValue, *LazyRuntimeValue) (RuntimeValue, error), error) {
+func (ex *EvaluationContext) BinaryOperatorFunction(operator string) (func(*LazyRuntimeValue, *LazyRuntimeValue) (RuntimeValue, LocatableError), LocatableError) {
 	switch operator {
 	case "==":
-		return func(lazyLeft, lazyRight *LazyRuntimeValue) (RuntimeValue, error) {
+		return func(lazyLeft, lazyRight *LazyRuntimeValue) (RuntimeValue, LocatableError) {
 			return ex.genericGreedyComparision(lazyLeft, lazyRight, func(left, right RuntimeValue) bool {
 				return reflect.DeepEqual(left, right)
 			})
 		}, nil
 	case "!=":
-		return func(lazyLeft, lazyRight *LazyRuntimeValue) (RuntimeValue, error) {
+		return func(lazyLeft, lazyRight *LazyRuntimeValue) (RuntimeValue, LocatableError) {
 			return ex.genericGreedyComparision(lazyLeft, lazyRight, func(left, right RuntimeValue) bool {
 				return !reflect.DeepEqual(left, right)
 			})
 		}, nil
 	case "&&":
-		return func(lazyLeft, lazyRight *LazyRuntimeValue) (RuntimeValue, error) {
-			return ex.lazyLogicComparision(lazyLeft, lazyRight, func(left bool, right func() (bool, error)) (bool, error) {
+		return func(lazyLeft, lazyRight *LazyRuntimeValue) (RuntimeValue, LocatableError) {
+			return ex.lazyLogicComparision(lazyLeft, lazyRight, func(left bool, right func() (bool, LocatableError)) (bool, LocatableError) {
 				if !left {
 					return false, nil
 				} else {
@@ -27,8 +27,8 @@ func (ex *EvaluationContext) BinaryOperatorFunction(operator string) (func(*Lazy
 			})
 		}, nil
 	case "||":
-		return func(lazyLeft, lazyRight *LazyRuntimeValue) (RuntimeValue, error) {
-			return ex.lazyLogicComparision(lazyLeft, lazyRight, func(left bool, right func() (bool, error)) (bool, error) {
+		return func(lazyLeft, lazyRight *LazyRuntimeValue) (RuntimeValue, LocatableError) {
+			return ex.lazyLogicComparision(lazyLeft, lazyRight, func(left bool, right func() (bool, LocatableError)) (bool, LocatableError) {
 				if left {
 					return true, nil
 				} else {
@@ -37,7 +37,7 @@ func (ex *EvaluationContext) BinaryOperatorFunction(operator string) (func(*Lazy
 			})
 		}, nil
 	case ">":
-		return func(lazyLeft, lazyRight *LazyRuntimeValue) (RuntimeValue, error) {
+		return func(lazyLeft, lazyRight *LazyRuntimeValue) (RuntimeValue, LocatableError) {
 			return ex.numericGreedyComparision(lazyLeft, lazyRight, func(left, right PreludeInt) bool {
 				return left > right
 			}, func(left, right PreludeFloat) bool {
@@ -45,7 +45,7 @@ func (ex *EvaluationContext) BinaryOperatorFunction(operator string) (func(*Lazy
 			})
 		}, nil
 	case ">=":
-		return func(lazyLeft, lazyRight *LazyRuntimeValue) (RuntimeValue, error) {
+		return func(lazyLeft, lazyRight *LazyRuntimeValue) (RuntimeValue, LocatableError) {
 			return ex.numericGreedyComparision(lazyLeft, lazyRight, func(left, right PreludeInt) bool {
 				return left >= right
 			}, func(left, right PreludeFloat) bool {
@@ -53,7 +53,7 @@ func (ex *EvaluationContext) BinaryOperatorFunction(operator string) (func(*Lazy
 			})
 		}, nil
 	case "<":
-		return func(lazyLeft, lazyRight *LazyRuntimeValue) (RuntimeValue, error) {
+		return func(lazyLeft, lazyRight *LazyRuntimeValue) (RuntimeValue, LocatableError) {
 			return ex.numericGreedyComparision(lazyLeft, lazyRight, func(left, right PreludeInt) bool {
 				return left < right
 			}, func(left, right PreludeFloat) bool {
@@ -61,7 +61,7 @@ func (ex *EvaluationContext) BinaryOperatorFunction(operator string) (func(*Lazy
 			})
 		}, nil
 	case "<=":
-		return func(lazyLeft, lazyRight *LazyRuntimeValue) (RuntimeValue, error) {
+		return func(lazyLeft, lazyRight *LazyRuntimeValue) (RuntimeValue, LocatableError) {
 			return ex.numericGreedyComparision(lazyLeft, lazyRight, func(left, right PreludeInt) bool {
 				return left <= right
 			}, func(left, right PreludeFloat) bool {
@@ -69,7 +69,7 @@ func (ex *EvaluationContext) BinaryOperatorFunction(operator string) (func(*Lazy
 			})
 		}, nil
 	case "+":
-		return func(lazyLeft, lazyRight *LazyRuntimeValue) (RuntimeValue, error) {
+		return func(lazyLeft, lazyRight *LazyRuntimeValue) (RuntimeValue, LocatableError) {
 			return ex.numericGreedyOperation(lazyLeft, lazyRight, func(left, right PreludeInt) PreludeInt {
 				return left + right
 			}, func(left, right PreludeFloat) PreludeFloat {
@@ -77,7 +77,7 @@ func (ex *EvaluationContext) BinaryOperatorFunction(operator string) (func(*Lazy
 			})
 		}, nil
 	case "-":
-		return func(lazyLeft, lazyRight *LazyRuntimeValue) (RuntimeValue, error) {
+		return func(lazyLeft, lazyRight *LazyRuntimeValue) (RuntimeValue, LocatableError) {
 			return ex.numericGreedyOperation(lazyLeft, lazyRight, func(left, right PreludeInt) PreludeInt {
 				return left - right
 			}, func(left, right PreludeFloat) PreludeFloat {
@@ -85,7 +85,7 @@ func (ex *EvaluationContext) BinaryOperatorFunction(operator string) (func(*Lazy
 			})
 		}, nil
 	case "*":
-		return func(lazyLeft, lazyRight *LazyRuntimeValue) (RuntimeValue, error) {
+		return func(lazyLeft, lazyRight *LazyRuntimeValue) (RuntimeValue, LocatableError) {
 			return ex.numericGreedyOperation(lazyLeft, lazyRight, func(left, right PreludeInt) PreludeInt {
 				return left * right
 			}, func(left, right PreludeFloat) PreludeFloat {
@@ -93,7 +93,7 @@ func (ex *EvaluationContext) BinaryOperatorFunction(operator string) (func(*Lazy
 			})
 		}, nil
 	case "/":
-		return func(lazyLeft, lazyRight *LazyRuntimeValue) (RuntimeValue, error) {
+		return func(lazyLeft, lazyRight *LazyRuntimeValue) (RuntimeValue, LocatableError) {
 			return ex.numericGreedyOperation(lazyLeft, lazyRight, func(left, right PreludeInt) PreludeInt {
 				return left / right
 			}, func(left, right PreludeFloat) PreludeFloat {
@@ -108,7 +108,7 @@ func (ex *EvaluationContext) BinaryOperatorFunction(operator string) (func(*Lazy
 func (ex *EvaluationContext) genericGreedyComparision(
 	lazyLeft, lazyRight *LazyRuntimeValue,
 	compare func(RuntimeValue, RuntimeValue) bool,
-) (RuntimeValue, error) {
+) (RuntimeValue, LocatableError) {
 	left, err := lazyLeft.Evaluate()
 	if err != nil {
 		return nil, err
@@ -117,18 +117,14 @@ func (ex *EvaluationContext) genericGreedyComparision(
 	if err != nil {
 		return nil, err
 	}
-	if compare(left, right) {
-		return ex.environment.MakeEmptyDataRuntimeValue("True")
-	} else {
-		return ex.environment.MakeEmptyDataRuntimeValue("False")
-	}
+	return ex.boolToRuntimeValue(compare(left, right))
 }
 
 func (ex *EvaluationContext) numericGreedyComparision(
 	lazyLeft, lazyRight *LazyRuntimeValue,
 	compareInt func(PreludeInt, PreludeInt) bool,
 	compareFloat func(PreludeFloat, PreludeFloat) bool,
-) (RuntimeValue, error) {
+) (RuntimeValue, LocatableError) {
 	left, err := lazyLeft.Evaluate()
 	if err != nil {
 		return nil, err
@@ -141,9 +137,9 @@ func (ex *EvaluationContext) numericGreedyComparision(
 		}
 		switch right := right.(type) {
 		case PreludeInt:
-			return ex.environment.boolToRuntimeValue(compareInt(left, right))
+			return ex.boolToRuntimeValue(compareInt(left, right))
 		case PreludeFloat:
-			return ex.environment.boolToRuntimeValue(compareFloat(PreludeFloat(left), right))
+			return ex.boolToRuntimeValue(compareFloat(PreludeFloat(left), right))
 		default:
 			return nil, ex.RuntimeErrorf("expected numeric, got %d", left)
 		}
@@ -154,9 +150,9 @@ func (ex *EvaluationContext) numericGreedyComparision(
 		}
 		switch right := right.(type) {
 		case PreludeInt:
-			return ex.environment.boolToRuntimeValue(compareFloat(left, PreludeFloat(right)))
+			return ex.boolToRuntimeValue(compareFloat(left, PreludeFloat(right)))
 		case PreludeFloat:
-			return ex.environment.boolToRuntimeValue(compareFloat(left, right))
+			return ex.boolToRuntimeValue(compareFloat(left, right))
 		default:
 			return nil, ex.RuntimeErrorf("expected numeric, got %f", left)
 		}
@@ -169,7 +165,7 @@ func (ex *EvaluationContext) numericGreedyOperation(
 	lazyLeft, lazyRight *LazyRuntimeValue,
 	combineInt func(PreludeInt, PreludeInt) PreludeInt,
 	combineFloat func(PreludeFloat, PreludeFloat) PreludeFloat,
-) (RuntimeValue, error) {
+) (RuntimeValue, LocatableError) {
 	left, err := lazyLeft.Evaluate()
 	if err != nil {
 		return nil, err
@@ -208,11 +204,12 @@ func (ex *EvaluationContext) numericGreedyOperation(
 
 func (ex *EvaluationContext) lazyLogicComparision(
 	lazyLeft, lazyRight *LazyRuntimeValue,
-	compare func(bool, func() (bool, error)) (bool, error),
-) (RuntimeValue, error) {
+	compare func(bool, func() (bool, LocatableError)) (bool, LocatableError),
+) (RuntimeValue, LocatableError) {
+	var err error
 	left, err := lazyLeft.Evaluate()
 	if err != nil {
-		return nil, err
+		return nil, ex.LocatableErrorOrConvert(err)
 	}
 	boolTypeValue, err := ex.environment.LookupRuntimeValue("Bool")
 	boolType := RuntimeType{
@@ -221,11 +218,11 @@ func (ex *EvaluationContext) lazyLogicComparision(
 		typeValue:  &boolTypeValue,
 	}
 	if err != nil {
-		return nil, err
+		return nil, ex.LocatableErrorOrConvert(err)
 	}
 	trueTypeValue, err := ex.environment.LookupRuntimeValue("True")
 	if err != nil {
-		return nil, err
+		return nil, ex.LocatableErrorOrConvert(err)
 	}
 	trueType := RuntimeType{
 		name:       "True",
@@ -238,10 +235,10 @@ func (ex *EvaluationContext) lazyLogicComparision(
 
 	isLeftTrue, err := trueType.IncludesValue(left)
 	if err != nil {
-		return nil, err
+		return nil, ex.LocatableErrorOrConvert(err)
 	}
 
-	isComparisionTrue, err := compare(isLeftTrue, func() (bool, error) {
+	isComparisionTrue, err := compare(isLeftTrue, func() (bool, LocatableError) {
 		right, err := lazyRight.Evaluate()
 		if err != nil {
 			return false, nil
@@ -254,10 +251,10 @@ func (ex *EvaluationContext) lazyLogicComparision(
 	})
 
 	if err != nil {
-		return nil, err
+		return nil, ex.LocatableErrorOrConvert(err)
 	}
 
-	return ex.environment.boolToRuntimeValue(isComparisionTrue)
+	return ex.boolToRuntimeValue(isComparisionTrue)
 }
 
 func (env *Environment) boolToRuntimeValue(value bool) (RuntimeValue, error) {
@@ -266,4 +263,9 @@ func (env *Environment) boolToRuntimeValue(value bool) (RuntimeValue, error) {
 	} else {
 		return env.MakeEmptyDataRuntimeValue("False")
 	}
+}
+
+func (ex *EvaluationContext) boolToRuntimeValue(value bool) (RuntimeValue, LocatableError) {
+	runtimeBool, err := ex.environment.boolToRuntimeValue(value)
+	return runtimeBool, ex.LocatableErrorOrConvert(err)
 }

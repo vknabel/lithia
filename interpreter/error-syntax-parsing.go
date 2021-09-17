@@ -22,20 +22,28 @@ func (inter *Interpreter) SyntaxParsingError(fileName string, source string, tre
 	}
 }
 
-func (e SyntaxParsingError) Error() string {
-	partialErrors := []string{}
+func (err SyntaxParsingError) LocatableErrors() []LocatableError {
+	partialErrors := []LocatableError{}
 
-	for _, errorNode := range e.ErrorNodes(e.tree.RootNode()) {
+	for _, errorNode := range err.ErrorNodes(err.tree.RootNode()) {
 		var message string
 		if errorNode.ChildCount() > 0 {
 			message = fmt.Sprintln(errorNode.Child(0).String())
 		} else {
 			message = ""
 		}
-		currentError := FormatNodeErrorMessage("syntax error", message, e.fileName, errorNode, e.source)
+		currentError := NewLocatableError("syntax error", message, err.fileName, err.source, errorNode)
 		partialErrors = append(partialErrors, currentError)
 	}
-	return strings.Join(partialErrors, "\n\n")
+	return partialErrors
+}
+
+func (err SyntaxParsingError) Error() string {
+	partials := []string{}
+	for _, partialError := range err.LocatableErrors() {
+		partials = append(partials, partialError.Error())
+	}
+	return strings.Join(partials, "\n\n")
 }
 
 func (e SyntaxParsingError) ErrorNodes(node *sitter.Node) []*sitter.Node {

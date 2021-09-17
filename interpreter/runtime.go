@@ -19,11 +19,11 @@ type RuntimeType struct {
 type LazyRuntimeValue struct {
 	once  *sync.Once
 	value RuntimeValue
-	err   error
-	eval  func() (RuntimeValue, error)
+	err   LocatableError
+	eval  func() (RuntimeValue, LocatableError)
 }
 
-func NewLazyRuntimeValue(eval func() (RuntimeValue, error)) *LazyRuntimeValue {
+func NewLazyRuntimeValue(eval func() (RuntimeValue, LocatableError)) *LazyRuntimeValue {
 	return &LazyRuntimeValue{
 		once:  &sync.Once{},
 		eval:  eval,
@@ -34,19 +34,19 @@ func NewLazyRuntimeValue(eval func() (RuntimeValue, error)) *LazyRuntimeValue {
 func NewConstantRuntimeValue(value RuntimeValue) *LazyRuntimeValue {
 	return &LazyRuntimeValue{
 		once:  &sync.Once{},
-		eval:  func() (RuntimeValue, error) { return value, nil },
+		eval:  func() (RuntimeValue, LocatableError) { return value, nil },
 		value: value,
 	}
 }
 
-func (l *LazyRuntimeValue) Evaluate() (RuntimeValue, error) {
+func (l *LazyRuntimeValue) Evaluate() (RuntimeValue, LocatableError) {
 	l.once.Do(func() {
 		l.value, l.err = l.eval()
 	})
 	return l.value, l.err
 }
 
-func RuntimeTypeValueIncludesValue(t RuntimeValue, v RuntimeValue) (bool, error) {
+func RuntimeTypeValueIncludesValue(t RuntimeValue, v RuntimeValue) (bool, LocatableError) {
 	if _, ok := t.(PreludeAnyType); ok {
 		return true, nil
 	}
@@ -80,6 +80,6 @@ func RuntimeTypeValueIncludesValue(t RuntimeValue, v RuntimeValue) (bool, error)
 	}
 }
 
-func (t RuntimeType) IncludesValue(v RuntimeValue) (bool, error) {
+func (t RuntimeType) IncludesValue(v RuntimeValue) (bool, LocatableError) {
 	return RuntimeTypeValueIncludesValue(t, v)
 }

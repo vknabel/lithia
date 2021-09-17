@@ -100,7 +100,7 @@ func (inter *Interpreter) EmbedFileIntoModule(module *Module, fileName string, s
 	return ex, nil
 }
 
-func (ex *EvaluationContext) EvaluateSourceFile() (*LazyRuntimeValue, error) {
+func (ex *EvaluationContext) EvaluateSourceFile() (*LazyRuntimeValue, LocatableError) {
 	count := ex.node.ChildCount()
 	children := make([]*sitter.Node, count)
 	for i := uint32(0); i < count; i++ {
@@ -113,7 +113,7 @@ func (ex *EvaluationContext) EvaluateSourceFile() (*LazyRuntimeValue, error) {
 		return lp > rp
 	})
 
-	return NewLazyRuntimeValue(func() (RuntimeValue, error) {
+	return NewLazyRuntimeValue(func() (RuntimeValue, LocatableError) {
 		var lastValue RuntimeValue
 		for _, child := range children {
 			lazyValue, err := ex.ChildNodeExecutionContext(child).EvaluateNode()
@@ -150,7 +150,7 @@ func priority(nodeType string) int {
 	}
 }
 
-func (ex *EvaluationContext) EvaluateModule() (*LazyRuntimeValue, error) {
+func (ex *EvaluationContext) EvaluateModule() (*LazyRuntimeValue, LocatableError) {
 	internalName := ex.node.ChildByFieldName("name").Content(ex.source)
 	runtimeModule := NewConstantRuntimeValue(RuntimeModule{module: ex.module})
 	ex.environment.DeclareUnexported(internalName, runtimeModule)

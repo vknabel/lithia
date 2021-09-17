@@ -27,7 +27,7 @@ func (v *RuntimeVariable) Lookup(member string) (*LazyRuntimeValue, error) {
 			},
 		)), nil
 	case "current":
-		return NewLazyRuntimeValue(func() (RuntimeValue, error) {
+		return NewLazyRuntimeValue(func() (RuntimeValue, LocatableError) {
 			return v.Current()
 		}), nil
 	default:
@@ -46,7 +46,7 @@ func (v *RuntimeVariable) Accept(lazyValue *LazyRuntimeValue) (RuntimeValue, err
 	return value, nil
 }
 
-func (v *RuntimeVariable) Current() (RuntimeValue, error) {
+func (v *RuntimeVariable) Current() (RuntimeValue, LocatableError) {
 	v.lock.RLock()
 	defer v.lock.RUnlock()
 	return v.current, nil

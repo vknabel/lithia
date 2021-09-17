@@ -39,7 +39,7 @@ func (f DataDeclRuntimeValue) Lookup(member string) (*LazyRuntimeValue, error) {
 
 func (dataDecl DataDeclRuntimeValue) Call(arguments []*LazyRuntimeValue) (RuntimeValue, error) {
 	if len(arguments) < len(dataDecl.fields) {
-		lazy := NewLazyRuntimeValue(func() (RuntimeValue, error) {
+		lazy := NewLazyRuntimeValue(func() (RuntimeValue, LocatableError) {
 			return CurriedCallable{
 				actual:         dataDecl,
 				args:           arguments,

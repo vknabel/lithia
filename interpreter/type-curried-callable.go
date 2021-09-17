@@ -26,7 +26,7 @@ func (f CurriedCallable) String() string {
 func (c CurriedCallable) Call(arguments []*LazyRuntimeValue) (RuntimeValue, error) {
 	allArgs := append(c.args, arguments...)
 	if len(arguments) < c.remainingArity {
-		lazy := NewLazyRuntimeValue(func() (RuntimeValue, error) {
+		lazy := NewLazyRuntimeValue(func() (RuntimeValue, LocatableError) {
 			return CurriedCallable{
 				actual:         c.actual,
 				args:           allArgs,

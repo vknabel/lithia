@@ -12,7 +12,10 @@
             "program": "${workspaceFolder}/cmd/lithia/main.go",
             "args": [
                 "${workspaceFolder}/stdlib/stdlib-tests.lithia"
-            ]
+            ],
+            "env": {
+                "LITHIA_STDLIB": "${workspaceFolder}/stdlib"
+            }
         },
         {
             "name": "Test example stdlib",
@@ -24,7 +27,8 @@
                 "${workspaceFolder}/stdlib/stdlib-tests.lithia"
             ],
             "env": {
-                "LITHIA_TESTS": "1"
+                "LITHIA_TESTS": "1",
+                "LITHIA_STDLIB": "${workspaceFolder}/stdlib"
             }
         },
         {
@@ -35,7 +39,10 @@
             "program": "${workspaceFolder}/cmd/lithia/main.go",
             "args": [
                 "${workspaceFolder}/examples/syntax.lithia"
-            ]
+            ],
+            "env": {
+                "LITHIA_STDLIB": "${workspaceFolder}/stdlib"
+            }
         },
     ]
 }
