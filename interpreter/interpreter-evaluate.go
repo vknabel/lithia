@@ -103,7 +103,18 @@ func (ex *EvaluationContext) EvaluateDataDeclaration() (*LazyRuntimeValue, Locat
 }
 
 func (ex *EvaluationContext) EvaluateExternDeclaration() (*LazyRuntimeValue, LocatableError) {
-	return ex.ChildNodeExecutionContext(ex.node.ChildByFieldName("name")).EvaluateIdentifier()
+	name := ex.node.ChildByFieldName("name").Content(ex.source)
+	externalDef, ok := ex.interpreter.ExternalDefinitions[ex.module.name]
+	if !ok {
+		return nil, ex.SyntaxErrorf("no external declarations allowed in module %s", ex.module.name)
+	}
+	runtimeValue, ok := externalDef.Lookup(name, ex.environment)
+	if !ok {
+		return nil, ex.SyntaxErrorf("unknown external declaration %s in module %s", name, ex.module.name)
+	}
+	constantValue := NewConstantRuntimeValue(runtimeValue)
+	ex.environment.Declare(name, constantValue)
+	return constantValue, nil
 }
 
 func (ex *EvaluationContext) ParseParamterList() ([]string, error) {

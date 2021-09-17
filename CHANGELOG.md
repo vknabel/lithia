@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- stdlib: `osEnv` and `osExit` now moved to `os.env` and `os.exit`
+- compiler: `extern` fails when they can't be resolved
+
 ## v0.0.3
 
 - `module` instead of `package` to avoid confusion

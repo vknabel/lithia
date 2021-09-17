@@ -12,13 +12,11 @@ import (
 func TestStdlib(t *testing.T) {
 	pathToStdlib := "../stdlib"
 	inter := i.NewInterpreter(pathToStdlib)
-	prelude := inter.NewPreludeEnvironment()
-
-	calledExitCode := i.PreludeInt(-1)
-	prelude.Scope["osExit"] = i.NewConstantRuntimeValue(mockOsExit(prelude, func(code i.PreludeInt) {
-		calledExitCode = code
-	}))
-	prelude.Scope["osEnv"] = i.NewConstantRuntimeValue(mockOsEnv(prelude, map[string]string{"LITHIA_TESTS": "1"}))
+	mockOS := &mockExternalOS{
+		calledExitCode: -1,
+		env:            map[string]string{"LITHIA_TESTS": "1"},
+	}
+	inter.ExternalDefinitions["os"] = mockOS
 
 	scriptData, err := os.ReadFile(filepath.Join(pathToStdlib, "stdlib-tests.lithia"))
 	if err != nil {
@@ -30,9 +28,27 @@ func TestStdlib(t *testing.T) {
 		t.Errorf("Error interpreting stdlib-tests.lithia: %s", err)
 		return
 	}
-	if calledExitCode != i.PreludeInt(0) && calledExitCode != i.PreludeInt(-1) {
-		t.Errorf("lithia tests failed with exit code %d", calledExitCode)
+	if mockOS.calledExitCode != i.PreludeInt(0) && mockOS.calledExitCode != i.PreludeInt(-1) {
+		t.Errorf("lithia tests failed with exit code %d", mockOS.calledExitCode)
 		return
+	}
+}
+
+type mockExternalOS struct {
+	calledExitCode i.PreludeInt
+	env            map[string]string
+}
+
+func (e *mockExternalOS) Lookup(name string, env *i.Environment) (i.RuntimeValue, bool) {
+	switch name {
+	case "exit":
+		return mockOsExit(env, func(code i.PreludeInt) {
+			e.calledExitCode = code
+		}), true
+	case "env":
+		return mockOsEnv(env, e.env), true
+	default:
+		return nil, false
 	}
 }
 

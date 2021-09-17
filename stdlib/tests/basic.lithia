@@ -2,6 +2,7 @@ module tests
 
 import lists
 import strings
+import os
 
 let testCases = Variable Nil
 
@@ -16,7 +17,7 @@ data TestSummary {
     failedTests
 }
 
-let enabled = with osEnv "LITHIA_TESTS", type Optional {
+let enabled = with os.env "LITHIA_TESTS", type Optional {
     Some: { some => some.value != "" },
     None: { _ => False }
 }
@@ -45,7 +46,7 @@ func runTests { =>
                 testCount,
                 " tests"
             ]
-            osExit 1
+            os.exit 1
         },
         Nil: { _ =>
             let testCount = summary.ok + summary.notOk

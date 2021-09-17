@@ -16,6 +16,13 @@ type RuntimeType struct {
 	typeValue  *RuntimeValue
 }
 
+func (t RuntimeType) RuntimeTypeValue() RuntimeValue {
+	if t.typeValue == nil {
+		return t.RuntimeType()
+	}
+	return *t.typeValue
+}
+
 type LazyRuntimeValue struct {
 	once  *sync.Once
 	value RuntimeValue
@@ -67,7 +74,7 @@ func RuntimeTypeValueIncludesValue(t RuntimeValue, v RuntimeValue) (bool, Locata
 		return false, nil
 	} else {
 		if _, ok := t.(RuntimeType); ok {
-			t = *t.(RuntimeType).typeValue
+			t = t.(RuntimeType).RuntimeTypeValue()
 		}
 		if v.RuntimeType().typeValue == nil {
 			return false, nil

@@ -12,10 +12,11 @@ import (
 )
 
 type Interpreter struct {
-	importRoots []string
-	parser      *parser.Parser
-	modules     map[ModuleName]*Module
-	prelude     *Environment
+	importRoots         []string
+	parser              *parser.Parser
+	modules             map[ModuleName]*Module
+	ExternalDefinitions map[ModuleName]ExternalDefinition
+	prelude             *Environment
 }
 
 func defaultImportRootPaths() []string {
@@ -45,11 +46,15 @@ func NewInterpreter(importRoots ...string) *Interpreter {
 			absoluteImportRoots[i] = root
 		}
 	}
-	return &Interpreter{
-		importRoots: absoluteImportRoots,
-		parser:      parser.NewParser(),
-		modules:     make(map[ModuleName]*Module),
+	inter := &Interpreter{
+		importRoots:         absoluteImportRoots,
+		parser:              parser.NewParser(),
+		modules:             make(map[ModuleName]*Module),
+		ExternalDefinitions: make(map[ModuleName]ExternalDefinition),
 	}
+	inter.ExternalDefinitions["prelude"] = ExternalPrelude{}
+	inter.ExternalDefinitions["os"] = ExternalOS{}
+	return inter
 }
 
 func (inter *Interpreter) Interpret(fileName string, script string) (RuntimeValue, error) {

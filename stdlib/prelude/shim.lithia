@@ -1,7 +1,7 @@
 module prelude
 
 extern print message
-extern osExit code
+extern debug message
 
 extern Int
 extern Float
