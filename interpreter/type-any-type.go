@@ -11,8 +11,12 @@ type PreludeAnyType struct{}
 func (PreludeAnyType) RuntimeType() RuntimeType {
 	return RuntimeType{
 		name:       "Any",
-		modulePath: []string{"prelude"},
+		moduleName: "prelude",
 	}
+}
+
+func (a PreludeAnyType) String() string {
+	return "Any"
 }
 
 func (a PreludeAnyType) Lookup(member string) (*LazyRuntimeValue, error) {

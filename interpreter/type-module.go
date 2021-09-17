@@ -8,6 +8,10 @@ type RuntimeModule struct {
 	module *Module
 }
 
+func (m RuntimeModule) String() string {
+	return fmt.Sprintf("(import %s)", m.module.name)
+}
+
 func (RuntimeModule) RuntimeType() RuntimeType {
 	return PreludeModuleType{}.RuntimeType()
 }

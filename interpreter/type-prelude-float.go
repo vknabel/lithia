@@ -6,10 +6,14 @@ var _ RuntimeValue = PreludeFloat(0)
 
 type PreludeFloat float64
 
+func (f PreludeFloat) String() string {
+	return fmt.Sprintf("%f", f)
+}
+
 func (PreludeFloat) RuntimeType() RuntimeType {
 	return RuntimeType{
 		name:       "Float",
-		modulePath: []string{"prelude"},
+		moduleName: "prelude",
 	}
 }
 

@@ -12,8 +12,14 @@ type RuntimeVariable struct {
 	current RuntimeValue
 }
 
+func (v *RuntimeVariable) String() string {
+	v.lock.RLock()
+	defer v.lock.RUnlock()
+	return fmt.Sprintf("(%s %s)", v.RuntimeType().name, v.current)
+}
+
 func (*RuntimeVariable) RuntimeType() RuntimeType {
-	return PreludeVariableType{}.RuntimeType()
+	return RxVariableType{}.RuntimeType()
 }
 
 func (v *RuntimeVariable) Lookup(member string) (*LazyRuntimeValue, error) {

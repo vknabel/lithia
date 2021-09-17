@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- improved printing of values
+- stdlib: `Variable` now moved to `rx.Variable`
 - stdlib: `osEnv` and `osExit` now moved to `os.env` and `os.exit`
 - compiler: `extern` fails when they can't be resolved
 

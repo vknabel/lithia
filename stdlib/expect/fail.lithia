@@ -1,5 +1,6 @@
 module expect
 
 import tests
+import rx
 
-let fail = Variable tests.fail
+let fail = rx.Variable tests.fail

@@ -6,10 +6,14 @@ var _ RuntimeValue = PreludeInt(0)
 
 type PreludeInt int64
 
+func (i PreludeInt) String() string {
+	return fmt.Sprintf("%d", i)
+}
+
 func (PreludeInt) RuntimeType() RuntimeType {
 	return RuntimeType{
 		name:       "Int",
-		modulePath: []string{"prelude"},
+		moduleName: "prelude",
 	}
 }
 

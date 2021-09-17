@@ -54,6 +54,7 @@ func NewInterpreter(importRoots ...string) *Interpreter {
 	}
 	inter.ExternalDefinitions["prelude"] = ExternalPrelude{}
 	inter.ExternalDefinitions["os"] = ExternalOS{}
+	inter.ExternalDefinitions["rx"] = ExternalRx{}
 	return inter
 }
 

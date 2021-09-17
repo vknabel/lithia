@@ -214,7 +214,7 @@ func (ex *EvaluationContext) lazyLogicComparision(
 	boolTypeValue, err := ex.environment.LookupRuntimeValue("Bool")
 	boolType := RuntimeType{
 		name:       "Bool",
-		modulePath: []string{"prelude"},
+		moduleName: "prelude",
 		typeValue:  &boolTypeValue,
 	}
 	if err != nil {
@@ -226,7 +226,7 @@ func (ex *EvaluationContext) lazyLogicComparision(
 	}
 	trueType := RuntimeType{
 		name:       "True",
-		modulePath: []string{"prelude"},
+		moduleName: "prelude",
 		typeValue:  &trueTypeValue,
 	}
 	if ok, err := boolType.IncludesValue(left); !ok || err != nil {

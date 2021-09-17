@@ -11,9 +11,5 @@ extern String {
 }
 extern Rune
 extern Function
-extern Variable {
-    accept value
-    current
-}
 extern Module
 extern Any

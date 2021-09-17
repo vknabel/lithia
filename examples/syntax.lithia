@@ -1,4 +1,5 @@
 import tests
+import rx
 
 let a = 1
 
@@ -18,7 +19,7 @@ func just { x => Some x }
 just 1
 just 1
 
-let x Variable 1
+let x rx.Variable 1
 x.accept "Hallo"
 print x.current
 

@@ -3,8 +3,9 @@ module tests
 import lists
 import strings
 import os
+import rx
 
-let testCases = Variable Nil
+let testCases = rx.Variable Nil
 
 data TestCase {
     title
@@ -64,7 +65,7 @@ func runTests { =>
 
 func runTestCase { summary, testCase =>
     let testNumber = summary.ok + summary.notOk + 1
-    let failure = Variable None
+    let failure = rx.Variable None
     testCase.impl { message => failure.accept Some message }
 
     with failure.current, type Optional {

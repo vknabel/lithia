@@ -18,8 +18,6 @@ func (e ExternalPrelude) Lookup(name string, env *Environment) (RuntimeValue, bo
 		return PreludeRune(0).RuntimeType(), true
 	case "Function":
 		return PreludeFunctionType{}, true
-	case "Variable":
-		return PreludeVariableType{}, true
 	case "Module":
 		return PreludeModuleType{}, true
 	case "Any":

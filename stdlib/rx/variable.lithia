@@ -1,0 +1,6 @@
+module rx
+
+extern Variable {
+    accept value
+    current
+}

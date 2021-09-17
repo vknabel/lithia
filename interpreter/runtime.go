@@ -1,6 +1,7 @@
 package interpreter
 
 import (
+	"fmt"
 	"reflect"
 	"sync"
 )
@@ -8,12 +9,19 @@ import (
 type RuntimeValue interface {
 	RuntimeType() RuntimeType
 	Lookup(name string) (*LazyRuntimeValue, error)
+	String() string
 }
+
+var _ RuntimeValue = RuntimeType{}
 
 type RuntimeType struct {
 	name       string
-	modulePath []string
+	moduleName ModuleName
 	typeValue  *RuntimeValue
+}
+
+func (t RuntimeType) String() string {
+	return fmt.Sprintf("%s.%s", t.moduleName, t.name)
 }
 
 func (t RuntimeType) RuntimeTypeValue() RuntimeValue {

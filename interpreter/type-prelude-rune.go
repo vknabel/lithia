@@ -6,10 +6,14 @@ var _ RuntimeValue = PreludeRune('l')
 
 type PreludeRune rune
 
+func (r PreludeRune) String() string {
+	return string(r)
+}
+
 func (PreludeRune) RuntimeType() RuntimeType {
 	return RuntimeType{
 		name:       "Rune",
-		modulePath: []string{"prelude"},
+		moduleName: "prelude",
 	}
 }
 

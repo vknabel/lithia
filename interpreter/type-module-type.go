@@ -1,15 +1,21 @@
 package interpreter
 
-import "fmt"
+import (
+	"fmt"
+)
 
 var _ RuntimeValue = PreludeModuleType{}
 
 type PreludeModuleType struct{}
 
+func (PreludeModuleType) String() string {
+	return "Module"
+}
+
 func (PreludeModuleType) RuntimeType() RuntimeType {
 	return RuntimeType{
 		name:       "Module",
-		modulePath: []string{"prelude"},
+		moduleName: "prelude",
 	}
 }
 

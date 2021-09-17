@@ -1,12 +1,23 @@
 package interpreter
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 var _ RuntimeValue = EnumDeclRuntimeValue{}
 
 type EnumDeclRuntimeValue struct {
 	name  string
 	cases map[string]*LazyRuntimeValue
+}
+
+func (e EnumDeclRuntimeValue) String() string {
+	cases := make([]string, 0, len(e.cases))
+	for key := range e.cases {
+		cases = append(cases, key)
+	}
+	return fmt.Sprintf("enum %s { %s }", e.name, strings.Join(cases, ", "))
 }
 
 func (EnumDeclRuntimeValue) RuntimeType() RuntimeType {

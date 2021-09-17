@@ -6,10 +6,14 @@ var _ RuntimeValue = PreludeFunctionType{}
 
 type PreludeFunctionType struct{}
 
+func (f PreludeFunctionType) String() string {
+	return "Function"
+}
+
 func (PreludeFunctionType) RuntimeType() RuntimeType {
 	return RuntimeType{
 		name:       "Function",
-		modulePath: []string{"prelude"},
+		moduleName: "prelude",
 	}
 }
 
