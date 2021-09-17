@@ -11,7 +11,25 @@ Lithia is designed around a few core concepts in mind all language features cont
 
 No. Unless you want to play around with new language concepts for some local non-production projects with a proof of concept programming language. If so, I’d be very happy to hear your feedback!
 
-> Currently Lithia is just an early proof of concept. Most basic language features exist, but the current tooling and standard libraries are far from being feature complete or stable.
+### Roadmap
+
+Currently Lithia is just an early proof of concept. Most basic language features exist, but the current tooling and standard libraries are far from being feature complete or stable.
+
+- [x] Module imports
+- [x] Testing library
+- [x] Easy installation
+- [ ] Prebuilt docker image
+- [ ] Prebuilt linux binaries
+- [ ] Creating a custom language server
+- [ ] ... with diagnostics
+- [ ] ... with syntax highlighting
+- [ ] ... with auto completion
+- [ ] A package manager
+- [ ] Move stdlib to a package
+- [ ] Custom plugins for external declarations
+- [ ] More static type safety
+
+Of course, some features don't end up on the above list. Espcially improving the standard libraries and documentation is an ongoing process.
 
 ## Installation
 
@@ -261,11 +279,12 @@ As seen above, we can easily rely on existing implementations, compose them and 
 
 ### Why no class inheritance?
 
-Classes and inheritance have their use cases and benefits, but as Lithia separates data from behavior,  inheritance doesn’t serve us well anymore.
+Classes and inheritance have their use cases and benefits, but as Lithia separates data from behavior, inheritance doesn’t serve us well anymore.
 
 For data we have two options:
+
 1.  Copying all members to another data. Though enums must also include this new data type.
-2. Nesting the data. Especially useful if the data is only used outside the default context. This is especially great if you need to combine many different witnesses or data types as with multi-inheritance. 
+2.  Nesting the data. Especially useful if the data is only used outside the default context. This is especially great if you need to combine many different witnesses or data types as with multi-inheritance.
 
 ```
 data Base { value }
@@ -295,12 +314,12 @@ let reduce = foldable.reduce
 doSomething strings, ""
 ```
 
-As witnesses aren’t typically used in enums (and one could also add a `Module`  case), we can simply import a whole module and use it as a replacement for multiple witnesses at once.
+As witnesses aren’t typically used in enums (and one could also add a `Module` case), we can simply import a whole module and use it as a replacement for multiple witnesses at once.
 
 Though the defaults should be used wisely: for example the `Result` type has two different, but valid implementations of `map`! On the other hand `List` only has one valid implementation.
 
 One additional feature of class inheritance is calling functionality of the super class. In Lithia the approach looks different, but in fact behaves similar:
-We simply create a  whole new witness, which calls the initial one under the hood.
+We simply create a whole new witness, which calls the initial one under the hood.
 
 ### Why no dynamic type tests?
 
