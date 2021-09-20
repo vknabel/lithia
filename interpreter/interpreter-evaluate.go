@@ -11,6 +11,7 @@ import (
 
 func (ex *EvaluationContext) EvaluateImport() (*LazyRuntimeValue, LocatableError) {
 	importModuleNode := ex.node.ChildByFieldName("name")
+	membersNode := ex.node.ChildByFieldName("members")
 	modulePath := make([]string, importModuleNode.NamedChildCount())
 	for i := 0; i < int(importModuleNode.NamedChildCount()); i++ {
 		modulePath[i] = importModuleNode.NamedChild(i).Content(ex.source)
@@ -26,6 +27,24 @@ func (ex *EvaluationContext) EvaluateImport() (*LazyRuntimeValue, LocatableError
 	if err != nil {
 		return nil, ex.LocatableErrorOrConvert(err)
 	}
+
+	if membersNode != nil {
+		for i := 0; i < int(membersNode.NamedChildCount()); i++ {
+			childNode := membersNode.NamedChild(i)
+			if childNode.Type() == parser.TYPE_NODE_IDENTIFIER {
+				memberName := membersNode.NamedChild(i).Content(ex.source)
+				member, ok := module.environment.Scope[memberName]
+				if !ok {
+					return nil, ex.ChildNodeExecutionContext(childNode).RuntimeErrorf("%s is not a member of %s", memberName, moduleName)
+				}
+				err := ex.environment.DeclareUnexported(memberName, member)
+				if err != nil {
+					return nil, ex.LocatableErrorOrConvert(err)
+				}
+			}
+		}
+	}
+
 	return runtimeModule, nil
 }
 

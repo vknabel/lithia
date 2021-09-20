@@ -1,9 +1,11 @@
 module example
 
-import tests
+import tests {
+    test
+}
 import strings
 
-tests.test "booleans are cool", { fail =>
+test "booleans are cool", { fail =>
     with True, type Bool {
         True: { _ => },
         False: { _ =>
@@ -12,17 +14,17 @@ tests.test "booleans are cool", { fail =>
     }
 }
 
-tests.test "strings.concat rocks", { fail =>
+test "strings.concat rocks", { fail =>
     let expected "Hello!"
     let actual strings.concat ["Hello", "!"]
     when expected != actual, fail actual
 }
 
-tests.test "string comparisions", { fail =>
+test "string comparisions", { fail =>
     when "" != "", fail "empty strings are not equal"
 }
 
-tests.test "any in enums matches all types", { fail =>
+test "any in enums matches all types", { fail =>
     enum AnyEnum {
         Int
         Any
@@ -35,7 +37,7 @@ tests.test "any in enums matches all types", { fail =>
     unless isCorrect, fail "should not be the case"
 }
 
-tests.test "when true succeeds", { fail =>
+test "when true succeeds", { fail =>
     let isTrue = when True, True
     with isTrue, type Bool {
         True: { true => "" },
@@ -43,7 +45,7 @@ tests.test "when true succeeds", { fail =>
     }
 }
 
-tests.test "int comparisions", { fail =>
+test "int comparisions", { fail =>
     unless 1 == 1, fail "1 == 1"
     unless 0 == 0, fail "0 == 0"
     unless 0 != 42, fail "0 != 42"
@@ -62,7 +64,7 @@ tests.test "int comparisions", { fail =>
     unless (incr 1) == 2, fail "(incr 1) == 2"
 }
 
-tests.test "strings.join", { fail =>
+test "strings.join", { fail =>
     when (strings.join ",", []) != "", fail "for empty list"
     when (strings.join ",", ["1"]) != "1", fail "for one element"
     when (strings.join ",", ["1", "2"]) != "1,2", fail "for two elements"

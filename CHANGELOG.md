@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- compiler: memberwise imports
+
 ## v0.0.4
 
 - docs: generated docs for stdlib

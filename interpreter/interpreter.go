@@ -137,25 +137,6 @@ func (ex *EvaluationContext) EvaluateSourceFile() (*LazyRuntimeValue, LocatableE
 	return NewConstantRuntimeValue(lastValue), nil
 }
 
-func priority(nodeType string) int {
-	switch nodeType {
-	case parser.TYPE_NODE_MODULE_DECLARATION:
-		return 19
-	case parser.TYPE_NODE_IMPORT_DECLARATION:
-		return 17
-	case parser.TYPE_NODE_DATA_DECLARATION:
-		return 15
-	case parser.TYPE_NODE_ENUM_DECLARATION:
-		return 13
-	case parser.TYPE_NODE_FUNCTION_DECLARATION:
-		return 7
-	case parser.TYPE_NODE_LET_DECLARATION:
-		return 3
-	default:
-		return 0
-	}
-}
-
 func (ex *EvaluationContext) EvaluateModule(docs DocString) (*LazyRuntimeValue, LocatableError) {
 	internalName := ex.node.ChildByFieldName("name").Content(ex.source)
 	runtimeModule := NewConstantRuntimeValue(RuntimeModule{module: ex.module, docs: docs})
