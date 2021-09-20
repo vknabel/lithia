@@ -1,6 +1,9 @@
 package interpreter
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 func (ex *EvaluationContext) RuntimeErrorf(format string, args ...interface{}) LocatableError {
 	return ex.LocatableErrorf("runtime error", format, args...)
@@ -39,10 +42,10 @@ func (ex *EvaluationContext) RuntimeCannotCallNonFunction(nonFunction RuntimeVal
 		if err != nil {
 			stringifiedArgs = append(stringifiedArgs, "<error>")
 		} else {
-			stringifiedArgs = append(stringifiedArgs, arg.String())
+			stringifiedArgs = append(stringifiedArgs, fmt.Sprintf("%q", arg.String()))
 		}
 	}
-	return ex.RuntimeErrorf("cannot call non-function value of type %s: %s with args %s", nonFunction.RuntimeType().name, nonFunction.String(), strings.Join(stringifiedArgs, ", "))
+	return ex.RuntimeErrorf("cannot call non-function value of type %s: %q with args %s", nonFunction.RuntimeType().name, nonFunction.String(), strings.Join(stringifiedArgs, ", "))
 }
 
 func (ex *EvaluationContext) RuntimeBinaryOperatorOnlySupportsType(operator string, supportedTypes []RuntimeType, gotValue RuntimeValue) LocatableError {
@@ -51,7 +54,7 @@ func (ex *EvaluationContext) RuntimeBinaryOperatorOnlySupportsType(operator stri
 		supportedTypesNames = append(supportedTypesNames, supported.name)
 	}
 	return ex.RuntimeErrorf(
-		"binary operator %s only supports %s; value of type %s given: %s",
+		"binary operator %q only supports %s; value of type %s given: %q",
 		operator,
 		strings.Join(supportedTypesNames, ", "),
 		gotValue.RuntimeType().name,
