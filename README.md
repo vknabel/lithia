@@ -333,3 +333,8 @@ Most languages allow type casts and checks. Lithia does only support the type sw
 These checks are unstructured and therefore tempt to be used in the wrong places. Though type checks should be used sparingly. Lithia prefers to move required decisions to the edge of the code. Witnesses should implement decisions according to the provided data and desired behavior.
 
 Also: if there is one single type to focus on, the tooling and the developer can understand all cases much easier and faster.
+
+
+## License
+
+Lithia is available under the [MIT](./LICENSE) license.
