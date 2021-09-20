@@ -13,11 +13,13 @@ type RuntimeValue interface {
 }
 
 var _ RuntimeValue = RuntimeType{}
+var _ DocumentedRuntimeValue = RuntimeType{}
 
 type RuntimeType struct {
 	name       string
 	moduleName ModuleName
 	typeValue  *RuntimeValue
+	docs       Docs
 }
 
 func (t RuntimeType) String() string {
@@ -29,6 +31,10 @@ func (t RuntimeType) RuntimeTypeValue() RuntimeValue {
 		return t.RuntimeType()
 	}
 	return *t.typeValue
+}
+
+func (t RuntimeType) GetDocs() Docs {
+	return t.docs
 }
 
 type LazyRuntimeValue struct {

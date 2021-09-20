@@ -1,9 +1,24 @@
 module prelude
 
+/**
+ * A list of arbiratry elements.
+ * 
+ * ```
+ * import lists
+ * 
+ * let myList = [1, 2, 3, 4]
+ * lists.reduce { l, r => l + r }, 0, myList
+ * ```
+ */
 enum List {
+  /// Represents a non-empty List.
   data Cons {
+    /// The first element
     head
+    /// The remaining list.
+    /// @type List
     tail
   }
+  /// Marks the end of the list.
   data Nil
 }

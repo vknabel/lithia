@@ -1,5 +1,7 @@
 module comparables
 
+import prelude
+
 let Equatable = prelude.Equatable
 
 func map { transform, witness =>

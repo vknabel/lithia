@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"sort"
 	"strings"
 
 	sitter "github.com/smacker/go-tree-sitter"
@@ -55,6 +54,8 @@ func NewInterpreter(importRoots ...string) *Interpreter {
 	inter.ExternalDefinitions["prelude"] = ExternalPrelude{}
 	inter.ExternalDefinitions["os"] = ExternalOS{}
 	inter.ExternalDefinitions["rx"] = ExternalRx{}
+	inter.ExternalDefinitions["docs"] = ExternalDocs{}
+	inter.ExternalDefinitions["fs"] = ExternalFS{}
 	return inter
 }
 
@@ -113,28 +114,27 @@ func (ex *EvaluationContext) EvaluateSourceFile() (*LazyRuntimeValue, LocatableE
 		child := ex.node.Child(int(i))
 		children[i] = child
 	}
-	sort.SliceStable(children, func(i, j int) bool {
-		lp := priority(children[i].Type())
-		rp := priority(children[j].Type())
-		return lp > rp
-	})
 
-	return NewLazyRuntimeValue(func() (RuntimeValue, LocatableError) {
-		var lastValue RuntimeValue
-		for _, child := range children {
-			lazyValue, err := ex.ChildNodeExecutionContext(child).EvaluateNode()
+	ex.globalComments = make([]string, 0)
+	var lastValue RuntimeValue
+	for _, child := range children {
+		if child.Type() == parser.TYPE_NODE_COMMENT {
+			ex.globalComments = append(ex.globalComments, child.Content(ex.source))
+			continue
+		}
+		lazyValue, err := ex.ChildNodeExecutionContext(child).EvaluateNode()
+		ex.globalComments = make([]string, 0)
+		if err != nil {
+			return nil, err
+		}
+		if lazyValue != nil {
+			lastValue, err = lazyValue.Evaluate()
 			if err != nil {
 				return nil, err
 			}
-			if lazyValue != nil {
-				lastValue, err = lazyValue.Evaluate()
-				if err != nil {
-					return nil, err
-				}
-			}
 		}
-		return lastValue, nil
-	}), nil
+	}
+	return NewConstantRuntimeValue(lastValue), nil
 }
 
 func priority(nodeType string) int {
@@ -156,9 +156,10 @@ func priority(nodeType string) int {
 	}
 }
 
-func (ex *EvaluationContext) EvaluateModule() (*LazyRuntimeValue, LocatableError) {
+func (ex *EvaluationContext) EvaluateModule(docs DocString) (*LazyRuntimeValue, LocatableError) {
 	internalName := ex.node.ChildByFieldName("name").Content(ex.source)
-	runtimeModule := NewConstantRuntimeValue(RuntimeModule{module: ex.module})
+	runtimeModule := NewConstantRuntimeValue(RuntimeModule{module: ex.module, docs: docs})
+	ex.module.docs = DocString(strings.Trim(string(ex.module.docs)+"\n"+string(docs), "\n"))
 	ex.environment.DeclareUnexported(internalName, runtimeModule)
 	return runtimeModule, nil
 }

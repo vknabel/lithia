@@ -1,0 +1,20 @@
+module lists
+
+import rx
+
+func forEach { list, action =>
+    let lastValue = rx.Variable Void
+
+    func iterate { =>
+        type List {
+            Cons: { cons =>
+                lastValue.accept action cons.head
+                iterate cons.tail
+            },
+            Nil: { nil => Void }
+        }
+    }
+
+    iterate list
+    lastValue.current
+}

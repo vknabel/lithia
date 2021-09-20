@@ -1,0 +1,8 @@
+module optionals
+
+func orDefault { default =>
+    type Optional {
+        Some: { some => some.value },
+        None: { none => default }
+    }
+}

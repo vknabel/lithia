@@ -3,8 +3,11 @@ package interpreter
 import "fmt"
 
 var _ RuntimeValue = PreludeFunctionType{}
+var _ DocumentedRuntimeValue = PreludeFunctionType{}
 
-type PreludeFunctionType struct{}
+type PreludeFunctionType struct {
+	docs Docs
+}
 
 func (f PreludeFunctionType) String() string {
 	return "Function"
@@ -19,4 +22,8 @@ func (PreludeFunctionType) RuntimeType() RuntimeType {
 
 func (f PreludeFunctionType) Lookup(member string) (*LazyRuntimeValue, error) {
 	return nil, fmt.Errorf("function type %s has no member %s", f, member)
+}
+
+func (f PreludeFunctionType) GetDocs() Docs {
+	return f.docs
 }

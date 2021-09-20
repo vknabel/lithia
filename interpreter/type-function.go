@@ -7,10 +7,12 @@ import (
 
 var _ RuntimeValue = Function{}
 var _ Callable = Function{}
+var _ DocumentedRuntimeValue = Function{}
 
 type Function struct {
 	name      string
 	arguments []string
+	docs      Docs
 	body      func(*EvaluationContext) ([]*LazyRuntimeValue, error)
 	parent    *EvaluationContext
 }
@@ -73,4 +75,8 @@ func (f Function) Call(arguments []*LazyRuntimeValue) (RuntimeValue, error) {
 		return nil, fmt.Errorf("function %s returns %s, which is not callable", f.name, lastValue)
 	}
 
+}
+
+func (f Function) GetDocs() Docs {
+	return f.docs
 }

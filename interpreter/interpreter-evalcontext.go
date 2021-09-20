@@ -12,6 +12,8 @@ type EvaluationContext struct {
 
 	node   *sitter.Node
 	source []byte
+
+	globalComments []string
 }
 
 func (inter *Interpreter) NewEvaluationContext(file string, module *Module, node *sitter.Node, source []byte, environment *Environment) *EvaluationContext {
@@ -26,33 +28,36 @@ func (inter *Interpreter) NewEvaluationContext(file string, module *Module, node
 		environment:   environment,
 		functionCount: 0,
 
-		node:   node,
-		source: source,
+		node:           node,
+		source:         source,
+		globalComments: []string{},
 	}
 }
 
 func (i *EvaluationContext) NestedExecutionContext(name string) *EvaluationContext {
 	return &EvaluationContext{
-		interpreter:   i.interpreter,
-		file:          i.file,
-		module:        i.module,
-		path:          append(i.path, name),
-		environment:   NewEnvironment(i.environment),
-		functionCount: 0,
-		node:          i.node,
-		source:        i.source,
+		interpreter:    i.interpreter,
+		file:           i.file,
+		module:         i.module,
+		path:           append(i.path, name),
+		environment:    NewEnvironment(i.environment),
+		functionCount:  0,
+		node:           i.node,
+		source:         i.source,
+		globalComments: i.globalComments,
 	}
 }
 
 func (i *EvaluationContext) ChildNodeExecutionContext(childNode *sitter.Node) *EvaluationContext {
 	return &EvaluationContext{
-		interpreter:   i.interpreter,
-		file:          i.file,
-		module:        i.module,
-		path:          i.path,
-		environment:   i.environment,
-		functionCount: i.functionCount,
-		node:          childNode,
-		source:        i.source,
+		interpreter:    i.interpreter,
+		file:           i.file,
+		module:         i.module,
+		path:           i.path,
+		environment:    i.environment,
+		functionCount:  i.functionCount,
+		node:           childNode,
+		source:         i.source,
+		globalComments: i.globalComments,
 	}
 }

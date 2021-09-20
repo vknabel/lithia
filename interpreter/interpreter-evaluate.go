@@ -19,7 +19,7 @@ func (ex *EvaluationContext) EvaluateImport() (*LazyRuntimeValue, LocatableError
 	moduleName := ModuleName(strings.Join(modulePath, "."))
 	module, err := ex.interpreter.LoadModuleIfNeeded(moduleName)
 	if err != nil {
-		return nil, ex.SyntaxErrorf("error importing module %s: %s", moduleName, err.Error())
+		return nil, ex.LocatableErrorOrConvert(err)
 	}
 	runtimeModule := NewConstantRuntimeValue(RuntimeModule{module: module})
 	err = ex.environment.DeclareUnexported(importMember, runtimeModule)
@@ -46,11 +46,11 @@ func (ex *EvaluationContext) EvaluateLetDeclaration() (*LazyRuntimeValue, Locata
 	}
 	return lazyValue, nil
 }
-func (ex *EvaluationContext) EvaluateFunctionDeclaration() (*LazyRuntimeValue, LocatableError) {
+func (ex *EvaluationContext) EvaluateFunctionDeclaration(docs DocString) (*LazyRuntimeValue, LocatableError) {
 	var err error
 	name := ex.node.ChildByFieldName("name").Content(ex.source)
 	functionNode := ex.node.ChildByFieldName("function")
-	function, err := ex.ChildNodeExecutionContext(functionNode).ParseFunctionLiteral(name)
+	function, err := ex.ChildNodeExecutionContext(functionNode).ParseFunctionLiteral(name, docs)
 
 	if err != nil {
 		return nil, ex.LocatableErrorOrConvert(err)
@@ -62,7 +62,7 @@ func (ex *EvaluationContext) EvaluateFunctionDeclaration() (*LazyRuntimeValue, L
 	}
 	return impl, nil
 }
-func (ex *EvaluationContext) EvaluateDataDeclaration() (*LazyRuntimeValue, LocatableError) {
+func (ex *EvaluationContext) EvaluateDataDeclaration(docs DocString) (*LazyRuntimeValue, LocatableError) {
 	name := ex.node.ChildByFieldName("name").Content(ex.source)
 	propertiesNode := ex.node.ChildByFieldName("properties")
 
@@ -73,17 +73,26 @@ func (ex *EvaluationContext) EvaluateDataDeclaration() (*LazyRuntimeValue, Locat
 		numberOfFields = 0
 	}
 
-	data := DataDeclRuntimeValue{
-		name:   name,
-		fields: make([]DataDeclField, numberOfFields),
-	}
+	data := NewDataDecl(name, make([]DataDeclField, 0, numberOfFields), docs)
 
+	comments := make([]string, 0)
+	for i := 0; i < int(ex.node.ChildCount()); i++ {
+		child := ex.node.Child(i)
+		if child.Type() == parser.TYPE_NODE_COMMENT {
+			comments = append(comments, child.Content(ex.source))
+		}
+	}
 	for i := 0; i < numberOfFields; i++ {
 		child := propertiesNode.Child(i)
 		switch child.Type() {
 		case parser.TYPE_NODE_DATA_PROPERTY_VALUE:
 			name := child.ChildByFieldName("name").Content(ex.source)
-			data.fields[i] = DataDeclField{name: name}
+			fieldDecl := DataDeclField{
+				name: name,
+				docs: MakeDocString(comments),
+			}
+			comments = make([]string, 0)
+			data.fields = append(data.fields, fieldDecl)
 		case parser.TYPE_NODE_DATA_PROPERTY_FUNCTION:
 			name := child.ChildByFieldName("name").Content(ex.source)
 			var err error
@@ -91,7 +100,15 @@ func (ex *EvaluationContext) EvaluateDataDeclaration() (*LazyRuntimeValue, Locat
 			if err != nil {
 				return nil, ex.LocatableErrorOrConvert(err)
 			}
-			data.fields[i] = DataDeclField{name: name, params: parameters}
+			fieldDecl := DataDeclField{
+				name:   name,
+				params: parameters,
+				docs:   MakeDocString(comments),
+			}
+			comments = make([]string, 0)
+			data.fields = append(data.fields, fieldDecl)
+		case parser.TYPE_NODE_COMMENT:
+			comments = append(comments, child.Content(ex.source))
 		default:
 			return nil, ex.ChildNodeExecutionContext(child).SyntaxErrorf("unexpected node type %s", child.Type())
 		}
@@ -102,13 +119,16 @@ func (ex *EvaluationContext) EvaluateDataDeclaration() (*LazyRuntimeValue, Locat
 	return constantValue, nil
 }
 
-func (ex *EvaluationContext) EvaluateExternDeclaration() (*LazyRuntimeValue, LocatableError) {
+func (ex *EvaluationContext) EvaluateExternDeclaration(docs DocString) (*LazyRuntimeValue, LocatableError) {
 	name := ex.node.ChildByFieldName("name").Content(ex.source)
 	externalDef, ok := ex.interpreter.ExternalDefinitions[ex.module.name]
 	if !ok {
 		return nil, ex.SyntaxErrorf("no external declarations allowed in module %s", ex.module.name)
 	}
-	runtimeValue, ok := externalDef.Lookup(name, ex.environment)
+	runtimeValue, ok := externalDef.Lookup(name, ex.environment, Docs{
+		name: name,
+		docs: docs,
+	})
 	if !ok {
 		return nil, ex.SyntaxErrorf("unknown external declaration %s in module %s", name, ex.module.name)
 	}
@@ -187,14 +207,26 @@ func (ex *EvaluationContext) EvaluateSimpleInvocation() (*LazyRuntimeValue, Loca
 	return ex.EvaluateComplexInvocationExpr()
 }
 
-func (ex *EvaluationContext) EvaluateEnumDeclaration() (*LazyRuntimeValue, LocatableError) {
+func (ex *EvaluationContext) EvaluateEnumDeclaration(docs DocString) (*LazyRuntimeValue, LocatableError) {
 	name := ex.node.ChildByFieldName("name").Content(ex.source)
 	casesNode := ex.node.ChildByFieldName("cases")
 	if casesNode == nil {
-		enum := NewConstantRuntimeValue(EnumDeclRuntimeValue{name: name, cases: make(map[string]*LazyRuntimeValue)})
+		enum := NewConstantRuntimeValue(EnumDeclRuntimeValue{
+			name:  name,
+			cases: make(map[string]*LazyRuntimeValue),
+			docs:  docs,
+		})
 		ex.environment.Declare(name, enum)
 		return enum, nil
 	}
+	comments := make([]string, 0)
+	for i := 0; i < int(ex.node.ChildCount()); i++ {
+		child := ex.node.Child(i)
+		if child.Type() == parser.TYPE_NODE_COMMENT {
+			comments = append(comments, child.Content(ex.source))
+		}
+	}
+
 	caseCount := int(casesNode.ChildCount())
 	cases := make(map[string]*LazyRuntimeValue)
 	for i := 0; i < caseCount; i++ {
@@ -209,18 +241,25 @@ func (ex *EvaluationContext) EvaluateEnumDeclaration() (*LazyRuntimeValue, Locat
 			cases[caseName] = lookedUp
 		case parser.TYPE_NODE_DATA_DECLARATION:
 			caseName := child.ChildByFieldName("name").Content(ex.source)
-			runtimeValue, err := ex.ChildNodeExecutionContext(child).EvaluateDataDeclaration()
+			if caseName == "" {
+				fmt.Println("caseName:", caseName, len(comments))
+			}
+			runtimeValue, err := ex.ChildNodeExecutionContext(child).EvaluateDataDeclaration(MakeDocString(comments))
 			if err != nil {
 				return nil, err
 			}
 			cases[caseName] = runtimeValue
+			comments = make([]string, 0)
 		case parser.TYPE_NODE_ENUM_DECLARATION:
 			caseName := child.ChildByFieldName("name").Content(ex.source)
-			runtimeValue, err := ex.ChildNodeExecutionContext(child).EvaluateEnumDeclaration()
+			runtimeValue, err := ex.ChildNodeExecutionContext(child).EvaluateEnumDeclaration(MakeDocString(comments))
 			if err != nil {
 				return nil, err
 			}
 			cases[caseName] = runtimeValue
+			comments = make([]string, 0)
+		case parser.TYPE_NODE_COMMENT:
+			comments = append(comments, child.Content(ex.source))
 		default:
 			return nil, ex.ChildNodeExecutionContext(child).SyntaxErrorf("unexpected node type %s", child.Type())
 		}
@@ -228,6 +267,7 @@ func (ex *EvaluationContext) EvaluateEnumDeclaration() (*LazyRuntimeValue, Locat
 	constantValue := NewConstantRuntimeValue(EnumDeclRuntimeValue{
 		name:  name,
 		cases: cases,
+		docs:  docs,
 	})
 	ex.environment.Declare(name, constantValue)
 	return constantValue, nil
@@ -405,7 +445,7 @@ func (ex *EvaluationContext) EvaluateUnaryExpression() (*LazyRuntimeValue, Locat
 	return nil, ex.SyntaxErrorf("unimplemented")
 }
 
-func (ex *EvaluationContext) ParseFunctionLiteral(name string) (Function, LocatableError) {
+func (ex *EvaluationContext) ParseFunctionLiteral(name string, docs DocString) (Function, LocatableError) {
 	parametersNode := ex.node.ChildByFieldName("parameters")
 	bodyNode := ex.node.ChildByFieldName("body")
 
@@ -429,6 +469,7 @@ func (ex *EvaluationContext) ParseFunctionLiteral(name string) (Function, Locata
 	return Function{
 		name:      name,
 		arguments: params,
+		docs:      Docs{name: name, docs: docs},
 		parent:    ex,
 		body: func(i *EvaluationContext) ([]*LazyRuntimeValue, error) {
 			if bodyNode == nil {
@@ -444,7 +485,7 @@ func (ex *EvaluationContext) ParseFunctionLiteral(name string) (Function, Locata
 }
 
 func (ex *EvaluationContext) EvaluateFunctionLiteral() (*LazyRuntimeValue, LocatableError) {
-	function, err := ex.ParseFunctionLiteral("")
+	function, err := ex.ParseFunctionLiteral("", "")
 	if err != nil {
 		return nil, err
 	}
@@ -505,23 +546,35 @@ func SliceToList(consDecl DataDeclRuntimeValue, nilDecl DataDeclRuntimeValue, sl
 }
 
 func (ex *EvaluationContext) EvaluateNode() (*LazyRuntimeValue, LocatableError) {
+	if ex.node.Type() == parser.TYPE_NODE_COMMENT {
+		ex.globalComments = append(ex.globalComments, ex.node.Content(ex.source))
+		return nil, nil
+	}
+	value, err := ex.evaluateNodeWithoutComments()
+	if len(ex.globalComments) > 0 {
+		ex.globalComments = make([]string, 0)
+	}
+	return value, err
+}
+
+func (ex *EvaluationContext) evaluateNodeWithoutComments() (*LazyRuntimeValue, LocatableError) {
 	switch ex.node.Type() {
 	case parser.TYPE_NODE_SOURCE_FILE:
 		return ex.EvaluateSourceFile()
 	case parser.TYPE_NODE_MODULE_DECLARATION:
-		return ex.EvaluateModule()
+		return ex.EvaluateModule(MakeDocString(ex.globalComments))
 	case parser.TYPE_NODE_IMPORT_DECLARATION:
 		return ex.EvaluateImport()
 	case parser.TYPE_NODE_LET_DECLARATION:
 		return ex.EvaluateLetDeclaration()
 	case parser.TYPE_NODE_FUNCTION_DECLARATION:
-		return ex.EvaluateFunctionDeclaration()
+		return ex.EvaluateFunctionDeclaration(MakeDocString(ex.globalComments))
 	case parser.TYPE_NODE_DATA_DECLARATION:
-		return ex.EvaluateDataDeclaration()
+		return ex.EvaluateDataDeclaration(MakeDocString(ex.globalComments))
 	case parser.TYPE_NODE_EXTERN_DECLARATION:
-		return ex.EvaluateExternDeclaration()
+		return ex.EvaluateExternDeclaration(MakeDocString(ex.globalComments))
 	case parser.TYPE_NODE_ENUM_DECLARATION:
-		return ex.EvaluateEnumDeclaration()
+		return ex.EvaluateEnumDeclaration(MakeDocString(ex.globalComments))
 	case parser.TYPE_NODE_COMPLEX_INVOCATION_EXPRESSION:
 		return ex.EvaluateComplexInvocationExpr()
 	case parser.TYPE_NODE_SIMPLE_INVOCATION_EXPRESSION:
@@ -550,8 +603,6 @@ func (ex *EvaluationContext) EvaluateNode() (*LazyRuntimeValue, LocatableError) 
 	// 	return interpreter.Evaluate(node)
 	case parser.TYPE_NODE_IDENTIFIER:
 		return ex.EvaluateIdentifier()
-	case parser.TYPE_NODE_COMMENT:
-		return nil, nil
 	// case parser.TYPE_NODE_ENUM_CASE_REFERENCE:
 	// 	return interpreter.Evaluate(node)
 	// case parser.TYPE_NODE_ERROR:

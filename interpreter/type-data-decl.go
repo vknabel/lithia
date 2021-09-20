@@ -11,11 +11,21 @@ var _ Callable = DataDeclRuntimeValue{}
 type DataDeclRuntimeValue struct {
 	name   string
 	fields []DataDeclField
+	docs   DocString
+}
+
+func NewDataDecl(name string, fields []DataDeclField, docs DocString) DataDeclRuntimeValue {
+	return DataDeclRuntimeValue{
+		name:   name,
+		fields: fields,
+		docs:   docs,
+	}
 }
 
 type DataDeclField struct {
 	name   string
 	params []string
+	docs   DocString
 }
 
 func (d DataDeclRuntimeValue) String() string {

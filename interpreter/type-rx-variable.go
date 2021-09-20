@@ -28,6 +28,9 @@ func (v *RuntimeVariable) Lookup(member string) (*LazyRuntimeValue, error) {
 		return NewConstantRuntimeValue(NewBuiltinFunction(
 			"accept",
 			[]string{"value"},
+			Docs{
+				docs: "Evalutes and sets the current value",
+			},
 			func(args []*LazyRuntimeValue) (RuntimeValue, error) {
 				return v.Accept(args[0])
 			},

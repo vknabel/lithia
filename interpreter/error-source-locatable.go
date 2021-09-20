@@ -12,6 +12,8 @@ type LocatableError interface {
 	LocatableError() LocatableError
 }
 
+var _ LocatableError = SourceLocatableError{}
+
 type SourceLocatableError struct {
 	Kind           string
 	Message        string
@@ -58,6 +60,9 @@ func (ex *EvaluationContext) LocatableErrorOrConvert(err error) LocatableError {
 	}
 	if locatableError, ok := err.(LocatableError); ok {
 		return locatableError
+	}
+	if parsingError, ok := err.(SyntaxParsingError); ok {
+		return NewLocatableError("syntax", parsingError.Error(), ex.file, string(ex.source), ex.node)
 	}
 	return NewLocatableError("error", err.Error(), ex.file, string(ex.source), ex.node)
 }

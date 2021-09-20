@@ -7,8 +7,11 @@ import (
 
 var _ RuntimeValue = RxVariableType{}
 var _ Callable = &RxVariableType{}
+var _ DocumentedRuntimeValue = &RxVariableType{}
 
-type RxVariableType struct{}
+type RxVariableType struct {
+	docs Docs
+}
 
 func (v RxVariableType) String() string {
 	return v.RuntimeType().String()
@@ -35,4 +38,8 @@ func (v RxVariableType) Call(arguments []*LazyRuntimeValue) (RuntimeValue, error
 		return nil, err
 	}
 	return &RuntimeVariable{current: value, lock: &sync.RWMutex{}}, nil
+}
+
+func (v RxVariableType) GetDocs() Docs {
+	return v.docs
 }

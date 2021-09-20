@@ -1,0 +1,21 @@
+module strings
+
+import lists
+
+func join { separator, listOfStrings =>
+    with listOfStrings, type List {
+        Cons: { first => 
+            with first.tail, type List {
+                Cons: { lookahead => 
+                    strings.concat [
+                        first.head,
+                        separator,
+                        (strings.join separator, lookahead)
+                    ]
+                },
+                Nil: { nil => first.head }
+            }
+        },
+        Nil: { nil => "" }
+    }
+}

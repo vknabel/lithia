@@ -1,7 +1,9 @@
 # Changelog
 
-## Unreleased
+## v0.0.4
 
+- docs: generated docs for stdlib
+- stdlib: added new modules
 - stdlib: renamed `Rune` to `Char`
 - improved printing of values
 - stdlib: `Variable` now moved to `rx.Variable`

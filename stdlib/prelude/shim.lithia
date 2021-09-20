@@ -1,3 +1,8 @@
+/**
+ * Implements the most basic data types.
+ * Espcially those needed for built-in functionality and for the compiler.
+ * Will always be imported implicitly.
+ */
 module prelude
 
 extern print message

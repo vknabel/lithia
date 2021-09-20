@@ -20,6 +20,7 @@ Currently Lithia is just an early proof of concept. Most basic language features
 - [x] Easy installation
 - [ ] Prebuilt docker image
 - [ ] Prebuilt linux binaries
+- [ ] Docs generator
 - [ ] Creating a custom language server
 - [ ] ... with diagnostics
 - [ ] ... with syntax highlighting
@@ -52,6 +53,8 @@ As you might expect there aren’t a lot language features to cover:
 - Module imports
 
 On the other hand we explicitly opted out a pretty long list of features: mutability by default, interfaces, classes, inheritance, type extensions, methods, generics, custom operators, null, instance checks, importing all members of a module, exceptions and tuples.
+
+> Curios? Head over to the generated [Standard Libraray documentation](./stdlib/README.md).
 
 ### Functions
 

@@ -1,0 +1,76 @@
+import booleans
+import comparables
+import docs
+import fs
+import lists
+import optionals
+import os
+import prelude
+import rx
+import strings
+import tests
+
+func writeModuleMarkdownDocs { intoPath, mod =>
+    let filePath = strings.concat [intoPath, "/", mod.name, ".md"]
+    fs.writeString filePath, docs.docsToMarkdown mod
+}
+
+func overviewListToMarkdown { grouped, names =>
+    let tableOfContents = with names, pipe [
+        lists.map { name => 
+            strings.concat [
+                "- [", name, "]", "(./", name, ".md)"
+            ]
+        },
+        strings.join "\n"
+    ]
+    strings.concat [
+        "# ", grouped.title, "\n\n",
+        grouped.summary, "\n\n",
+        tableOfContents, "\n"
+    ]
+}
+
+func writeOverview { intoPath, grouped, names =>
+    let filePath = strings.concat [intoPath, "/README.md"]
+    fs.writeString filePath, (overviewListToMarkdown grouped, names)
+}
+
+data GroupedModuleDocs {
+    title
+    summary
+    modules
+}
+
+func main { grouped =>
+    let modules = grouped.modules
+    let docsFolder = optionals.orDefault "./stdlib", os.env "LITHIA_EXPORT_DOCS"
+    lists.forEach modules, pipe [
+        docs.inspect,
+        writeModuleMarkdownDocs docsFolder,
+        print
+    ]
+    print (writeOverview docsFolder, grouped, (pipe [
+        lists.map docs.inspect,
+        lists.map { mod => mod.name }
+    ], grouped.modules))
+}
+
+main (GroupedModuleDocs "Lithia Standard Library", 
+    (strings.join "\n", [
+    "There is one implicitly imported module for all files, called `prelude`.",
+    "Other modules are not imported implicitly."
+    ]),
+    [
+    booleans,
+    comparables,
+    docs,
+    fs,
+    lists,
+    optionals,
+    os,
+    prelude,
+    rx,
+    strings,
+    tests
+])

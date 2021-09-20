@@ -1,0 +1,7 @@
+module fs
+
+extern writeString toPath, newContents
+extern readString fromPath
+extern exists atPath
+extern delete atPath
+extern deleteAll atPath

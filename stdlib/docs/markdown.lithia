@@ -1,0 +1,91 @@
+module docs
+
+import strings
+import lists
+
+func docsToMarkdown { docs =>
+    with docs, type TypeDocs {
+        ModuleDocs: { d =>
+            strings.concat [
+                "# ", d.name, "\n\n",
+                "_module_ ", d.docs, "\n\n",
+                (strings.join "\n" , (lists.map docsToMarkdown, d.types))
+            ]
+        },
+        EnumDocs: { d => 
+            strings.concat [
+                "## ", d.name, "\n\n",
+                "_enum_ ",
+                d.docs, 
+                (if d.cases == Nil, "", strings.concat [
+                    "\n\n",
+                    "### Cases\n\n",
+                    (strings.join "\n" , (lists.map enumCaseDocsToMarkdown, d.cases)),
+                    "\n"
+                ])
+            ]
+        },
+        DataDocs: { d => 
+            strings.concat [
+                "## ", d.name, "\n\n",
+                "_data_ ",
+                d.docs,
+                (if d.fields == Nil, "", strings.concat [
+                    "\n\n",
+                    "### Properties\n\n",
+                    (strings.join "\n" , (lists.map dataFieldDocsToMarkdown, d.fields)),
+                    "\n"
+                ])
+            ]
+        },
+        FunctionDocs: { d =>
+            strings.concat [
+                "## ", d.name,"\n\n"
+                "_func_ ",
+                d.docs, 
+                (if d.params == Nil, "", strings.concat [
+                    "\n\n",
+                    "### Parameters\n\n",
+                    (strings.join "\n", (lists.map { p => "- ".append p }, d.params)),
+                    "\n"
+                ])
+            ]
+        },
+        ConstantDocs: { d =>
+            strings.concat [
+                "## ", d.name,"\n\n"
+                "_let_ ",
+                d.docs, "\n"
+            ]
+        },
+        ExternDocs: { d =>
+            strings.concat [
+                "## ", d.name,"\n\n"
+                "_extern_ ",
+                d.docs, "\n"
+            ]
+        },
+        None: { _ => "" }
+    }
+}
+
+func enumCaseDocsToMarkdown { case =>
+    strings.concat [
+        "- [", case.name, "](#", case.type.name, ")", markdownDocsSuffix case.docs
+    ]
+}
+
+func dataFieldDocsToMarkdown { field =>
+    with field.params, type List {
+        Cons: { _ => 
+            strings.concat ["- ", field.name, " ", (strings.join ", ", field.params), markdownDocsSuffix field.docs]
+        },
+        Nil: { _ => 
+            strings.concat ["- ", field.name, markdownDocsSuffix field.docs]
+        }
+    }
+}
+
+func markdownDocsSuffix { docsString =>
+    if docsString == "", "", strings.concat [" - ", docsString]
+}

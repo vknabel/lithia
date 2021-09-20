@@ -4,10 +4,10 @@ var _ ExternalDefinition = ExternalRx{}
 
 type ExternalRx struct{}
 
-func (e ExternalRx) Lookup(name string, env *Environment) (RuntimeValue, bool) {
+func (e ExternalRx) Lookup(name string, env *Environment, docs Docs) (DocumentedRuntimeValue, bool) {
 	switch name {
 	case "Variable":
-		return RxVariableType{}, true
+		return RxVariableType{docs}, true
 	default:
 		return nil, false
 	}

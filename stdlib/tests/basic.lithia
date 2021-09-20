@@ -1,3 +1,24 @@
+/**
+ * A basic testing framework. Compatible to TAP13.
+ * It doesn't provide any expectations or matchers.
+ * Instead there is only a fail function.
+ *
+ * ```
+ * import tests
+ *
+ * tests.test "my test case", { fail =>
+ *   when False, fail "when should not trigger when False"
+ * }
+ *
+ * when tests.enabled, tests.runTests
+ * ```
+ *
+ * By default, tests are enabled, when `$LITHIA_TESTS` is set.
+ *
+ * ### Discussion
+ *
+ * In case you really need expectations, writing a wrapper around tests should be possible.
+ */
 module tests
 
 import lists
@@ -8,25 +29,47 @@ import rx
 let testCases = rx.Variable Nil
 
 data TestCase {
+    /// The title of the test case for the logs.
     title
+    /// The implementation of the test case.
+    /// Calls fail with a String, when failing
     impl fail
 }
 
+/// The prinatble summary of all tests.
 data TestSummary {
+    /// How many tests have been ok.
     ok
+    /// How many tests have been not ok.
     notOk
+    /// List of failed test numbers.
     failedTests
 }
 
+/// Indicates if tests are enabled.
+/// True if environment variable `$LITHIA_TESTS` is set.
+/// @type Bool
 let enabled = with os.env "LITHIA_TESTS", type Optional {
     Some: { some => some.value != "" },
     None: { _ => False }
 }
 
+/**
+ * Adds a new test case to the queue and will be executed once `runTests` has been called.
+ * 
+ * ```
+ * import tests
+ *
+ * tests.test "my test case", { fail =>
+ *   when False, fail "when should not trigger when False"
+ * }
+ * ```
+ **/
 func test { case, function =>
     testCases.accept (lists.append (TestCase case, function), testCases.current)
 }
 
+/// Runs all test cases, that have been buffered by now.
 func runTests { =>
     print "TAP version 13"
     print strings.concat [

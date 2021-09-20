@@ -1,0 +1,6 @@
+module prelude
+
+enum Result {
+    data Success { value }
+    data Failure { error }
+}

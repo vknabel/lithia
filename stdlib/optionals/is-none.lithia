@@ -9,13 +9,13 @@ func isNone { =>
   }
 }
 
-describe "is none", { it =>
-  it "true for none", { expect =>
-    expect isNone None
-  }
+// describe "is none", { it =>
+//   it "true for none", { expect =>
+//     expect isNone None
+//   }
   
-  it "false for some", { expect =>
-    expect booleans.not isNone (Some 41)
-    expect booleans.not isNone (Some None)
-  }
-}
+//   it "false for some", { expect =>
+//     expect booleans.not isNone (Some 41)
+//     expect booleans.not isNone (Some None)
+//   }
+// }

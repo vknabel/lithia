@@ -9,52 +9,54 @@ var _ ExternalDefinition = ExternalOS{}
 
 type ExternalOS struct{}
 
-func (e ExternalOS) Lookup(name string, env *Environment) (RuntimeValue, bool) {
+func (e ExternalOS) Lookup(name string, env *Environment, docs Docs) (DocumentedRuntimeValue, bool) {
 	switch name {
 	case "exit":
-		return builtinOsExit, true
+		return builtinOsExit(docs), true
 	case "env":
-		return builtinOsEnv(env), true
+		return builtinOsEnv(env, docs), true
 	default:
 		return nil, false
 	}
 }
 
-var builtinOsExit = NewBuiltinFunction(
-	"osExit",
-	[]string{"code"},
-	func(args []*LazyRuntimeValue) (RuntimeValue, error) {
-		value, err := args[0].Evaluate()
-		if err != nil {
-			return nil, err
-		}
-		if code, ok := value.(PreludeInt); ok {
-			os.Exit(int(code))
-			return value, nil
-		} else {
-			return nil, fmt.Errorf("%s is not an int", value)
-		}
-	},
-)
-
-func builtinOsEnv(prelude *Environment) BuiltinFunction {
+func builtinOsExit(docs Docs) BuiltinFunction {
 	return NewBuiltinFunction(
-		"osEnv",
+		"exit",
+		[]string{"code"},
+		docs,
+		func(args []*LazyRuntimeValue) (RuntimeValue, error) {
+			value, err := args[0].Evaluate()
+			if err != nil {
+				return nil, err
+			}
+			if code, ok := value.(PreludeInt); ok {
+				os.Exit(int(code))
+				return value, nil
+			} else {
+				return nil, fmt.Errorf("%s is not an int", value)
+			}
+		},
+	)
+}
+
+func builtinOsEnv(prelude *Environment, docs Docs) BuiltinFunction {
+	return NewBuiltinFunction(
+		"env",
 		[]string{"key"},
+		docs,
 		func(args []*LazyRuntimeValue) (RuntimeValue, error) {
 			value, err := args[0].Evaluate()
 			if err != nil {
 				return nil, err
 			}
 			if key, ok := value.(PreludeString); ok {
-				if env, ok := os.LookupEnv(string(key)); ok {
+				if env, ok := os.LookupEnv(string(key)); ok && env != "" {
 					return prelude.MakeDataRuntimeValue("Some", map[string]*LazyRuntimeValue{
 						"value": NewConstantRuntimeValue(PreludeString(env)),
 					})
 				} else {
-					return prelude.MakeDataRuntimeValue("Some", map[string]*LazyRuntimeValue{
-						"value": NewConstantRuntimeValue(PreludeString(env)),
-					})
+					return prelude.MakeEmptyDataRuntimeValue("None")
 				}
 			} else {
 				return nil, fmt.Errorf("%s is not a string", value)

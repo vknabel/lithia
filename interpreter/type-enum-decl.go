@@ -10,6 +10,7 @@ var _ RuntimeValue = EnumDeclRuntimeValue{}
 type EnumDeclRuntimeValue struct {
 	name  string
 	cases map[string]*LazyRuntimeValue
+	docs  DocString
 }
 
 func (e EnumDeclRuntimeValue) String() string {

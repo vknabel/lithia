@@ -31,5 +31,5 @@ func (d DataRuntimeValue) String() string {
 		}
 	}
 
-	return fmt.Sprintf("%s %s", d.typeValue.name, strings.Join(params, ", "))
+	return fmt.Sprintf("(%s %s)", d.typeValue.name, strings.Join(params, ", "))
 }

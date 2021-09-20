@@ -1,0 +1,113 @@
+module docs
+
+extern inspect value
+
+/// All possible docs inspection values.
+enum TypeDocs {
+    /// Contains all documentation information for a given enum.
+    data EnumDocs {
+        /// Name of the enum
+        name
+        docs
+        cases
+    }
+    data DataDocs {
+        /// The name of the data declaration
+        name
+        docs
+        /// A List of fields of DataFieldDocs
+        fields
+    }
+    data ModuleDocs {
+        /// name of the module
+        name
+        /// all types declared in the module
+        types
+        docs
+    }
+    data FunctionDocs {
+        name
+        docs
+        params
+    }
+    data ConstantDocs {
+        name
+        docs
+    }
+    data ExternDocs {
+        name
+        docs
+    }
+    None
+}
+
+/// Describes a field of a data type
+data DataFieldDocs {
+    /// name of the data property
+    name
+    docs
+    params
+}
+
+/// The documentation for a specific enum case.
+data EnumCaseDocs {
+    name
+    docs
+    type
+}
+
+import tests
+
+tests.test "inspect for TypeDocs returns string", { fail =>
+    enum IsString {
+        String
+        None
+    }
+    with inspect TypeDocs, type TypeDocs {
+        EnumDocs: { enumDocs =>
+            when enumDocs.docs == "", fail "must not be empty"
+        },
+        DataDocs: { _ => fail "DataDocs given" },
+        ModuleDocs: { _ => fail "ModuleDocs given" },
+        FunctionDocs: { _ => fail "FunctionDocs given" },
+        ConstantDocs: { _ => fail "ConstantDocs given" },
+        ExternDocs: { _ => fail "ExternDocs given" },
+        None: { _ => fail "None given" }
+    }
+}
+
+tests.test "inspect for EnumDocs returns DataDocs", { fail =>
+    enum IsString {
+        String
+        None
+    }
+    with inspect EnumDocs, type TypeDocs {
+        DataDocs: { dataDocs => 
+            when dataDocs.docs == "", fail "must not be empty"
+        },
+        EnumDocs: { _ => fail "EnumDocs given" },
+        ModuleDocs: { _ => fail "ModuleDocs given" },
+        FunctionDocs: { _ => fail "FunctionDocs given" },
+        ConstantDocs: { _ => fail "ConstantDocs given" },
+        ExternDocs: { _ => fail "ExternDocs given" },
+        None: { _ => fail "None given" }
+    }
+}
+
+tests.test "inspect for EnumCaseDocs returns DataDocs", { fail =>
+    enum IsString {
+        String
+        None
+    }
+    with inspect EnumCaseDocs, type TypeDocs {
+        DataDocs: { dataDocs => 
+            when dataDocs.docs == "", fail "must not be empty"
+        },
+        EnumDocs: { _ => fail "EnumDocs given" },
+        ModuleDocs: { _ => fail "ModuleDocs given" },
+        FunctionDocs: { _ => fail "FunctionDocs given" },
+        ConstantDocs: { _ => fail "ConstantDocs given" },
+        ExternDocs: { _ => fail "ExternDocs given" },
+        None: { _ => fail "None given" }
+    }
+}

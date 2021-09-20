@@ -39,7 +39,7 @@ type mockExternalOS struct {
 	env            map[string]string
 }
 
-func (e *mockExternalOS) Lookup(name string, env *i.Environment) (i.RuntimeValue, bool) {
+func (e *mockExternalOS) Lookup(name string, env *i.Environment, docs i.Docs) (i.DocumentedRuntimeValue, bool) {
 	switch name {
 	case "exit":
 		return mockOsExit(env, func(code i.PreludeInt) {
@@ -56,6 +56,7 @@ func mockOsExit(prelude *i.Environment, impl func(i.PreludeInt)) i.BuiltinFuncti
 	return i.NewBuiltinFunction(
 		"osExit",
 		[]string{"code"},
+		i.Docs{},
 		func(args []*i.LazyRuntimeValue) (i.RuntimeValue, error) {
 			value, err := args[0].Evaluate()
 			if err != nil {
@@ -74,6 +75,7 @@ func mockOsEnv(prelude *i.Environment, fakeOsEnv map[string]string) i.BuiltinFun
 	return i.NewBuiltinFunction(
 		"osEnv",
 		[]string{"key"},
+		i.Docs{},
 		func(args []*i.LazyRuntimeValue) (i.RuntimeValue, error) {
 			value, err := args[0].Evaluate()
 			if err != nil {

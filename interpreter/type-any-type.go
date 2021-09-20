@@ -5,8 +5,11 @@ import (
 )
 
 var _ RuntimeValue = PreludeAnyType{}
+var _ DocumentedRuntimeValue = PreludeAnyType{}
 
-type PreludeAnyType struct{}
+type PreludeAnyType struct {
+	docs Docs
+}
 
 func (PreludeAnyType) RuntimeType() RuntimeType {
 	return RuntimeType{
@@ -34,4 +37,8 @@ func (t RuntimeType) RuntimeType() RuntimeType {
 
 func (t RuntimeType) Lookup(member string) (*LazyRuntimeValue, error) {
 	return nil, fmt.Errorf("type %s has no member %s", t.name, member)
+}
+
+func (a PreludeAnyType) GetDocs() Docs {
+	return a.docs
 }

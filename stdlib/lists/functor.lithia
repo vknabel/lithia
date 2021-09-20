@@ -1,0 +1,13 @@
+module lists
+
+let functor = Functor map
+
+func map { transform, list =>
+    with list, type List {
+        Cons: { part =>
+            let tail = lists.map transform, part.tail
+            Cons transform part.head, tail
+        },
+        Nil: { nil => Nil }
+    }
+}

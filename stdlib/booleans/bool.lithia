@@ -1,13 +1,3 @@
 module booleans
 
 import tests
-
-describe "optional", { it =>
-  it "can have some value", { _ =>
-    Some 41
-  }
- 
-  it "can be none", { _ =>
-    None
-  }
-}

@@ -43,7 +43,11 @@ func (err SyntaxParsingError) Error() string {
 	for _, partialError := range err.LocatableErrors() {
 		partials = append(partials, partialError.Error())
 	}
-	return strings.Join(partials, "\n\n")
+	if len(partials) > 0 {
+		return strings.Join(partials, "\n\n")
+	} else {
+		return fmt.Sprintf("%s: %s\n\n", err.fileName, err.tree.RootNode().String())
+	}
 }
 
 func (e SyntaxParsingError) ErrorNodes(node *sitter.Node) []*sitter.Node {

@@ -6,6 +6,7 @@ var _ RuntimeValue = RuntimeModule{}
 
 type RuntimeModule struct {
 	module *Module
+	docs   DocString
 }
 
 func (m RuntimeModule) String() string {

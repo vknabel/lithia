@@ -27,3 +27,21 @@ func with { value, body =>
 }
 
 func compose { f, g, value => f g value }
+
+/**
+ * Recursively walk a tree of nodes, calling a function on each node.
+ * The given accumulator function merges each element into a new one for the next call.
+ *
+ * @param accumulator into, next
+ * @param initial
+ * @param list
+ */
+func reduceList { accumulator, initial =>
+    type List {
+        Cons: { cons =>
+            let next = (accumulator initial, cons.head)
+            reduceList accumulator, next, cons.tail
+        },
+        Nil: { nil => initial }
+    }
+}

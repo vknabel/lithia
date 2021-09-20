@@ -7,22 +7,29 @@ import (
 
 var _ RuntimeValue = BuiltinFunction{}
 var _ Callable = BuiltinFunction{}
+var _ DocumentedRuntimeValue = BuiltinFunction{}
 
 type BuiltinFunction struct {
 	name string
 	args []string
+	docs Docs
 	impl func(args []*LazyRuntimeValue) (RuntimeValue, error)
 }
 
 func NewBuiltinFunction(
 	name string,
 	args []string,
+	docs Docs,
 	impl func(args []*LazyRuntimeValue) (RuntimeValue, error),
 ) BuiltinFunction {
+	if docs.name == "" {
+		docs.name = name
+	}
 	f := BuiltinFunction{
 		name: name,
 		args: args,
 		impl: impl,
+		docs: docs,
 	}
 	var _ RuntimeValue = f
 	var _ Callable = f
@@ -61,4 +68,8 @@ func (f BuiltinFunction) Call(arguments []*LazyRuntimeValue) (RuntimeValue, erro
 	} else {
 		return nil, fmt.Errorf("%s is not callable", g)
 	}
+}
+
+func (f BuiltinFunction) GetDocs() Docs {
+	return f.docs
 }

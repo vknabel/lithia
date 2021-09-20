@@ -1,6 +1,0 @@
-module expect
-
-import tests
-import rx
-
-let fail = rx.Variable tests.fail
