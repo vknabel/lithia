@@ -202,10 +202,6 @@ func (ex *EvaluationContext) EvaluateComplexInvocationExpr() (*LazyRuntimeValue,
 		if err != nil {
 			return nil, ex.LocatableErrorOrConvert(err)
 		}
-		function, ok := reflect.ValueOf(functionValue).Interface().(Callable)
-		if !ok {
-			return nil, ex.RuntimeErrorf("expected callable, got %T", functionValue)
-		}
 
 		args := make([]*LazyRuntimeValue, ex.node.NamedChildCount()-1)
 		for i := 0; i < int(ex.node.NamedChildCount()-1); i++ {
@@ -215,6 +211,11 @@ func (ex *EvaluationContext) EvaluateComplexInvocationExpr() (*LazyRuntimeValue,
 				return nil, err
 			}
 			args[i] = lazyValue
+		}
+
+		function, ok := reflect.ValueOf(functionValue).Interface().(Callable)
+		if !ok {
+			return nil, ex.RuntimeCannotCallNonFunction(functionValue, args)
 		}
 
 		result, err := function.Call(args)
@@ -402,23 +403,16 @@ func (ex *EvaluationContext) EvaluateTypeExpression() (*LazyRuntimeValue, Locata
 		}
 		typeExpression := TypeExpression{typeValue: enumDecl, cases: typeCases}
 		if len(enumDecl.cases) != len(typeCases) && typeCases["Any"] == nil {
-			return nil, ex.RuntimeErrorf("expected %s cases, got %s", casesToString(enumDecl.cases), casesToString(typeCases))
+			return nil, ex.RuntimeNonExhaustiveTypeExpression(enumDecl, typeCases)
 		}
 		for label := range typeCases {
 			if _, ok := enumDecl.cases[label]; !ok {
-				return nil, ex.RuntimeErrorf("undefined enum case %s, expected %s", label, casesToString(enumDecl.cases))
+				return nil, ex.RuntimeInvalidCaseTypeExpression(enumDecl, typeCases)
 			}
 		}
 		return typeExpression, nil
 	})
 	return lazyCheckedTypeExpression, nil
-}
-func casesToString(cases map[string]*LazyRuntimeValue) string {
-	var labels []string
-	for label := range cases {
-		labels = append(labels, label)
-	}
-	return fmt.Sprintf("[%s]", strings.Join(labels, ", "))
 }
 
 func (ex *EvaluationContext) EvaluateGroup() (*LazyRuntimeValue, LocatableError) {
