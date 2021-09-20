@@ -401,7 +401,7 @@ func (ex *EvaluationContext) EvaluateTypeExpression() (*LazyRuntimeValue, Locata
 			return nil, ex.RuntimeErrorf("expected enum type, got %s", typeValue)
 		}
 		typeExpression := TypeExpression{typeValue: enumDecl, cases: typeCases}
-		if len(enumDecl.cases) != len(typeCases) {
+		if len(enumDecl.cases) != len(typeCases) && typeCases["Any"] == nil {
 			return nil, ex.RuntimeErrorf("expected %s cases, got %s", casesToString(enumDecl.cases), casesToString(typeCases))
 		}
 		for label := range typeCases {

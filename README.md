@@ -147,7 +147,9 @@ let nameOf = type JuristicPerson {
 nameOf you
 ```
 
-> **\*Nice to know:** If the given value is not valid, your programm will crash. If you might have arbitrary values, you can add an `Any` case. As it matches all values, make sure it is always the last value.\*
+If you are just interested in a few cases, you can also use the `Any` case.
+
+> _**Nice to know:** If the given value is not valid, your programm will crash. If you might have arbitrary values, you can add an `Any` case. As it matches all values, make sure it is always the last value._
 
 ### Modules
 

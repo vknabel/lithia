@@ -37,6 +37,20 @@ test "any in enums matches all types", { fail =>
     unless isCorrect, fail "should not be the case"
 }
 
+test "any allows to use fewer enum cases in type expression", { fail =>
+    enum AnyEnum {
+        Int
+        String
+        Any
+    }
+
+    let isCorrect = with "should be any", type AnyEnum {
+        Int: { _ => False },
+        Any: { _ => True }
+    }
+    unless isCorrect, fail "should not be the case"
+}
+
 test "when true succeeds", { fail =>
     let isTrue = when True, True
     with isTrue, type Bool {

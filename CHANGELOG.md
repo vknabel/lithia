@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- compiler: type-expressions with `Any` to match multiple cases
 - compiler: memberwise imports
 
 ## v0.0.4
