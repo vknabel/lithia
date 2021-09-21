@@ -24,11 +24,11 @@ func (RxVariableType) RuntimeType() RuntimeType {
 	}
 }
 
-func (v RxVariableType) Lookup(member string) (*LazyRuntimeValue, error) {
+func (v RxVariableType) Lookup(member string) (Evaluatable, error) {
 	return nil, fmt.Errorf("variable type %s has no member %s", v, member)
 }
 
-func (v RxVariableType) Call(arguments []*LazyRuntimeValue) (RuntimeValue, error) {
+func (v RxVariableType) Call(arguments []Evaluatable) (RuntimeValue, error) {
 	var _ Callable = v
 	if len(arguments) != 1 {
 		return nil, fmt.Errorf("too many arguments for variable type %s", v)

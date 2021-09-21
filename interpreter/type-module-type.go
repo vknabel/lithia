@@ -22,7 +22,7 @@ func (PreludeModuleType) RuntimeType() RuntimeType {
 	}
 }
 
-func (a PreludeModuleType) Lookup(member string) (*LazyRuntimeValue, error) {
+func (a PreludeModuleType) Lookup(member string) (Evaluatable, error) {
 	return nil, fmt.Errorf("module type %s has no member %s", a, member)
 }
 

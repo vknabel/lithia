@@ -7,7 +7,7 @@ var _ Callable = CurriedCallable{}
 
 type CurriedCallable struct {
 	actual         Callable
-	args           []*LazyRuntimeValue
+	args           []Evaluatable
 	remainingArity int
 }
 
@@ -15,7 +15,7 @@ func (CurriedCallable) RuntimeType() RuntimeType {
 	return PreludeFunctionType{}.RuntimeType()
 }
 
-func (f CurriedCallable) Lookup(member string) (*LazyRuntimeValue, error) {
+func (f CurriedCallable) Lookup(member string) (Evaluatable, error) {
 	return nil, fmt.Errorf("function %s has no member %s", f, member)
 }
 
@@ -23,7 +23,7 @@ func (f CurriedCallable) String() string {
 	return fmt.Sprintf("{ -%d => @(%s) }", len(f.args), f.actual)
 }
 
-func (c CurriedCallable) Call(arguments []*LazyRuntimeValue) (RuntimeValue, error) {
+func (c CurriedCallable) Call(arguments []Evaluatable) (RuntimeValue, error) {
 	allArgs := append(c.args, arguments...)
 	if len(arguments) < c.remainingArity {
 		lazy := NewLazyRuntimeValue(func() (RuntimeValue, LocatableError) {

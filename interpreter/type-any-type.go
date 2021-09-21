@@ -22,7 +22,7 @@ func (a PreludeAnyType) String() string {
 	return "Any"
 }
 
-func (a PreludeAnyType) Lookup(member string) (*LazyRuntimeValue, error) {
+func (a PreludeAnyType) Lookup(member string) (Evaluatable, error) {
 	return nil, fmt.Errorf("any type %s has no member %s", a, member)
 }
 
@@ -35,7 +35,7 @@ func (t RuntimeType) RuntimeType() RuntimeType {
 	}
 }
 
-func (t RuntimeType) Lookup(member string) (*LazyRuntimeValue, error) {
+func (t RuntimeType) Lookup(member string) (Evaluatable, error) {
 	return nil, fmt.Errorf("type %s has no member %s", t.name, member)
 }
 

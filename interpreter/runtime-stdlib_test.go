@@ -57,7 +57,7 @@ func mockOsExit(prelude *i.Environment, impl func(i.PreludeInt)) i.BuiltinFuncti
 		"osExit",
 		[]string{"code"},
 		i.Docs{},
-		func(args []*i.LazyRuntimeValue) (i.RuntimeValue, error) {
+		func(args []i.Evaluatable) (i.RuntimeValue, error) {
 			value, err := args[0].Evaluate()
 			if err != nil {
 				return nil, err
@@ -76,18 +76,18 @@ func mockOsEnv(prelude *i.Environment, fakeOsEnv map[string]string) i.BuiltinFun
 		"osEnv",
 		[]string{"key"},
 		i.Docs{},
-		func(args []*i.LazyRuntimeValue) (i.RuntimeValue, error) {
+		func(args []i.Evaluatable) (i.RuntimeValue, error) {
 			value, err := args[0].Evaluate()
 			if err != nil {
 				return nil, err
 			}
 			if key, ok := value.(i.PreludeString); ok {
 				if env, ok := fakeOsEnv[string(key)]; ok {
-					return prelude.MakeDataRuntimeValue("Some", map[string]*i.LazyRuntimeValue{
+					return prelude.MakeDataRuntimeValue("Some", map[string]i.Evaluatable{
 						"value": i.NewConstantRuntimeValue(i.PreludeString(env)),
 					})
 				} else {
-					return prelude.MakeDataRuntimeValue("Some", map[string]*i.LazyRuntimeValue{
+					return prelude.MakeDataRuntimeValue("Some", map[string]i.Evaluatable{
 						"value": i.NewConstantRuntimeValue(i.PreludeString(env)),
 					})
 				}

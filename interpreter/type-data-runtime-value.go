@@ -9,7 +9,7 @@ var _ RuntimeValue = DataRuntimeValue{}
 
 type DataRuntimeValue struct {
 	typeValue *DataDeclRuntimeValue
-	members   map[string]*LazyRuntimeValue
+	members   map[string]Evaluatable
 }
 
 func (d DataRuntimeValue) RuntimeType() RuntimeType {

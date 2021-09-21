@@ -25,7 +25,7 @@ func builtinOsExit(docs Docs) BuiltinFunction {
 		"exit",
 		[]string{"code"},
 		docs,
-		func(args []*LazyRuntimeValue) (RuntimeValue, error) {
+		func(args []Evaluatable) (RuntimeValue, error) {
 			value, err := args[0].Evaluate()
 			if err != nil {
 				return nil, err
@@ -45,14 +45,14 @@ func builtinOsEnv(prelude *Environment, docs Docs) BuiltinFunction {
 		"env",
 		[]string{"key"},
 		docs,
-		func(args []*LazyRuntimeValue) (RuntimeValue, error) {
+		func(args []Evaluatable) (RuntimeValue, error) {
 			value, err := args[0].Evaluate()
 			if err != nil {
 				return nil, err
 			}
 			if key, ok := value.(PreludeString); ok {
 				if env, ok := os.LookupEnv(string(key)); ok && env != "" {
-					return prelude.MakeDataRuntimeValue("Some", map[string]*LazyRuntimeValue{
+					return prelude.MakeDataRuntimeValue("Some", map[string]Evaluatable{
 						"value": NewConstantRuntimeValue(PreludeString(env)),
 					})
 				} else {

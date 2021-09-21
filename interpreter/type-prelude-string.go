@@ -17,7 +17,7 @@ func (PreludeString) RuntimeType() RuntimeType {
 	}
 }
 
-func (s PreludeString) Lookup(member string) (*LazyRuntimeValue, error) {
+func (s PreludeString) Lookup(member string) (Evaluatable, error) {
 	switch member {
 	case "length":
 		return NewConstantRuntimeValue(PreludeInt(len(s))), nil
@@ -25,7 +25,7 @@ func (s PreludeString) Lookup(member string) (*LazyRuntimeValue, error) {
 		return NewConstantRuntimeValue(BuiltinFunction{
 			name: "append",
 			args: []string{""},
-			impl: func(arguments []*LazyRuntimeValue) (RuntimeValue, error) {
+			impl: func(arguments []Evaluatable) (RuntimeValue, error) {
 				arg, err := arguments[0].Evaluate()
 				if err != nil {
 					return nil, err

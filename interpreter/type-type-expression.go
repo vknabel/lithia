@@ -7,7 +7,7 @@ var _ Callable = TypeExpression{}
 
 type TypeExpression struct {
 	typeValue EnumDeclRuntimeValue
-	cases     map[string]*LazyRuntimeValue
+	cases     map[string]Evaluatable
 }
 
 func (TypeExpression) RuntimeType() RuntimeType {
@@ -17,11 +17,11 @@ func (t TypeExpression) String() string {
 	return fmt.Sprintf("{ value => type %s }", t.typeValue.name)
 }
 
-func (t TypeExpression) Lookup(member string) (*LazyRuntimeValue, error) {
+func (t TypeExpression) Lookup(member string) (Evaluatable, error) {
 	return nil, fmt.Errorf("function %s has no member %s", fmt.Sprint(t), member)
 }
 
-func (typeExpr TypeExpression) Call(arguments []*LazyRuntimeValue) (RuntimeValue, error) {
+func (typeExpr TypeExpression) Call(arguments []Evaluatable) (RuntimeValue, error) {
 	if len(arguments) == 0 {
 		return typeExpr, nil
 	}

@@ -13,14 +13,14 @@ type BuiltinFunction struct {
 	name string
 	args []string
 	docs Docs
-	impl func(args []*LazyRuntimeValue) (RuntimeValue, error)
+	impl func(args []Evaluatable) (RuntimeValue, error)
 }
 
 func NewBuiltinFunction(
 	name string,
 	args []string,
 	docs Docs,
-	impl func(args []*LazyRuntimeValue) (RuntimeValue, error),
+	impl func(args []Evaluatable) (RuntimeValue, error),
 ) BuiltinFunction {
 	if docs.name == "" {
 		docs.name = name
@@ -40,7 +40,7 @@ func (f BuiltinFunction) RuntimeType() RuntimeType {
 	return PreludeFunctionType{}.RuntimeType()
 }
 
-func (f BuiltinFunction) Lookup(member string) (*LazyRuntimeValue, error) {
+func (f BuiltinFunction) Lookup(member string) (Evaluatable, error) {
 	return nil, fmt.Errorf("function %s has no member %s", fmt.Sprint(f), member)
 }
 
@@ -48,7 +48,7 @@ func (f BuiltinFunction) String() string {
 	return fmt.Sprintf("{ %s => @(%s) }", strings.Join(f.args, ","), f.name)
 }
 
-func (f BuiltinFunction) Call(arguments []*LazyRuntimeValue) (RuntimeValue, error) {
+func (f BuiltinFunction) Call(arguments []Evaluatable) (RuntimeValue, error) {
 	if len(arguments) < len(f.args) {
 		return CurriedCallable{
 			actual:         f,

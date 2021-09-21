@@ -46,7 +46,7 @@ func builtinDebug(docs Docs) BuiltinFunction {
 		"debug",
 		[]string{"message"},
 		docs,
-		func(args []*LazyRuntimeValue) (RuntimeValue, error) {
+		func(args []Evaluatable) (RuntimeValue, error) {
 			value, err := args[0].Evaluate()
 			if err != nil {
 				return nil, err
@@ -62,7 +62,7 @@ func builtinPrint(docs Docs) BuiltinFunction {
 		"print",
 		[]string{"message"},
 		docs,
-		func(args []*LazyRuntimeValue) (RuntimeValue, error) {
+		func(args []Evaluatable) (RuntimeValue, error) {
 			value, err := args[0].Evaluate()
 			if err != nil {
 				return nil, err

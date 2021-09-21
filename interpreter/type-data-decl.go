@@ -43,11 +43,11 @@ func (d DataDeclRuntimeValue) RuntimeType() RuntimeType {
 	return PreludeAnyType{}.RuntimeType()
 }
 
-func (f DataDeclRuntimeValue) Lookup(member string) (*LazyRuntimeValue, error) {
+func (f DataDeclRuntimeValue) Lookup(member string) (Evaluatable, error) {
 	return nil, fmt.Errorf("data type %s has no member %s", f, member)
 }
 
-func (dataDecl DataDeclRuntimeValue) Call(arguments []*LazyRuntimeValue) (RuntimeValue, error) {
+func (dataDecl DataDeclRuntimeValue) Call(arguments []Evaluatable) (RuntimeValue, error) {
 	if len(arguments) < len(dataDecl.fields) {
 		lazy := NewLazyRuntimeValue(func() (RuntimeValue, LocatableError) {
 			return CurriedCallable{
@@ -58,7 +58,7 @@ func (dataDecl DataDeclRuntimeValue) Call(arguments []*LazyRuntimeValue) (Runtim
 		})
 		return lazy.Evaluate()
 	} else if len(arguments) == len(dataDecl.fields) {
-		members := make(map[string]*LazyRuntimeValue, len(dataDecl.fields))
+		members := make(map[string]Evaluatable, len(dataDecl.fields))
 		for i, field := range dataDecl.fields {
 			arg := arguments[i]
 			members[field.name] = arg

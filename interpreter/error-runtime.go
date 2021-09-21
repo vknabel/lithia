@@ -11,7 +11,7 @@ func (ex *EvaluationContext) RuntimeErrorf(format string, args ...interface{}) L
 
 func (ex *EvaluationContext) RuntimeNonExhaustiveTypeExpression(
 	enumDecl EnumDeclRuntimeValue,
-	typeCases map[string]*LazyRuntimeValue,
+	typeCases map[string]Evaluatable,
 ) LocatableError {
 	missing := []string{}
 	for caseName := range enumDecl.cases {
@@ -24,7 +24,7 @@ func (ex *EvaluationContext) RuntimeNonExhaustiveTypeExpression(
 
 func (ex *EvaluationContext) RuntimeInvalidCaseTypeExpression(
 	enumDecl EnumDeclRuntimeValue,
-	typeCases map[string]*LazyRuntimeValue,
+	typeCases map[string]Evaluatable,
 ) LocatableError {
 	invalids := []string{}
 	for caseName := range typeCases {
@@ -35,7 +35,7 @@ func (ex *EvaluationContext) RuntimeInvalidCaseTypeExpression(
 	return ex.RuntimeErrorf("invalid type expression for %s: invalid [%s]", enumDecl.name, strings.Join(invalids, ", "))
 }
 
-func (ex *EvaluationContext) RuntimeCannotCallNonFunction(nonFunction RuntimeValue, args []*LazyRuntimeValue) LocatableError {
+func (ex *EvaluationContext) RuntimeCannotCallNonFunction(nonFunction RuntimeValue, args []Evaluatable) LocatableError {
 	stringifiedArgs := []string{}
 	for _, lazyArg := range args {
 		arg, err := lazyArg.Evaluate()

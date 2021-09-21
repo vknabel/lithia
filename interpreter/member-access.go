@@ -2,7 +2,7 @@ package interpreter
 
 import "fmt"
 
-func (dataValue DataRuntimeValue) Lookup(name string) (*LazyRuntimeValue, error) {
+func (dataValue DataRuntimeValue) Lookup(name string) (Evaluatable, error) {
 	if lazyValue, ok := dataValue.members[name]; ok {
 		return lazyValue, nil
 	} else {

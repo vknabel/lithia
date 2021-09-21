@@ -22,7 +22,7 @@ func (*RuntimeVariable) RuntimeType() RuntimeType {
 	return RxVariableType{}.RuntimeType()
 }
 
-func (v *RuntimeVariable) Lookup(member string) (*LazyRuntimeValue, error) {
+func (v *RuntimeVariable) Lookup(member string) (Evaluatable, error) {
 	switch member {
 	case "accept":
 		return NewConstantRuntimeValue(NewBuiltinFunction(
@@ -31,7 +31,7 @@ func (v *RuntimeVariable) Lookup(member string) (*LazyRuntimeValue, error) {
 			Docs{
 				docs: "Evalutes and sets the current value",
 			},
-			func(args []*LazyRuntimeValue) (RuntimeValue, error) {
+			func(args []Evaluatable) (RuntimeValue, error) {
 				return v.Accept(args[0])
 			},
 		)), nil
@@ -44,7 +44,7 @@ func (v *RuntimeVariable) Lookup(member string) (*LazyRuntimeValue, error) {
 	}
 }
 
-func (v *RuntimeVariable) Accept(lazyValue *LazyRuntimeValue) (RuntimeValue, error) {
+func (v *RuntimeVariable) Accept(lazyValue Evaluatable) (RuntimeValue, error) {
 	value, err := lazyValue.Evaluate()
 	if err != nil {
 		return nil, err

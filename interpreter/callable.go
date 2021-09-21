@@ -1,6 +1,6 @@
 package interpreter
 
 type Callable interface {
-	Call(arguments []*LazyRuntimeValue) (RuntimeValue, error)
+	Call(arguments []Evaluatable) (RuntimeValue, error)
 	String() string
 }

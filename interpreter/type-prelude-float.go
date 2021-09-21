@@ -17,6 +17,6 @@ func (PreludeFloat) RuntimeType() RuntimeType {
 	}
 }
 
-func (f PreludeFloat) Lookup(member string) (*LazyRuntimeValue, error) {
+func (f PreludeFloat) Lookup(member string) (Evaluatable, error) {
 	return nil, fmt.Errorf("float %f has no member %s", f, member)
 }

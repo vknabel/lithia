@@ -17,6 +17,6 @@ func (PreludeChar) RuntimeType() RuntimeType {
 	}
 }
 
-func (r PreludeChar) Lookup(member string) (*LazyRuntimeValue, error) {
+func (r PreludeChar) Lookup(member string) (Evaluatable, error) {
 	return nil, fmt.Errorf("char %q has no member %s", r, member)
 }

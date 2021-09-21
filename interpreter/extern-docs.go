@@ -23,7 +23,7 @@ func (e ExternalDocs) docsInspectValueFunction(env *Environment, docs Docs) Docu
 		"inspect",
 		[]string{"value"},
 		docs,
-		func(args []*LazyRuntimeValue) (RuntimeValue, error) {
+		func(args []Evaluatable) (RuntimeValue, error) {
 			if len(args) != 1 {
 				return nil, fmt.Errorf("inspect takes exactly one argument")
 			}
@@ -64,7 +64,7 @@ func docsInspectValue(value RuntimeValue, env *Environment) (RuntimeValue, error
 		if err != nil {
 			return nil, err
 		}
-		return env.MakeDataRuntimeValue("ModuleDocs", map[string]*LazyRuntimeValue{
+		return env.MakeDataRuntimeValue("ModuleDocs", map[string]Evaluatable{
 			"name":  NewConstantRuntimeValue(PreludeString(value.module.name)),
 			"types": NewConstantRuntimeValue(childrenList),
 			"docs":  NewConstantRuntimeValue(PreludeString(value.module.docs)),
@@ -80,7 +80,7 @@ func docsInspectValue(value RuntimeValue, env *Environment) (RuntimeValue, error
 			if err != nil {
 				return nil, err
 			}
-			doc, err := env.MakeDataRuntimeValue("DataFieldDocs", map[string]*LazyRuntimeValue{
+			doc, err := env.MakeDataRuntimeValue("DataFieldDocs", map[string]Evaluatable{
 				"name":   NewConstantRuntimeValue(PreludeString(field.name)),
 				"docs":   NewConstantRuntimeValue(PreludeString(field.docs)),
 				"params": NewConstantRuntimeValue(paramsList),
@@ -94,7 +94,7 @@ func docsInspectValue(value RuntimeValue, env *Environment) (RuntimeValue, error
 		if err != nil {
 			return nil, err
 		}
-		return env.MakeDataRuntimeValue("DataDocs", map[string]*LazyRuntimeValue{
+		return env.MakeDataRuntimeValue("DataDocs", map[string]Evaluatable{
 			"name":   NewConstantRuntimeValue(PreludeString(value.name)),
 			"docs":   NewConstantRuntimeValue(PreludeString(value.docs)),
 			"fields": NewConstantRuntimeValue(fieldDocsList),
@@ -112,7 +112,7 @@ func docsInspectValue(value RuntimeValue, env *Environment) (RuntimeValue, error
 			if err != nil {
 				return nil, err
 			}
-			doc, err := env.MakeDataRuntimeValue("EnumCaseDocs", map[string]*LazyRuntimeValue{
+			doc, err := env.MakeDataRuntimeValue("EnumCaseDocs", map[string]Evaluatable{
 				"name": NewConstantRuntimeValue(PreludeString(key)),
 				"docs": NewConstantRuntimeValue(PreludeString("")),
 				"type": NewConstantRuntimeValue(enumCaseValueDocs),
@@ -126,7 +126,7 @@ func docsInspectValue(value RuntimeValue, env *Environment) (RuntimeValue, error
 		if err != nil {
 			return nil, err
 		}
-		return env.MakeDataRuntimeValue("EnumDocs", map[string]*LazyRuntimeValue{
+		return env.MakeDataRuntimeValue("EnumDocs", map[string]Evaluatable{
 			"name":  NewConstantRuntimeValue(PreludeString(value.name)),
 			"docs":  NewConstantRuntimeValue(PreludeString(value.docs)),
 			"cases": NewConstantRuntimeValue(casesList),
@@ -140,7 +140,7 @@ func docsInspectValue(value RuntimeValue, env *Environment) (RuntimeValue, error
 		if err != nil {
 			return nil, err
 		}
-		return env.MakeDataRuntimeValue("FunctionDocs", map[string]*LazyRuntimeValue{
+		return env.MakeDataRuntimeValue("FunctionDocs", map[string]Evaluatable{
 			"name":   NewConstantRuntimeValue(PreludeString(value.name)),
 			"docs":   NewConstantRuntimeValue(PreludeString(value.docs.docs)),
 			"params": NewConstantRuntimeValue(paramsList),
@@ -154,19 +154,19 @@ func docsInspectValue(value RuntimeValue, env *Environment) (RuntimeValue, error
 		if err != nil {
 			return nil, err
 		}
-		return env.MakeDataRuntimeValue("FunctionDocs", map[string]*LazyRuntimeValue{
+		return env.MakeDataRuntimeValue("FunctionDocs", map[string]Evaluatable{
 			"name":   NewConstantRuntimeValue(PreludeString(value.name)),
 			"docs":   NewConstantRuntimeValue(PreludeString("")),
 			"params": NewConstantRuntimeValue(paramsList),
 		})
 	case DocumentedRuntimeValue:
 		docs := value.GetDocs()
-		return env.MakeDataRuntimeValue("ExternDocs", map[string]*LazyRuntimeValue{
+		return env.MakeDataRuntimeValue("ExternDocs", map[string]Evaluatable{
 			"name": NewConstantRuntimeValue(PreludeString(docs.name)),
 			"docs": NewConstantRuntimeValue(PreludeString(docs.docs)),
 		})
 	default:
-		return env.MakeDataRuntimeValue("None", map[string]*LazyRuntimeValue{})
+		return env.MakeDataRuntimeValue("None", map[string]Evaluatable{})
 	}
 }
 
@@ -178,7 +178,7 @@ func (env *Environment) eagerSliceToList(slice []RuntimeValue) (RuntimeValue, er
 		if err != nil {
 			return nil, err
 		}
-		return env.MakeDataRuntimeValue("Cons", map[string]*LazyRuntimeValue{
+		return env.MakeDataRuntimeValue("Cons", map[string]Evaluatable{
 			"head": NewConstantRuntimeValue(slice[0]),
 			"tail": NewConstantRuntimeValue(tail),
 		})

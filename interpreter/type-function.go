@@ -13,7 +13,7 @@ type Function struct {
 	name      string
 	arguments []string
 	docs      Docs
-	body      func(*EvaluationContext) ([]*LazyRuntimeValue, error)
+	body      func(*EvaluationContext) ([]Evaluatable, error)
 	parent    *EvaluationContext
 }
 
@@ -25,11 +25,11 @@ func (Function) RuntimeType() RuntimeType {
 	return PreludeFunctionType{}.RuntimeType()
 }
 
-func (f Function) Lookup(member string) (*LazyRuntimeValue, error) {
+func (f Function) Lookup(member string) (Evaluatable, error) {
 	return nil, fmt.Errorf("function %s has no member %s", f, member)
 }
 
-func (f Function) Call(arguments []*LazyRuntimeValue) (RuntimeValue, error) {
+func (f Function) Call(arguments []Evaluatable) (RuntimeValue, error) {
 	closure := f.parent.NestedExecutionContext(f.name)
 	if len(arguments) < len(f.arguments) {
 		return CurriedCallable{

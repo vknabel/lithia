@@ -48,7 +48,7 @@ func (ex *EvaluationContext) EvaluateImport() (*LazyRuntimeValue, LocatableError
 	return runtimeModule, nil
 }
 
-func (ex *EvaluationContext) EvaluateLetDeclaration() (*LazyRuntimeValue, LocatableError) {
+func (ex *EvaluationContext) EvaluateLetDeclaration() (Evaluatable, LocatableError) {
 	nameNode := ex.node.ChildByFieldName("name")
 	valueNode := ex.node.ChildByFieldName("value")
 	if nameNode == nil || valueNode == nil {
@@ -165,8 +165,8 @@ func (ex *EvaluationContext) ParseParamterList() ([]string, error) {
 	return params, nil
 }
 
-func (ex *EvaluationContext) ParseStatementList() ([]*LazyRuntimeValue, LocatableError) {
-	stmts := make([]*LazyRuntimeValue, 0, ex.node.NamedChildCount())
+func (ex *EvaluationContext) ParseStatementList() ([]Evaluatable, LocatableError) {
+	stmts := make([]Evaluatable, 0, ex.node.NamedChildCount())
 	for i := 0; i < int(ex.node.NamedChildCount()); i++ {
 		child := ex.node.NamedChild(i)
 		stmt, err := ex.ChildNodeExecutionContext(child).EvaluateNode()
@@ -203,7 +203,7 @@ func (ex *EvaluationContext) EvaluateComplexInvocationExpr() (*LazyRuntimeValue,
 			return nil, ex.LocatableErrorOrConvert(err)
 		}
 
-		args := make([]*LazyRuntimeValue, ex.node.NamedChildCount()-1)
+		args := make([]Evaluatable, ex.node.NamedChildCount()-1)
 		for i := 0; i < int(ex.node.NamedChildCount()-1); i++ {
 			child := ex.node.NamedChild(i + 1)
 			lazyValue, err := ex.ChildNodeExecutionContext(child).EvaluateNode()
@@ -233,7 +233,7 @@ func (ex *EvaluationContext) EvaluateEnumDeclaration(docs DocString) (*LazyRunti
 	if casesNode == nil {
 		enum := NewConstantRuntimeValue(EnumDeclRuntimeValue{
 			name:  name,
-			cases: make(map[string]*LazyRuntimeValue),
+			cases: make(map[string]Evaluatable),
 			docs:  docs,
 		})
 		ex.environment.Declare(name, enum)
@@ -248,7 +248,7 @@ func (ex *EvaluationContext) EvaluateEnumDeclaration(docs DocString) (*LazyRunti
 	}
 
 	caseCount := int(casesNode.ChildCount())
-	cases := make(map[string]*LazyRuntimeValue)
+	cases := make(map[string]Evaluatable)
 	for i := 0; i < caseCount; i++ {
 		child := casesNode.Child(i)
 		switch child.Type() {
@@ -293,38 +293,9 @@ func (ex *EvaluationContext) EvaluateEnumDeclaration(docs DocString) (*LazyRunti
 	return constantValue, nil
 }
 
-func (ex *EvaluationContext) EvaluateIdentifier() (*LazyRuntimeValue, LocatableError) {
+func (ex *EvaluationContext) EvaluateIdentifier() (*ExprIdentifier, LocatableError) {
 	content := ex.node.Content(ex.source)
-	return NewLazyRuntimeValue(func() (RuntimeValue, LocatableError) {
-		if lazyValue, ok := ex.environment.Get(content); ok {
-			value, err := lazyValue.Evaluate()
-			if err != nil {
-				return nil, err
-			}
-			switch value := value.(type) {
-			case DataDeclRuntimeValue:
-				if len(value.fields) == 0 {
-					return DataRuntimeValue{
-						typeValue: &value,
-						members:   make(map[string]*LazyRuntimeValue),
-					}, nil
-				} else {
-					return value, nil
-				}
-			case Function:
-				if len(value.arguments) == 0 {
-					result, err := value.Call(nil)
-					return result, ex.LocatableErrorOrConvert(err)
-				} else {
-					return value, nil
-				}
-			default:
-				return value, nil
-			}
-		} else {
-			return nil, ex.RuntimeErrorf("undefined identifier %s", content)
-		}
-	}), nil
+	return ex.NewExprIdentifier(content), nil
 }
 
 func (ex *EvaluationContext) EvaluateMemberAccess() (*LazyRuntimeValue, LocatableError) {
@@ -375,7 +346,7 @@ func (ex *EvaluationContext) EvaluateTypeExpression() (*LazyRuntimeValue, Locata
 	}
 
 	caseCount := int(bodyNode.NamedChildCount())
-	typeCases := make(map[string]*LazyRuntimeValue, caseCount)
+	typeCases := make(map[string]Evaluatable, caseCount)
 	for i := 0; i < caseCount; i++ {
 		typeCaseNode := bodyNode.NamedChild(i)
 		labelNode := typeCaseNode.ChildByFieldName("label")
@@ -415,7 +386,7 @@ func (ex *EvaluationContext) EvaluateTypeExpression() (*LazyRuntimeValue, Locata
 	return lazyCheckedTypeExpression, nil
 }
 
-func (ex *EvaluationContext) EvaluateGroup() (*LazyRuntimeValue, LocatableError) {
+func (ex *EvaluationContext) EvaluateGroup() (Evaluatable, LocatableError) {
 	expressionNode := ex.node.ChildByFieldName("expression")
 	if expressionNode == nil {
 		return nil, ex.SyntaxErrorf("expected expression")
@@ -431,7 +402,7 @@ func (ex *EvaluationContext) EvaluateStringLiteral() (*LazyRuntimeValue, Locatab
 	return NewConstantRuntimeValue(PreludeString(string)), nil
 }
 
-func (ex *EvaluationContext) EvaluateBinaryExpression() (*LazyRuntimeValue, LocatableError) {
+func (ex *EvaluationContext) EvaluateBinaryExpression() (*ExprBinaryOp, LocatableError) {
 	if ex.node.NamedChildCount() != 2 {
 		return nil, ex.SyntaxErrorf("expected 2 children, got %d", ex.node.NamedChildCount())
 	}
@@ -449,9 +420,7 @@ func (ex *EvaluationContext) EvaluateBinaryExpression() (*LazyRuntimeValue, Loca
 	if err != nil {
 		return nil, err
 	}
-	return NewLazyRuntimeValue(func() (RuntimeValue, LocatableError) {
-		return impl(lazyLeft, lazyRight)
-	}), nil
+	return ex.NewExprBinaryOp(operator, impl, lazyLeft, lazyRight), nil
 }
 
 func (ex *EvaluationContext) EvaluateUnaryExpression() (*LazyRuntimeValue, LocatableError) {
@@ -479,14 +448,15 @@ func (ex *EvaluationContext) ParseFunctionLiteral(name string, docs DocString) (
 		name = fmt.Sprintf("func#%d", ex.functionCount)
 		ex.functionCount += 1
 	}
+
 	return Function{
 		name:      name,
 		arguments: params,
 		docs:      Docs{name: name, docs: docs},
 		parent:    ex,
-		body: func(i *EvaluationContext) ([]*LazyRuntimeValue, error) {
+		body: func(i *EvaluationContext) ([]Evaluatable, error) {
 			if bodyNode == nil {
-				return []*LazyRuntimeValue{}, nil
+				return []Evaluatable{}, nil
 			}
 			stmts, err := i.ChildNodeExecutionContext(bodyNode).ParseStatementList()
 			if err != nil {
@@ -507,7 +477,7 @@ func (ex *EvaluationContext) EvaluateFunctionLiteral() (*LazyRuntimeValue, Locat
 
 func (ex *EvaluationContext) EvaluateArrayLiteral() (*LazyRuntimeValue, LocatableError) {
 	numberOfElements := int(ex.node.NamedChildCount())
-	elements := make([]*LazyRuntimeValue, numberOfElements)
+	elements := make([]Evaluatable, numberOfElements)
 	for i := 0; i < numberOfElements; i++ {
 		elementNode := ex.node.NamedChild(i)
 		lazyElement, err := ex.ChildNodeExecutionContext(elementNode).EvaluateNode()
@@ -539,16 +509,16 @@ func (ex *EvaluationContext) EvaluateArrayLiteral() (*LazyRuntimeValue, Locatabl
 	}), nil
 }
 
-func SliceToList(consDecl DataDeclRuntimeValue, nilDecl DataDeclRuntimeValue, slice []*LazyRuntimeValue) RuntimeValue {
+func SliceToList(consDecl DataDeclRuntimeValue, nilDecl DataDeclRuntimeValue, slice []Evaluatable) RuntimeValue {
 	if len(slice) == 0 {
 		return DataRuntimeValue{
 			typeValue: &nilDecl,
-			members:   make(map[string]*LazyRuntimeValue),
+			members:   make(map[string]Evaluatable),
 		}
 	} else {
 		return DataRuntimeValue{
 			typeValue: &consDecl,
-			members: map[string]*LazyRuntimeValue{
+			members: map[string]Evaluatable{
 				"head": slice[0],
 				"tail": NewLazyRuntimeValue(func() (RuntimeValue, LocatableError) {
 					return SliceToList(consDecl, nilDecl, slice[1:]), nil
@@ -558,7 +528,7 @@ func SliceToList(consDecl DataDeclRuntimeValue, nilDecl DataDeclRuntimeValue, sl
 	}
 }
 
-func (ex *EvaluationContext) EvaluateNode() (*LazyRuntimeValue, LocatableError) {
+func (ex *EvaluationContext) EvaluateNode() (Evaluatable, LocatableError) {
 	if ex.node.Type() == parser.TYPE_NODE_COMMENT {
 		ex.globalComments = append(ex.globalComments, ex.node.Content(ex.source))
 		return nil, nil
@@ -570,7 +540,7 @@ func (ex *EvaluationContext) EvaluateNode() (*LazyRuntimeValue, LocatableError) 
 	return value, err
 }
 
-func (ex *EvaluationContext) evaluateNodeWithoutComments() (*LazyRuntimeValue, LocatableError) {
+func (ex *EvaluationContext) evaluateNodeWithoutComments() (Evaluatable, LocatableError) {
 	switch ex.node.Type() {
 	case parser.TYPE_NODE_SOURCE_FILE:
 		return ex.EvaluateSourceFile()

@@ -17,7 +17,7 @@ func (RuntimeModule) RuntimeType() RuntimeType {
 	return PreludeModuleType{}.RuntimeType()
 }
 
-func (m RuntimeModule) Lookup(member string) (*LazyRuntimeValue, error) {
+func (m RuntimeModule) Lookup(member string) (Evaluatable, error) {
 	if lazy, ok := m.module.environment.Get(member); ok {
 		return lazy, nil
 	} else {

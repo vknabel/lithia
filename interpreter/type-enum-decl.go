@@ -9,7 +9,7 @@ var _ RuntimeValue = EnumDeclRuntimeValue{}
 
 type EnumDeclRuntimeValue struct {
 	name  string
-	cases map[string]*LazyRuntimeValue
+	cases map[string]Evaluatable
 	docs  DocString
 }
 
@@ -25,7 +25,7 @@ func (EnumDeclRuntimeValue) RuntimeType() RuntimeType {
 	return PreludeAnyType{}.RuntimeType()
 }
 
-func (e EnumDeclRuntimeValue) Lookup(member string) (*LazyRuntimeValue, error) {
+func (e EnumDeclRuntimeValue) Lookup(member string) (Evaluatable, error) {
 	if typeDecl, ok := e.cases[member]; ok {
 		return typeDecl, nil
 	} else {

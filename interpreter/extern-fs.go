@@ -31,7 +31,7 @@ func builtinFsWrite(env *Environment, docs Docs) BuiltinFunction {
 		"writeString",
 		[]string{"toPath", "contents"},
 		docs,
-		func(args []*LazyRuntimeValue) (RuntimeValue, error) {
+		func(args []Evaluatable) (RuntimeValue, error) {
 			toPathValue, err := args[0].Evaluate()
 			if err != nil {
 				return nil, err
@@ -50,11 +50,11 @@ func builtinFsWrite(env *Environment, docs Docs) BuiltinFunction {
 			}
 			writeError := os.WriteFile(string(toPath), []byte(string(contents)), 0644)
 			if writeError != nil {
-				return env.MakeDataRuntimeValue("Failure", map[string]*LazyRuntimeValue{
+				return env.MakeDataRuntimeValue("Failure", map[string]Evaluatable{
 					"error": NewConstantRuntimeValue(PreludeString(writeError.Error())),
 				})
 			} else {
-				return env.MakeDataRuntimeValue("Success", map[string]*LazyRuntimeValue{
+				return env.MakeDataRuntimeValue("Success", map[string]Evaluatable{
 					"value": NewConstantRuntimeValue(toPath),
 				})
 			}
@@ -67,7 +67,7 @@ func builtinFsRead(env *Environment, docs Docs) BuiltinFunction {
 		"readString",
 		[]string{"fromPath"},
 		docs,
-		func(args []*LazyRuntimeValue) (RuntimeValue, error) {
+		func(args []Evaluatable) (RuntimeValue, error) {
 			fromPathValue, err := args[0].Evaluate()
 			if err != nil {
 				return nil, err
@@ -78,11 +78,11 @@ func builtinFsRead(env *Environment, docs Docs) BuiltinFunction {
 			}
 			bytes, writeError := os.ReadFile(string(fromPath))
 			if writeError != nil {
-				return env.MakeDataRuntimeValue("Failure", map[string]*LazyRuntimeValue{
+				return env.MakeDataRuntimeValue("Failure", map[string]Evaluatable{
 					"error": NewConstantRuntimeValue(PreludeString(writeError.Error())),
 				})
 			} else {
-				return env.MakeDataRuntimeValue("Success", map[string]*LazyRuntimeValue{
+				return env.MakeDataRuntimeValue("Success", map[string]Evaluatable{
 					"value": NewConstantRuntimeValue(PreludeString(string(bytes))),
 				})
 			}
@@ -95,7 +95,7 @@ func builtinFsExists(env *Environment, docs Docs) BuiltinFunction {
 		"exists",
 		[]string{"atPath"},
 		docs,
-		func(args []*LazyRuntimeValue) (RuntimeValue, error) {
+		func(args []Evaluatable) (RuntimeValue, error) {
 			atPathValue, err := args[0].Evaluate()
 			if err != nil {
 				return nil, err
@@ -119,7 +119,7 @@ func builtinFsDelete(env *Environment, docs Docs) BuiltinFunction {
 		"delete",
 		[]string{"atPath"},
 		docs,
-		func(args []*LazyRuntimeValue) (RuntimeValue, error) {
+		func(args []Evaluatable) (RuntimeValue, error) {
 			atPathValue, err := args[0].Evaluate()
 			if err != nil {
 				return nil, err
@@ -130,11 +130,11 @@ func builtinFsDelete(env *Environment, docs Docs) BuiltinFunction {
 			}
 			writeError := os.Remove(string(atPath))
 			if writeError != nil {
-				return env.MakeDataRuntimeValue("Failure", map[string]*LazyRuntimeValue{
+				return env.MakeDataRuntimeValue("Failure", map[string]Evaluatable{
 					"error": NewConstantRuntimeValue(PreludeString(writeError.Error())),
 				})
 			} else {
-				return env.MakeDataRuntimeValue("Success", map[string]*LazyRuntimeValue{
+				return env.MakeDataRuntimeValue("Success", map[string]Evaluatable{
 					"value": NewConstantRuntimeValue(atPath),
 				})
 			}
@@ -147,7 +147,7 @@ func builtinFsDeleteAll(env *Environment, docs Docs) BuiltinFunction {
 		"deleteAll",
 		[]string{"atPath"},
 		docs,
-		func(args []*LazyRuntimeValue) (RuntimeValue, error) {
+		func(args []Evaluatable) (RuntimeValue, error) {
 			atPathValue, err := args[0].Evaluate()
 			if err != nil {
 				return nil, err
@@ -158,11 +158,11 @@ func builtinFsDeleteAll(env *Environment, docs Docs) BuiltinFunction {
 			}
 			writeError := os.Remove(string(atPath))
 			if writeError != nil {
-				return env.MakeDataRuntimeValue("Failure", map[string]*LazyRuntimeValue{
+				return env.MakeDataRuntimeValue("Failure", map[string]Evaluatable{
 					"error": NewConstantRuntimeValue(PreludeString(writeError.Error())),
 				})
 			} else {
-				return env.MakeDataRuntimeValue("Success", map[string]*LazyRuntimeValue{
+				return env.MakeDataRuntimeValue("Success", map[string]Evaluatable{
 					"value": NewConstantRuntimeValue(atPath),
 				})
 			}

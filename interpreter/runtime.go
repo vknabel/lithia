@@ -8,7 +8,7 @@ import (
 
 type RuntimeValue interface {
 	RuntimeType() RuntimeType
-	Lookup(name string) (*LazyRuntimeValue, error)
+	Lookup(name string) (Evaluatable, error)
 	String() string
 }
 
@@ -36,6 +36,8 @@ func (t RuntimeType) RuntimeTypeValue() RuntimeValue {
 func (t RuntimeType) GetDocs() Docs {
 	return t.docs
 }
+
+var _ Evaluatable = &LazyRuntimeValue{}
 
 type LazyRuntimeValue struct {
 	once  *sync.Once
