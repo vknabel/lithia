@@ -20,12 +20,14 @@ Currently Lithia is just an early proof of concept. Most basic language features
 - [x] Easy installation
 - [ ] Prebuilt docker image
 - [ ] Prebuilt linux binaries
-- [ ] Docs generator
+- [ ] Docs generator _in progress_
+- [ ] Stack traces
 - [ ] Creating a custom language server
 - [ ] ... with diagnostics
 - [ ] ... with syntax highlighting
 - [ ] ... with auto completion
 - [ ] A package manager
+- [ ] Tuning performance
 - [ ] Move stdlib to a package
 - [ ] Custom plugins for external declarations
 - [ ] More static type safety
