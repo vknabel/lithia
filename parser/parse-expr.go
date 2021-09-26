@@ -6,7 +6,7 @@ import (
 	"github.com/vknabel/go-lithia/ast"
 )
 
-func (fp *FileParser) ParseExpressionIfGiven() (*ast.Expr, []SyntaxError) {
+func (fp *FileParser) ParseExpressionIfGiven() (ast.Expr, []SyntaxError) {
 	switch fp.Node.Type() {
 	case TYPE_NODE_COMPLEX_INVOCATION_EXPRESSION:
 		panic("not implemented")
@@ -35,7 +35,8 @@ func (fp *FileParser) ParseExpressionIfGiven() (*ast.Expr, []SyntaxError) {
 	case TYPE_NODE_ARRAY_LITERAL:
 		panic("not implemented")
 	case TYPE_NODE_FUNCTION_LITERAL:
-		panic("not implemented")
+		expr, errs := fp.ParseFunctionExpr()
+		return expr, errs
 	case TYPE_NODE_PARAMETER_LIST:
 		panic("not implemented")
 	case TYPE_NODE_IDENTIFIER:
@@ -49,7 +50,7 @@ func (fp *FileParser) ParseExpressionIfGiven() (*ast.Expr, []SyntaxError) {
 func (fp *FileParser) ParseExpression() (*ast.Expr, []SyntaxError) {
 	expr, errs := fp.ParseExpressionIfGiven()
 	if expr != nil || errs != nil {
-		return expr, errs
+		return &expr, errs
 	}
 	return nil, []SyntaxError{fmt.Errorf("expected expression, got %s", fp.Node.Type())}
 }
