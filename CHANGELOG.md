@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+## v0.0.5
+
+- docs: improved docs
 - runtime: better print of functions
 - runtime: improved runtime error messages
 - compiler: type-expressions with `Any` to match multiple cases

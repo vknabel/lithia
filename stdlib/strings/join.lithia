@@ -2,6 +2,16 @@ module strings
 
 import lists
 
+/**
+ * Joins a list of strings with a given separator.
+ * The separator will only be inserted between two elements.
+ * If there are none or just one element, there won't be any separator.
+ * 
+ * ```
+ * strings.join " ", ["Hello", "World!"]
+ * // "Hello World!"
+ * ```
+ */
 func join { separator, listOfStrings =>
     with listOfStrings, type List {
         Cons: { first => 

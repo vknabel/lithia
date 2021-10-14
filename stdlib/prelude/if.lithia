@@ -1,5 +1,13 @@
 module prelude
 
+/**
+ * When the given condition evaluates to `True`, returns `then`. Otherwise `false`.
+ * Both, `then` and `else` are evaluted lazily.
+ *
+ * ```
+ * if True, print "Succeeded", exit 1
+ * ```
+ */
 func if { condition, then, else =>
     with condition, type Bool {
         True: { _ => then },

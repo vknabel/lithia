@@ -1,5 +1,9 @@
 module prelude
 
+/**
+  * Represents boolean values like `True` and `False`.
+  * Typically used for conditionals and flags.
+  */
 enum Bool {
   data True
   data False
