@@ -18,7 +18,7 @@ type Function struct {
 }
 
 func (f Function) String() string {
-	return fmt.Sprintf("{ %s => @(%s) }", strings.Join(f.arguments, ","), f.name)
+	return fmt.Sprintf("{ %s => @(%s) }", strings.Join(f.arguments, ", "), f.name)
 }
 
 func (Function) RuntimeType() RuntimeType {

@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- runtime: better print of functions
 - runtime: improved runtime error messages
 - compiler: type-expressions with `Any` to match multiple cases
 - compiler: memberwise imports
