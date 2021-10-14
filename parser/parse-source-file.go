@@ -1,8 +1,6 @@
 package parser
 
 import (
-	"fmt"
-
 	"github.com/vknabel/go-lithia/ast"
 )
 
@@ -42,7 +40,7 @@ func (fp *FileParser) ParseSourceFile() (*ast.SourceFile, []SyntaxError) {
 			sourceFile.AddExpr(&expr)
 			continue
 		}
-		parsingErrors = append(parsingErrors, fmt.Errorf("unexpected %q, expected module, import, enum, data, func, let or an expression", child.Type()))
+		parsingErrors = append(parsingErrors, fp.SyntaxErrorf("unexpected %q, expected module, import, enum, data, func, let or an expression", child.Type()))
 	}
 	return sourceFile, parsingErrors
 }

@@ -13,3 +13,14 @@ type ExprOperatorBinary struct {
 func (e ExprOperatorBinary) Meta() *MetaExpr {
 	return e.MetaInfo
 }
+
+func MakeExprOperatorBinary(operator OperatorBinary, left, right *Expr, source *Source) *ExprOperatorBinary {
+	return &ExprOperatorBinary{
+		Operator: operator,
+		Left:     left,
+		Right:    right,
+		MetaInfo: &MetaExpr{
+			Source: source,
+		},
+	}
+}

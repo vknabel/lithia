@@ -1,8 +1,6 @@
 package parser
 
 import (
-	"fmt"
-
 	sitter "github.com/smacker/go-tree-sitter"
 	"github.com/vknabel/go-lithia/ast"
 )
@@ -59,7 +57,7 @@ func (fp *FileParser) AstSource() *ast.Source {
 
 func (fp *FileParser) AssertNodeType(nodeType string) []SyntaxError {
 	if fp.Node.Type() != nodeType {
-		return []SyntaxError{fmt.Errorf("unexpected %q, expected %q", fp.Node.Type(), nodeType)}
+		return []SyntaxError{fp.SyntaxErrorf("unexpected %q, expected %q", fp.Node.Type(), nodeType)}
 	}
 	return nil
 }

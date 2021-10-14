@@ -1,8 +1,6 @@
 package parser
 
 import (
-	"fmt"
-
 	"github.com/vknabel/go-lithia/ast"
 )
 
@@ -18,7 +16,7 @@ func (fp *FileParser) ParseEnumCaseDeclaration() (*ast.DeclEnumCase, []ast.Decl,
 		enumCase := ast.MakeDeclEnumCase(enumDecl.Name)
 		return enumCase, append(childDecls, *enumDecl), errors
 	default:
-		return nil, nil, []SyntaxError{fmt.Errorf("unexpected node")}
+		return nil, nil, []SyntaxError{fp.SyntaxErrorf("unexpected node")}
 	}
 }
 

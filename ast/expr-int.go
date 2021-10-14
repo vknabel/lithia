@@ -11,3 +11,12 @@ type ExprInt struct {
 func (e ExprInt) Meta() *MetaExpr {
 	return e.MetaInfo
 }
+
+func MakeExprInt(literal int64, source *Source) *ExprInt {
+	return &ExprInt{
+		Literal: literal,
+		MetaInfo: &MetaExpr{
+			Source: source,
+		},
+	}
+}

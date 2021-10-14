@@ -1,8 +1,6 @@
 package parser
 
 import (
-	"fmt"
-
 	"github.com/vknabel/go-lithia/ast"
 )
 
@@ -47,7 +45,7 @@ func (fp *FileParser) ParseFunctionExpr() (*ast.ExprFunc, []SyntaxError) {
 			continue
 		}
 
-		errors = append(errors, fmt.Errorf("unknown child type"))
+		errors = append(errors, fp.SyntaxErrorf("unknown child type"))
 	}
 
 	return function, errors

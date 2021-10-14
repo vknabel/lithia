@@ -1,8 +1,6 @@
 package parser
 
 import (
-	"fmt"
-
 	"github.com/vknabel/go-lithia/ast"
 )
 
@@ -13,7 +11,7 @@ func (fp *FileParser) ParseFieldDeclaration() (*ast.DeclField, []SyntaxError) {
 	case TYPE_NODE_DATA_PROPERTY_FUNCTION:
 		return fp.parseDataPropertyFunction()
 	default:
-		return nil, []SyntaxError{fmt.Errorf("unexpected node type %s", fp.Node.Type())}
+		return nil, []SyntaxError{fp.SyntaxErrorf("unexpected node type %s", fp.Node.Type())}
 	}
 }
 
