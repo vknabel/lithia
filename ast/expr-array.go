@@ -11,3 +11,12 @@ type ExprArray struct {
 func (e ExprArray) Meta() *MetaExpr {
 	return e.MetaInfo
 }
+
+func MakeExprArray(elements []*Expr, source *Source) *ExprArray {
+	return &ExprArray{
+		Elements: elements,
+		MetaInfo: &MetaExpr{
+			Source: source,
+		},
+	}
+}

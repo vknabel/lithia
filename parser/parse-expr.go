@@ -27,9 +27,10 @@ func (fp *FileParser) ParseExpressionIfGiven() (ast.Expr, []SyntaxError) {
 	case TYPE_NODE_TYPE_CASE:
 		panic("not implemented")
 	case TYPE_NODE_STRING_LITERAL:
-		panic("not implemented")
-	case TYPE_NODE_ESCAPE_SEQUENCE:
-		panic("not implemented")
+		expr, errs := fp.ParseExprString()
+		return expr, errs
+	// case TYPE_NODE_ESCAPE_SEQUENCE:
+	// 	panic("not implemented")
 	case TYPE_NODE_GROUP_LITERAL:
 		expr, errs := fp.ParseGroupExpr()
 		return expr, errs
@@ -37,7 +38,8 @@ func (fp *FileParser) ParseExpressionIfGiven() (ast.Expr, []SyntaxError) {
 		expr, errs := fp.ParseIntExpr()
 		return expr, errs
 	case TYPE_NODE_ARRAY_LITERAL:
-		panic("not implemented")
+		expr, errs := fp.ParseExprArray()
+		return expr, errs
 	case TYPE_NODE_FUNCTION_LITERAL:
 		expr, errs := fp.ParseFunctionExpr()
 		return expr, errs
