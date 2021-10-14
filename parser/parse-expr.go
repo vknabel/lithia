@@ -44,7 +44,8 @@ func (fp *FileParser) ParseExpressionIfGiven() (ast.Expr, []SyntaxError) {
 	case TYPE_NODE_PARAMETER_LIST:
 		panic("not implemented")
 	case TYPE_NODE_IDENTIFIER:
-		panic("not implemented")
+		expr, errs := fp.parseExprIdentifier()
+		return expr, errs
 
 	default:
 		return nil, nil

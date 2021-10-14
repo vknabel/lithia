@@ -11,3 +11,12 @@ type ExprIdentifier struct {
 func (e ExprIdentifier) Meta() *MetaExpr {
 	return e.MetaInfo
 }
+
+func MakeExprIdentifier(name Identifier, source *Source) *ExprIdentifier {
+	return &ExprIdentifier{
+		Name: name,
+		MetaInfo: &MetaExpr{
+			Source: source,
+		},
+	}
+}
