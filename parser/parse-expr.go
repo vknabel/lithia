@@ -19,9 +19,11 @@ func (fp *FileParser) ParseExpressionIfGiven() (ast.Expr, []SyntaxError) {
 		expr, errs := fp.ParseBinaryExpr()
 		return expr, errs
 	case TYPE_NODE_MEMBER_ACCESS:
-		panic("not implemented")
+		expr, errs := fp.ParseExprMemberAccess()
+		return expr, errs
 	case TYPE_NODE_TYPE_EXPRESSION:
-		panic("not implemented")
+		expr, errs := fp.ParseExprTypeSwitch()
+		return expr, errs
 	case TYPE_NODE_TYPE_BODY:
 		panic("not implemented")
 	case TYPE_NODE_TYPE_CASE:
