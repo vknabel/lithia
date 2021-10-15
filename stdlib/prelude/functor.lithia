@@ -1,11 +1,41 @@
 module monads
 
-// 1. Identity: (map { a => a}, value) == value
-// 2. Associative: (pipe [map f, map g], value) == map pipe [f, g], value
+/// A functor wraps values in a context and allows different decisions depending on the context.
+/// For example, the types `Optional` and `List` have functors.
+///
+/// ```
+/// import lists
+/// import optionals
+///
+/// let incr = { i => i + 1 }
+/// lists.functor.map incr, [1, 2, 3]
+/// // > [2, 3, 4]
+/// optionals.functor.map incr, Some 41
+/// // > Some 42
+/// optionals.functor.map incr, None
+/// // > None
+/// ```
+///
+/// Invariants:
+/// 1. Identity: `(map { a => a}, value) == value`
+/// 2. Associative: `(pipe [map f, map g], value) == map pipe [f, g], value`
 data Functor {
+    /// Transforms a wrapped value using a function depending context of the functor
     map f, value
 }
 
+/**
+ * Transforms a wrapped value using a functor witness.
+ * Essentially just uses the map of the given witness,
+ * but allows to defer the decision regarding the witness itself.
+ *
+ * ```
+ * import lists
+ *
+ * let incr = { i => i + 1 }
+ * map incr, lists.functor, [1, 2, 3]
+ * ```
+ */
 func map { f, witness, value =>
     witness.map f, value
 }

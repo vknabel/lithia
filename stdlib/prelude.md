@@ -10,7 +10,8 @@ _extern_
 
 ## Bool
 
-_enum_ 
+_enum_ Represents boolean values like `True` and `False`.
+Typically used for conditionals and flags.
 
 ### Cases
 
@@ -33,7 +34,11 @@ _data_ Represents a non-empty List.
 
 ## Equatable
 
-_data_ 
+_data_ Allows comparision of values for equality.
+Declare and pass a witness for custom equality.
+
+In contrast to the default equality operator ==, you can define custom equality.
+If you explicitly want the strict behavior, pick the `sameEquatable` witness.
 
 ### Properties
 
@@ -49,7 +54,7 @@ _data_
 
 ## False
 
-_data_ 
+_data_ A constant to represent invalid conditions.
 ## Float
 
 _extern_ 
@@ -60,11 +65,29 @@ _extern_
 
 ## Functor
 
-_data_ 
+_data_ A functor wraps values in a context and allows different decisions depending on the context.
+For example, the types `Optional` and `List` have functors.
+
+```
+import lists
+import optionals
+
+let incr = { i => i + 1 }
+lists.functor.map incr, [1, 2, 3]
+// > [2, 3, 4]
+optionals.functor.map incr, Some 41
+// > Some 42
+optionals.functor.map incr, None
+// > None
+```
+
+Invariants:
+1. Identity: `(map { a => a}, value) == value`
+2. Associative: `(pipe [map f, map g], value) == map pipe [f, g], value`
 
 ### Properties
 
-- map f, value
+- map f, value - Transforms a wrapped value using a function depending context of the functor
 
 ## Int
 
@@ -83,8 +106,8 @@ lists.reduce { l, r => l + r }, 0, myList
 
 ### Cases
 
-- [Cons](#Cons)
 - [Nil](#Nil)
+- [Cons](#Cons)
 
 ## Module
 
@@ -92,7 +115,9 @@ _extern_
 
 ## Monad
 
-_data_ 
+_data_ Left-Identity: `(pipe [pure, flatMap f], value) == f value`
+Right-Identity: `(pipe [pure, flatMap { x => x }], value) == pure value`
+Associative: `(pipe [pure, flatMap f, flatMap g], value) == pipe [pure, flatMap g, flatMap f], value`
 
 ### Properties
 
@@ -145,7 +170,7 @@ _data_
 
 ## True
 
-_data_ 
+_data_ A constant to represent valid conditions.
 ## Void
 
 _data_ 
@@ -179,7 +204,12 @@ _func_
 
 ## if
 
-_func_ 
+_func_ When the given condition evaluates to `True`, returns `then`. Otherwise `false`.
+Both, `then` and `else` are evaluted lazily.
+
+```
+if True, print "Succeeded", exit 1
+```
 
 ### Parameters
 
@@ -189,7 +219,16 @@ _func_
 
 ## map
 
-_func_ 
+_func_ Transforms a wrapped value using a functor witness.
+Essentially just uses the map of the given witness,
+but allows to defer the decision regarding the witness itself.
+
+```
+import lists
+
+let incr = { i => i + 1 }
+map incr, lists.functor, [1, 2, 3]
+```
 
 ### Parameters
 

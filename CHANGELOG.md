@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- docs: improved docs for prelude
+
 ## v0.0.5
 
 - docs: improved docs
