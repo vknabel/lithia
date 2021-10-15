@@ -4,7 +4,12 @@ _module_
 
 ## concat
 
-_func_ 
+_func_ Concatenates a list of given strings in order.
+
+```
+strings.concat ["Hello ", "World", "!"]
+// "Hello World!"
+```
 
 ### Parameters
 
@@ -12,7 +17,14 @@ _func_
 
 ## join
 
-_func_ 
+_func_ Joins a list of strings with a given separator.
+The separator will only be inserted between two elements.
+If there are none or just one element, there won't be any separator.
+
+```
+strings.join " ", ["Hello", "World!"]
+// "Hello World!"
+```
 
 ### Parameters
 

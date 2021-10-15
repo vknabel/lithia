@@ -4,7 +4,11 @@ _module_
 
 ## Equatable
 
-_data_ 
+_data_ Allows comparision of values for equality.
+Declare and pass a witness for custom equality.
+
+In contrast to the default equality operator ==, you can define custom equality.
+If you explicitly want the strict behavior, pick the `sameEquatable` witness.
 
 ### Properties
 

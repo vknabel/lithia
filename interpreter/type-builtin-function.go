@@ -45,7 +45,7 @@ func (f BuiltinFunction) Lookup(member string) (Evaluatable, error) {
 }
 
 func (f BuiltinFunction) String() string {
-	return fmt.Sprintf("{ %s => @(%s) }", strings.Join(f.args, ","), f.name)
+	return fmt.Sprintf("{ %s => @(%s) }", strings.Join(f.args, ", "), f.name)
 }
 
 func (f BuiltinFunction) Call(arguments []Evaluatable) (RuntimeValue, error) {

@@ -2,6 +2,14 @@ module strings
 
 import lists
 
+/**
+ * Concatenates a list of given strings in order.
+ * 
+ * ```
+ * strings.concat ["Hello ", "World", "!"]
+ * // "Hello World!"
+ * ```
+ */
 func concat { listOfStrings =>
     lists.reduce { into, next => into.append next }, "", listOfStrings
 }
