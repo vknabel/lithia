@@ -4,12 +4,22 @@ import prelude
 
 let Equatable = prelude.Equatable
 
-func map { transform, witness =>
+/// Negates the result of the given `Equatable`.
+func negated { witness =>
   Equatable { lhs, rhs =>
-    transform (witness lhs, rhs)
+    booleans.negate (witness lhs, rhs)
   }
 }
 
-func negated { =>
-  map booleans.negate
+/**
+ * Transforms the inputs of an `Equatable`-witness.
+ * 
+ * ```
+ * comparables.pullback { person => person.name }, insensitiveEquatable, Person "Somebody"
+ * ```
+ */
+func pullback { transform, witness =>
+  Equatable { lhs, rhs =>
+    witness.equal transform lhs, transform rhs
+  }
 }

@@ -4,49 +4,32 @@ _module_
 
 ## append
 
-_func_ 
+_func_ `append element`
 
-### Parameters
-
-- element
-
+Appends an element to the end of a list.
 ## count
 
-_func_ 
+_func_ `count list`
 
-### Parameters
-
-- list
-
+Counts all elements of a list.
 ## forEach
 
-_func_ 
+_func_ `forEach list, action`
 
-### Parameters
-
-- list
-- action
-
+Iterates over all values of a list to generate side effects.
 
 ## map
 
-_func_ 
+_func_ `map transform, list`
 
-### Parameters
-
-- transform
-- list
 
 ## reduce
 
-_func_ Recursively walk a tree of nodes, calling a function on each node.
+_func_ `reduce accumulator, initial`
+
+Recursively walk a tree of nodes, calling a function on each node.
 The given accumulator function merges each element into a new one for the next call.
 
-@param accumulator into, next
-@param initial
-@param list
-
-### Parameters
-
-- accumulator
-- initial
+```
+lists.reduce { into, next => into + next.length }, 0, ["count", "chars"]
+```

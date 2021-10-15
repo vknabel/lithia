@@ -3,9 +3,6 @@ module prelude
 /**
  * Pipes a given value through a list of functions.
  * The first function is applied to the value, the second to the result of the first, etc.
- * 
- * @param functions
- * @param initial
  */
 func pipe { functions, initial =>
     reduceList { into, next => next into }, initial, functions
@@ -18,9 +15,6 @@ func pipe { functions, initial =>
  * ```
  * with True, Bool(True: { _ => }, False: { _ => })
  * ```
- *
- * @param value
- * @param body
  */
 func with { value, body =>
     body value
@@ -32,9 +26,9 @@ func compose { f, g, value => f g value }
  * Recursively walk a tree of nodes, calling a function on each node.
  * The given accumulator function merges each element into a new one for the next call.
  *
- * @param accumulator into, next
- * @param initial
- * @param list
+ * ```
+ * reduceList { into, next => into + next.length }, 0, ["count", "chars"]
+ * ```
  */
 func reduceList { accumulator, initial =>
     type List {

@@ -8,43 +8,31 @@ _enum_
 
 ### Cases
 
-- [Some](#Some)
 - [None](#None)
+- [Some](#Some)
 
 ## equalFor
 
-_func_ 
+_func_ `equalFor someWitness, lhs, rhs`
 
-### Parameters
-
-- someWitness
-- lhs
-- rhs
 
 ## equatableFor
 
-_func_ 
+_func_ `equatableFor someWitness`
 
-### Parameters
-
-- someWitness
 
 
 ## isNone
 
-_func_ 
+_func_ `isNone `
+
+
 ## map
 
-_func_ 
+_func_ `map transform`
 
-### Parameters
-
-- transform
 
 ## orDefault
 
-_func_ 
+_func_ `orDefault default`
 
-### Parameters
-
-- default

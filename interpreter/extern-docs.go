@@ -100,8 +100,15 @@ func docsInspectValue(value RuntimeValue, env *Environment) (RuntimeValue, error
 			"fields": NewConstantRuntimeValue(fieldDocsList),
 		})
 	case EnumDeclRuntimeValue:
+		sortedKeys := make([]string, 0, len(value.cases))
+		for key := range value.cases {
+			sortedKeys = append(sortedKeys, key)
+		}
+		sort.Strings(sortedKeys)
+
 		casesDocs := make([]RuntimeValue, 0)
-		for key, lazyEnumCase := range value.cases {
+		for _, key := range sortedKeys {
+			lazyEnumCase := value.cases[key]
 			var err error
 			enumCase, err := lazyEnumCase.Evaluate()
 			if err != nil {

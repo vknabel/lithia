@@ -12,17 +12,22 @@ If you explicitly want the strict behavior, pick the `sameEquatable` witness.
 
 ### Properties
 
-- equal lhs, rhs
-
-## map
-
-_func_ 
-
-### Parameters
-
-- transform
-- witness
+- `equal lhs, rhs`
 
 ## negated
 
-_func_ 
+_func_ `negated witness`
+
+Negates the result of the given `Equatable`.
+
+Parameters:
+- witness:
+## pullback
+
+_func_ `pullback transform, witness`
+
+Transforms the inputs of an `Equatable`-witness.
+
+```
+comparables.pullback { person => person.name }, insensitiveEquatable, Person "Somebody"
+```

@@ -4,8 +4,7 @@ _module_
 
 ## negated
 
-_func_ 
+_func_ `negated flag`
 
-### Parameters
-
-- flag
+Transforms a given `Bool` into the opposing value.
+When flag is `True`, it will return `False` and vise versa.

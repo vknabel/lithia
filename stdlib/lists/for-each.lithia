@@ -2,6 +2,7 @@ module lists
 
 import rx
 
+/// Iterates over all values of a list to generate side effects.
 func forEach { list, action =>
     let lastValue = rx.Variable Void
 

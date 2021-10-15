@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- stdlib: added `comparables.pullback`
+- stdlib: removed `comparables.map`
 - docs: improved docs for prelude
 
 ## v0.0.5

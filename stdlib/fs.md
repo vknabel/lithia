@@ -4,41 +4,25 @@ _module_
 
 ## delete
 
-_func_ 
+_func_ `delete atPath`
 
-### Parameters
-
-- atPath
 
 ## deleteAll
 
-_func_ 
+_func_ `deleteAll atPath`
 
-### Parameters
-
-- atPath
 
 ## exists
 
-_func_ 
+_func_ `exists atPath`
 
-### Parameters
-
-- atPath
 
 ## readString
 
-_func_ 
+_func_ `readString fromPath`
 
-### Parameters
-
-- fromPath
 
 ## writeString
 
-_func_ 
+_func_ `writeString toPath, contents`
 
-### Parameters
-
-- toPath
-- contents
