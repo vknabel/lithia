@@ -76,7 +76,7 @@ func enumCaseDocsToMarkdown { case =>
 func dataFieldDocsToMarkdown { field =>
     with field.params, type List {
         Cons: { _ => 
-            strings.concat ["- `", field.name, (strings.join ", ", field.params), "`", markdownDocsSuffix field.docs]
+            strings.concat ["- `", field.name, " ", (strings.join ", ", field.params), "`", markdownDocsSuffix field.docs]
         },
         Nil: { _ => 
             strings.concat ["- `", field.name, "`", markdownDocsSuffix field.docs]

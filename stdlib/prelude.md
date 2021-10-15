@@ -42,7 +42,7 @@ If you explicitly want the strict behavior, pick the `sameEquatable` witness.
 
 ### Properties
 
-- `equallhs, rhs`
+- `equal lhs, rhs`
 
 ## Failure
 
@@ -87,7 +87,7 @@ Invariants:
 
 ### Properties
 
-- `mapf, value` - Transforms a wrapped value using a function depending context of the functor
+- `map f, value` - Transforms a wrapped value using a function depending context of the functor
 
 ## Int
 
@@ -124,8 +124,8 @@ Invariants:
 
 ### Properties
 
-- `purevalue`
-- `flatMapf, instance`
+- `pure value`
+- `flatMap f, instance`
 
 ## Nil
 

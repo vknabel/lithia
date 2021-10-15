@@ -27,7 +27,7 @@ _data_
 ### Properties
 
 - `title` - The title of the test case for the logs.
-- `implfail` - The implementation of the test case.
+- `impl fail` - The implementation of the test case.
 Calls fail with a String, when failing
 
 ## TestSummary

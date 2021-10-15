@@ -12,7 +12,7 @@ If you explicitly want the strict behavior, pick the `sameEquatable` witness.
 
 ### Properties
 
-- `equallhs, rhs`
+- `equal lhs, rhs`
 
 ## negated
 
