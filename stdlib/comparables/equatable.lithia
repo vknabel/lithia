@@ -5,7 +5,7 @@ import prelude
 let Equatable = prelude.Equatable
 
 /// Negates the result of the given `Equatable`.
-func negated { =>
+func negated { witness =>
   Equatable { lhs, rhs =>
     booleans.negate (witness lhs, rhs)
   }
