@@ -1,5 +1,7 @@
 module booleans
 
+/// Transforms a given `Bool` into the opposing value.
+/// When flag is `True`, it will return `False` and vise versa.
 func negated { flag =>
   type Bool {
     True: { _ => False },

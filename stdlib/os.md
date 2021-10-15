@@ -4,16 +4,10 @@ _module_
 
 ## env
 
-_func_ 
+_func_ `env key`
 
-### Parameters
-
-- key
 
 ## exit
 
-_func_ 
+_func_ `exit code`
 
-### Parameters
-
-- code

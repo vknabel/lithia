@@ -15,8 +15,8 @@ Typically used for conditionals and flags.
 
 ### Cases
 
-- [True](#True)
 - [False](#False)
+- [True](#True)
 
 ## Char
 
@@ -28,8 +28,8 @@ _data_ Represents a non-empty List.
 
 ### Properties
 
-- head - The first element
-- tail - The remaining list.
+- `head` - The first element
+- `tail` - The remaining list.
 @type List
 
 ## Equatable
@@ -42,7 +42,7 @@ If you explicitly want the strict behavior, pick the `sameEquatable` witness.
 
 ### Properties
 
-- equal lhs, rhs
+- `equallhs, rhs`
 
 ## Failure
 
@@ -50,7 +50,7 @@ _data_
 
 ### Properties
 
-- error
+- `error`
 
 ## False
 
@@ -87,7 +87,7 @@ Invariants:
 
 ### Properties
 
-- map f, value - Transforms a wrapped value using a function depending context of the functor
+- `mapf, value` - Transforms a wrapped value using a function depending context of the functor
 
 ## Int
 
@@ -106,8 +106,8 @@ lists.reduce { l, r => l + r }, 0, myList
 
 ### Cases
 
-- [Nil](#Nil)
 - [Cons](#Cons)
+- [Nil](#Nil)
 
 ## Module
 
@@ -115,14 +115,17 @@ _extern_
 
 ## Monad
 
-_data_ Left-Identity: `(pipe [pure, flatMap f], value) == f value`
-Right-Identity: `(pipe [pure, flatMap { x => x }], value) == pure value`
-Associative: `(pipe [pure, flatMap f, flatMap g], value) == pipe [pure, flatMap g, flatMap f], value`
+_data_ Monads apply a function returning wrapped values to a wrapped value.
+
+Invariants:
+1. Left-Identity: `(pipe [pure, flatMap f], value) == f value`
+2. Right-Identity: `(pipe [pure, flatMap { x => x }], value) == pure value`
+3. Associative: `(pipe [pure, flatMap f, flatMap g], value) == pipe [pure, flatMap g, flatMap f], value`
 
 ### Properties
 
-- pure value
-- flatMap f, instance
+- `purevalue`
+- `flatMapf, instance`
 
 ## Nil
 
@@ -136,8 +139,8 @@ _enum_
 
 ### Cases
 
-- [Some](#Some)
 - [None](#None)
+- [Some](#Some)
 
 ## Result
 
@@ -145,8 +148,8 @@ _enum_
 
 ### Cases
 
-- [Success](#Success)
 - [Failure](#Failure)
+- [Success](#Success)
 
 ## Some
 
@@ -154,7 +157,7 @@ _data_
 
 ### Properties
 
-- value
+- `value`
 
 ## String
 
@@ -166,7 +169,7 @@ _data_
 
 ### Properties
 
-- value
+- `value`
 
 ## True
 
@@ -176,50 +179,34 @@ _data_ A constant to represent valid conditions.
 _data_ 
 ## compose
 
-_func_ 
+_func_ `compose f, g, value`
 
-### Parameters
-
-- f
-- g
-- value
 
 ## debug
 
-_func_ 
+_func_ `debug message`
 
-### Parameters
-
-- message
 
 ## flatMap
 
-_func_ 
+_func_ `flatMap f, witness, instance`
 
-### Parameters
-
-- f
-- witness
-- instance
 
 ## if
 
-_func_ When the given condition evaluates to `True`, returns `then`. Otherwise `false`.
+_func_ `if condition, then, else`
+
+When the given condition evaluates to `True`, returns `then`. Otherwise `false`.
 Both, `then` and `else` are evaluted lazily.
 
 ```
 if True, print "Succeeded", exit 1
 ```
-
-### Parameters
-
-- condition
-- then
-- else
-
 ## map
 
-_func_ Transforms a wrapped value using a functor witness.
+_func_ `map f, witness, value`
+
+Transforms a wrapped value using a functor witness.
 Essentially just uses the map of the given witness,
 but allows to defer the decision regarding the witness itself.
 
@@ -229,89 +216,50 @@ import lists
 let incr = { i => i + 1 }
 map incr, lists.functor, [1, 2, 3]
 ```
-
-### Parameters
-
-- f
-- witness
-- value
-
 ## pipe
 
-_func_ Pipes a given value through a list of functions.
+_func_ `pipe functions, initial`
+
+Pipes a given value through a list of functions.
 The first function is applied to the value, the second to the result of the first, etc.
-
-@param functions
-@param initial
-
-### Parameters
-
-- functions
-- initial
-
 ## print
 
-_func_ 
+_func_ `print message`
 
-### Parameters
-
-- message
 
 ## pure
 
-_func_ 
+_func_ `pure value, witness`
 
-### Parameters
-
-- value
-- witness
 
 ## reduceList
 
-_func_ Recursively walk a tree of nodes, calling a function on each node.
+_func_ `reduceList accumulator, initial`
+
+Recursively walk a tree of nodes, calling a function on each node.
 The given accumulator function merges each element into a new one for the next call.
 
-@param accumulator into, next
-@param initial
-@param list
-
-### Parameters
-
-- accumulator
-- initial
-
+```
+reduceList { into, next => into + next.length }, 0, ["count", "chars"]
+```
 
 ## unless
 
-_func_ 
+_func_ `unless condition, then`
 
-### Parameters
-
-- condition
-- then
 
 ## when
 
-_func_ 
+_func_ `when condition, then`
 
-### Parameters
-
-- condition
-- then
 
 ## with
 
-_func_ Applies the given body to the given value.
+_func_ `with value, body`
+
+Applies the given body to the given value.
 Mostly useful for readability, e.g. in destructings.
 
 ```
 with True, Bool(True: { _ => }, False: { _ => })
 ```
-
-@param value
-@param body
-
-### Parameters
-
-- value
-- body

@@ -1,5 +1,6 @@
 module lists
 
+/// Appends an element to the end of a list.
 func append { element =>
     type List {
         Cons: { list => Cons list.head, (append element, list.tail) },

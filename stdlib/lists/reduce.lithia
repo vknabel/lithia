@@ -4,9 +4,9 @@ module lists
  * Recursively walk a tree of nodes, calling a function on each node.
  * The given accumulator function merges each element into a new one for the next call.
  *
- * @param accumulator into, next
- * @param initial
- * @param list
+ * ```
+ * lists.reduce { into, next => into + next.length }, 0, ["count", "chars"]
+ * ```
  */
 func reduce { accumulator, initial =>
     type List {

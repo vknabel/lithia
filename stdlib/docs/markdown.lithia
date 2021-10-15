@@ -41,14 +41,12 @@ func docsToMarkdown { docs =>
         FunctionDocs: { d =>
             strings.concat [
                 "## ", d.name,"\n\n"
-                "_func_ ",
-                d.docs, 
-                (if d.params == Nil, "", strings.concat [
-                    "\n\n",
-                    "### Parameters\n\n",
-                    (strings.join "\n", (lists.map { p => "- ".append p }, d.params)),
-                    "\n"
-                ])
+                "_func_ `",
+                d.name,
+                " ",
+                (strings.join ", ", d.params),
+                "`\n\n",
+                d.docs
             ]
         },
         ConstantDocs: { d =>
@@ -78,10 +76,10 @@ func enumCaseDocsToMarkdown { case =>
 func dataFieldDocsToMarkdown { field =>
     with field.params, type List {
         Cons: { _ => 
-            strings.concat ["- ", field.name, " ", (strings.join ", ", field.params), markdownDocsSuffix field.docs]
+            strings.concat ["- `", field.name, (strings.join ", ", field.params), "`", markdownDocsSuffix field.docs]
         },
         Nil: { _ => 
-            strings.concat ["- ", field.name, markdownDocsSuffix field.docs]
+            strings.concat ["- `", field.name, "`", markdownDocsSuffix field.docs]
         }
     }
 }

@@ -26,8 +26,8 @@ _data_
 
 ### Properties
 
-- title - The title of the test case for the logs.
-- impl fail - The implementation of the test case.
+- `title` - The title of the test case for the logs.
+- `implfail` - The implementation of the test case.
 Calls fail with a String, when failing
 
 ## TestSummary
@@ -36,26 +36,26 @@ _data_ The prinatble summary of all tests.
 
 ### Properties
 
-- ok - How many tests have been ok.
-- notOk - How many tests have been not ok.
-- failedTests - List of failed test numbers.
+- `ok` - How many tests have been ok.
+- `notOk` - How many tests have been not ok.
+- `failedTests` - List of failed test numbers.
 
 
 ## runTestCase
 
-_func_ 
+_func_ `runTestCase summary, testCase`
 
-### Parameters
-
-- summary
-- testCase
 
 ## runTests
 
-_func_ Runs all test cases, that have been buffered by now.
+_func_ `runTests `
+
+Runs all test cases, that have been buffered by now.
 ## test
 
-_func_ Adds a new test case to the queue and will be executed once `runTests` has been called.
+_func_ `test case, function`
+
+Adds a new test case to the queue and will be executed once `runTests` has been called.
 
 ```
 import tests
@@ -64,10 +64,4 @@ tests.test "my test case", { fail =>
 when False, fail "when should not trigger when False"
 }
 ```
-
-
-### Parameters
-
-- case
-- function
 

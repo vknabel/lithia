@@ -1,5 +1,6 @@
 module lists
 
+/// Counts all elements of a list.
 func count { list =>
     reduce { into, next => into + 1 }, 0, list
 }
