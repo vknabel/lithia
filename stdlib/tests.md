@@ -20,6 +20,14 @@ By default, tests are enabled, when `$LITHIA_TESTS` is set.
 
 In case you really need expectations, writing a wrapper around tests should be possible.
 
+- _data_ [TestCase](#TestCase)
+- _data_ [TestSummary](#TestSummary)
+
+- _func_ [runTestCase](#runTestCase) summary, testCase
+- _func_ [runTests](#runTests) 
+- _func_ [test](#test) case, function
+
+
 ## TestCase
 
 _data_ 

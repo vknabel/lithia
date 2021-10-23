@@ -2,6 +2,24 @@
 
 _module_ 
 
+- _data_ [Failure](#Failure)
+- _enum_ [Result](#Result)
+- _data_ [Success](#Success)
+
+
+- _func_ [flatMapSuccess](#flatMapSuccess) transform, result
+- _func_ [flatMapFailure](#flatMapFailure) transform, result
+- _func_ [flatMapSuccess](#flatMapSuccess) transform, result
+
+- _func_ [mapSuccess](#mapSuccess) transform, result
+- _func_ [mapFailure](#mapFailure) transform, result
+- _func_ [mapSuccess](#mapSuccess) transform, result
+
+- _func_ [pureFailure](#pureFailure) error
+- _func_ [pureSuccess](#pureSuccess) value
+
+
+
 ## Failure
 
 _data_ 

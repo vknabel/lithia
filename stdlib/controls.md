@@ -2,6 +2,20 @@
 
 _module_ 
 
+- _data_ [Contravariant](#Contravariant)
+- _enum_ [ContravariantWitness](#ContravariantWitness)
+- _data_ [Functor](#Functor)
+- _enum_ [FunctorWitness](#FunctorWitness)
+- _data_ [Monad](#Monad)
+- _enum_ [MonadWitness](#MonadWitness)
+- _func_ [contravariantFrom](#contravariantFrom) moduleWitness
+- _func_ [flatMap](#flatMap) f, witness, instance
+- _func_ [functorFrom](#functorFrom) moduleWitness
+- _func_ [map](#map) f, witness, value
+- _func_ [monadFrom](#monadFrom) monadWitness
+- _func_ [pullback](#pullback) f, witness, value
+- _func_ [pure](#pure) value, witness
+
 ## Contravariant
 
 _data_ A contravariant wraps behavior to handle inputs depending on a context.

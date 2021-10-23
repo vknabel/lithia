@@ -93,6 +93,11 @@ func (env *Environment) MakeDataRuntimeValue(dataDeclName string, members map[st
 		return nil, err
 	}
 	if someType, ok := value.(DataDeclRuntimeValue); ok {
+		for key, value := range members {
+			if value == nil {
+				return nil, fmt.Errorf("property %s of data %s would be nil", key, dataDeclName)
+			}
+		}
 		return DataRuntimeValue{typeValue: &someType, members: members}, nil
 	} else {
 		return nil, fmt.Errorf("%s is not a data type", value)

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+## v0.0.7
+
+- docs: overall improvements
 - stdlib: `strings.join` returns strings when just one element given
 - stdlib: removed `prelude.reduceList`, use `lists.reduce` instead
 - stdlib: moved `prelude.Result` to `results.Result`

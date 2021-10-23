@@ -2,6 +2,14 @@
 
 _module_ 
 
+- _enum_ [Optional](#Optional)
+- _func_ [equalFor](#equalFor) someWitness, lhs, rhs
+- _func_ [equatableFor](#equatableFor) someWitness
+
+- _func_ [isNone](#isNone) 
+- _func_ [map](#map) transform
+- _func_ [orDefault](#orDefault) default
+
 ## Optional
 
 _enum_ 

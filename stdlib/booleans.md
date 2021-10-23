@@ -2,6 +2,8 @@
 
 _module_ 
 
+- _func_ [negated](#negated) flag
+
 ## negated
 
 _func_ `negated flag`

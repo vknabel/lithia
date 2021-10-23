@@ -2,6 +2,9 @@
 
 _module_ 
 
+- _func_ [concat](#concat) listOfStrings
+- _func_ [join](#join) separator, listOfStrings
+
 ## concat
 
 _func_ `concat listOfStrings`

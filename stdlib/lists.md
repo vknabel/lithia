@@ -2,6 +2,20 @@
 
 _module_ 
 
+- _func_ [append](#append) element
+- _func_ [concat](#concat) nestedLists
+- _func_ [count](#count) list
+- _func_ [flatMap](#flatMap) transform, list
+- _func_ [foldr](#foldr) accumulator, initial
+- _func_ [forEach](#forEach) list, action
+
+- _func_ [map](#map) transform, list
+
+- _func_ [prependList](#prependList) prefix, postfix
+- _func_ [pure](#pure) value
+- _func_ [reduce](#reduce) accumulator, initial
+- _func_ [replicate](#replicate) n, element
+
 ## append
 
 _func_ `append element`

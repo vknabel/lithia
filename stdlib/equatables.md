@@ -2,6 +2,11 @@
 
 _module_ 
 
+- _data_ [Equatable](#Equatable)
+
+- _func_ [negated](#negated) witness
+- _func_ [pullback](#pullback) transform, witness
+
 ## Equatable
 
 _data_ Allows comparision of values for equality.
