@@ -47,9 +47,9 @@ brews:
       prefix.install "./stdlib"
 
 dockers:
-  dockerfile: Dockerfile
-  image_templates:
-    - "vknabel/lithia:latest"
-    - "vknabel/lithia:{{ .Tag }}"
-    - "vknabel/lithia:v{{ .Major }}"
-    - "vknabel/lithia:v{{ .Major }}.{{ .Minor }}"
+  - dockerfile: Dockerfile
+    image_templates:
+      - "vknabel/lithia:latest"
+      - "vknabel/lithia:{{ .Tag }}"
+      - "vknabel/lithia:v{{ .Major }}"
+      - "vknabel/lithia:v{{ .Major }}.{{ .Minor }}"
