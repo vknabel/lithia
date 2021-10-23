@@ -5,6 +5,7 @@
 - stdlib: added `comparables.pullback`
 - stdlib: removed `comparables.map`
 - docs: improved docs for prelude
+- docker: introduced [vknabel/lithia](https://hub.docker.com/repository/docker/vknabel/lithia/)
 
 ## v0.0.5
 
