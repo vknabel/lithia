@@ -19,9 +19,6 @@ If you explicitly want the strict behavior, pick the `sameEquatable` witness.
 _func_ `negated witness`
 
 Negates the result of the given `Equatable`.
-
-Parameters:
-- witness:
 ## pullback
 
 _func_ `pullback transform, witness`
