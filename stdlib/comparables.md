@@ -2,29 +2,40 @@
 
 _module_ 
 
-## Equatable
+## Ascending
 
-_data_ Allows comparision of values for equality.
-Declare and pass a witness for custom equality.
+_data_ 
+## Comparable
 
-In contrast to the default equality operator ==, you can define custom equality.
-If you explicitly want the strict behavior, pick the `sameEquatable` witness.
+_data_ 
 
 ### Properties
 
-- `equal lhs, rhs`
+- `compare lhs, rhs`
 
-## negated
+## Descending
 
-_func_ `negated witness`
+_data_ 
+## Equal
 
-Negates the result of the given `Equatable`.
+_data_ 
+## Order
+
+_enum_ 
+
+### Cases
+
+- [Ascending](#Ascending)
+- [Descending](#Descending)
+- [Equal](#Equal)
+
+
+## equatableFrom
+
+_func_ `equatableFrom comparableWitness`
+
+
 ## pullback
 
-_func_ `pullback transform, witness`
+_func_ `pullback f, witness`
 
-Transforms the inputs of an `Equatable`-witness.
-
-```
-comparables.pullback { person => person.name }, insensitiveEquatable, Person "Somebody"
-```

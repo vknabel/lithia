@@ -1,0 +1,7 @@
+func replicate { n, element =>
+    if n <= 0, Nil, (
+        Cons element, (
+            replicate n - 1, element
+        )
+    )
+}

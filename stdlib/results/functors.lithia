@@ -1,0 +1,24 @@
+module results
+
+import controls
+
+let successFunctor = controls.Functor mapSuccess
+
+func mapSuccess { transform, result =>
+    with result, type Result {
+        Success: { success => Success transform success.value },
+        Failure: { failure => failure }
+    }
+}
+
+let failureFunctor = controls.Functor mapFailure
+
+func mapFailure { transform, result =>
+    with result, type Result {
+        Success: { success => success },
+        Failure: { failure => Failure transform failure.error }
+    }
+}
+
+let functor = successFunctor
+let map = mapSuccess

@@ -1,5 +1,7 @@
 import booleans
 import comparables
+import controls
+import equatables
 import docs
 import fs
 import lists
@@ -7,6 +9,7 @@ import optionals
 import os
 import prelude
 import rx
+import results
 import strings
 import tests
 
@@ -64,12 +67,15 @@ main (GroupedModuleDocs "Lithia Standard Library",
     [
     booleans,
     comparables,
+    controls,
     docs,
+    equatables,
     fs,
     lists,
     optionals,
     os,
     prelude,
+    results,
     rx,
     strings,
     tests

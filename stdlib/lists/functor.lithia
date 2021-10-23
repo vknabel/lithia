@@ -1,5 +1,7 @@
 module lists
 
+import controls { Functor }
+
 let functor = Functor map
 
 func map { transform, list =>

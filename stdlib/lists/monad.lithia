@@ -1,0 +1,13 @@
+module lists
+
+import controls { Monad }
+
+let monad = Monad pure, flatMap
+
+func pure { value =>
+    Cons value
+}
+
+func flatMap { transform, list =>
+    lists.concat (lists.map transform, list)
+}

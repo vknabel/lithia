@@ -1,5 +1,11 @@
 module fs
 
+// used as returns
+import results {
+    Success,
+    Failure
+}
+
 extern writeString toPath, newContents
 extern readString fromPath
 extern exists atPath

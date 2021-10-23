@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+- stdlib: `strings.join` returns strings when just one element given
+- stdlib: removed `prelude.reduceList`, use `lists.reduce` instead
+- stdlib: moved `prelude.Result` to `results.Result`
+- stdlib: moved `prelude.Functor` and `prelude.Monad` to `controls.Functor` and `controls.Monad`
+- stdlib: moved `comparables.negated` and `comparables.pullback` to `equatables`
+- stdlib: added `controls.Functor`, `controls.Monad` witnesses and implementations for `results.Result` and `lists.List`
+- stdlib: added `comparables.Comparable`, `Order`, `Ascending`, `Equal`, `Descending`, `equatableFrom`
+- stdlib: added `controls.Contravariant` and witnesses `contravariant` and `pullback` in `equatables`, `comparables`
+- stdlib: added `lists.prependList`, `lists.concat`, `lists.replicate`
+- stdlib: `controls` types now define `*From` functions and `*Witness` types declaring compatability regarding `Function` and `Module`
+- stdlib: `controls.map`, `controls.flatMap`, `controls.pure` and `controls.pullback` convert their witness types before accessing the implementation
+
 ## v0.0.6
 
 - stdlib: added `comparables.pullback`

@@ -4,6 +4,8 @@ import tests {
     test
 }
 import strings
+import os
+import lists
 
 test "booleans are cool", { fail =>
     with True, type Bool {
@@ -80,14 +82,32 @@ test "int comparisions", { fail =>
 
 test "strings.join", { fail =>
     when (strings.join ",", []) != "", fail "for empty list"
+    when (strings.join ",", [1]) != "1", fail "string for one non-string"
     when (strings.join ",", ["1"]) != "1", fail "for one element"
     when (strings.join ",", ["1", "2"]) != "1,2", fail "for two elements"
     when (strings.join ",", ["1", "2", "3"]) != "1,2,3", fail "for three elements"
 }
 
+test "lists.replicate", { fail =>
+    when (lists.replicate 0, 42) != [], fail "zero elements"
+    // TODO: Bug in equal function
+    // when (lists.replicate 1, 42) != [42], fail "one element"
+    // when (lists.replicate 2, 42) != [42, 42], fail "two elements"
+}
+
+test "lists.flatMap", { fail =>
+    func stringifiedReplicate { list =>
+        let replications = lists.flatMap { i => lists.replicate i, i }, list
+        strings.join "", replications
+    }
+    when (stringifiedReplicate []) != "", fail "empty"
+    when (stringifiedReplicate [1]) != "1", fail "one replication"
+    when (stringifiedReplicate [2]) != "22", fail "two replications"
+}
+
 func main { =>
     print "main called"
-    osExit 1
+    os.exit 1
 }
 
 when tests.enabled, tests.runTests

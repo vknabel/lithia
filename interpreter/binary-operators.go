@@ -13,6 +13,7 @@ func (ex *EvaluationContext) BinaryOperatorFunction(operator string) (func(Evalu
 	case "!=":
 		return func(lazyLeft, lazyRight Evaluatable) (RuntimeValue, LocatableError) {
 			return ex.genericGreedyComparision(lazyLeft, lazyRight, func(left, right RuntimeValue) bool {
+
 				return !reflect.DeepEqual(left, right)
 			})
 		}, nil

@@ -1,4 +1,4 @@
-module monads
+module functors
 
 /// A functor wraps values in a context and allows different decisions depending on the context.
 /// For example, the types `Optional` and `List` have functors.
@@ -17,11 +17,42 @@ module monads
 /// ```
 ///
 /// Invariants:
-/// 1. Identity: `(map { a => a}, value) == value`
+/// 1. Identity: `(map { a => a }, value) == value`
 /// 2. Associative: `(pipe [map f, map g], value) == map pipe [f, g], value`
 data Functor {
     /// Transforms a wrapped value using a function depending context of the functor
     map f, value
+}
+
+/// Defines all valid witnesses for a functor.
+///
+/// ```
+/// import lists
+/// 
+/// map incr, lists
+/// map incr, lists.map
+/// map incr, lists.functor
+/// ```
+enum FunctorWitness {
+    Functor
+    Module
+    Function
+    Monad
+}
+
+func functorFrom { moduleWitness =>
+    with moduleWitness, type FunctorWitness {
+        Functor: { witness => witness },
+        Module: { module =>
+            Functor module.map
+        },
+        Function: { fmap =>
+            Functor fmap
+        },
+        Monad: { monad =>
+            Functor { f, instance => monad.pure (monad.flatMap f, instance) }
+        }
+    }
 }
 
 /**
@@ -33,9 +64,9 @@ data Functor {
  * import lists
  *
  * let incr = { i => i + 1 }
- * map incr, lists.functor, [1, 2, 3]
+ * map incr, lists, [1, 2, 3]
  * ```
  */
 func map { f, witness, value =>
-    witness.map f, value
+    (functorFrom witness).map f, value
 }

@@ -1,6 +1,7 @@
-module comparables
+module equatables
 
 import prelude
+import controls { Contravariant }
 
 let Equatable = prelude.Equatable
 
@@ -23,3 +24,5 @@ func pullback { transform, witness =>
     witness.equal transform lhs, transform rhs
   }
 }
+
+let contravariant = Contravariant pullback

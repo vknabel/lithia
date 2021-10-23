@@ -16,3 +16,5 @@
 
 dist/
 /lithia
+.envrc
+.DS_Store
