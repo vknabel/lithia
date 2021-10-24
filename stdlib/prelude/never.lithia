@@ -1,0 +1,4 @@
+
+/// An enum with no valid values.
+/// Allows empty, but valid type expressions.
+enum Never

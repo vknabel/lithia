@@ -1,0 +1,9 @@
+import tests { test }
+
+test "when true succeeds", { fail =>
+    let isTrue = when True, True
+    with isTrue, type Bool {
+        True: { true => "" },
+        False: { false => fail "should be True" }
+    }
+}

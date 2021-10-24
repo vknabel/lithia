@@ -6,6 +6,8 @@ import results {
     Failure
 }
 
+/// Write a given string to a path.
+/// Returns `results.Result`.
 extern writeString toPath, newContents
 extern readString fromPath
 extern exists atPath

@@ -1,4 +1,4 @@
-# comparables
+# cmp
 
 _module_ 
 
@@ -9,6 +9,7 @@ _module_
 - _enum_ [Order](#Order)
 
 - _func_ [equatableFrom](#equatableFrom) comparableWitness
+
 - _func_ [pullback](#pullback) f, witness
 
 ## Ascending
@@ -43,6 +44,7 @@ _enum_
 
 _func_ `equatableFrom comparableWitness`
 
+Creates an `eq.Equatable`
 
 ## pullback
 

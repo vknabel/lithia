@@ -1,3 +1,14 @@
+/// The booleans module declares more helpers around `prelude.Bool`.
+/// Also see `prelude.if`, `prelude.when`, `prelude.unless`.
 module booleans
 
-import tests
+import tests { test }
+
+test "booleans are cool", { fail =>
+    with True, type Bool {
+        True: { _ => },
+        False: { _ =>
+            fail "type switch not working for Bool"
+        }
+    }
+}

@@ -1,0 +1,47 @@
+module cmp
+
+import controls { Contravariant }
+
+func pullback { f, witness =>
+    Comparable { lhs, rhs =>
+        witness.compare f lhs, f rhs
+    }
+}
+
+let contravariant = Contravariant pullback
+
+import tests { test }
+
+test "cmp.contravariant is a Contravariant", { fail =>
+    with controls.contravariantFrom cmp.contravariant, type controls.ContravariantWitness {
+        Contravariant: { _ => /* success */ },
+        Any: { unexpected => fail unexpected }
+    }
+}
+
+test "cmp.pullback can act as Contravariant", { fail =>
+    with controls.contravariantFrom cmp.pullback, type controls.ContravariantWitness {
+        Contravariant: { _ => /* success */ },
+        Any: { unexpected => fail unexpected }
+    }
+}
+
+test "cmp can act as Contravariant", { fail =>
+    with controls.contravariantFrom cmp, type controls.ContravariantWitness {
+        Contravariant: { _ => /* success */ },
+        Any: { unexpected => fail unexpected }
+    }
+}
+
+test "cmp.pullback is valid", { fail =>
+    func negate { i => i * -1 }
+    let negatedNumeric = pullback negate, cmp.numeric
+    when (negatedNumeric.compare 1, 2) == Ascending, fail "-1 > -2"
+}
+
+test "cmp is a valid contraviant", { fail =>
+    func negateNumber { i => i * -1 }
+    let negateComparable = controls.pullback negateNumber, cmp
+    let negated = negateComparable cmp.numeric
+    when (negated.compare 1, 2) == Ascending, fail "-1 > -2"
+}
