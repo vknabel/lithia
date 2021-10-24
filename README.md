@@ -56,7 +56,7 @@ As you might expect there aren’t a lot language features to cover:
 
 On the other hand we explicitly opted out a pretty long list of features: mutability by default, interfaces, classes, inheritance, type extensions, methods, generics, custom operators, null, instance checks, importing all members of a module, exceptions and tuples.
 
-> Curios? Head over to the generated [Standard Libraray documentation](./stdlib/README.md).
+> Curios? Head over to the generated [Standard Library documentation](./stdlib/README.md).
 
 ### Functions
 
@@ -197,7 +197,7 @@ Lithia will search for a folder containing source files at the following locatio
 - at `$LITHIA_PACKAGES` if set
 - at `$LITHIA_STDLIB` or `/usr/local/opt/lithia/stdlib`
 
-> **\*Nice to know:** there is a special module which will always be imported implicitly, called `prelude`. It contains types like `Bool` or `List`. As Lithia treats the `prelude` as any other module. Therefore you can even override and update the standard library.\*
+> _**Nice to know:** there is a special module which will always be imported implicitly, called `prelude`. It contains types like `Bool` or `List`. As Lithia treats the `prelude` as any other module. Therefore you can even override and update the standard library._
 
 Modules and their members can be treated like any other value. Just pass them around as parameters.
 
