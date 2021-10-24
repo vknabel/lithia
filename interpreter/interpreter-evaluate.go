@@ -350,6 +350,9 @@ func (ex *EvaluationContext) EvaluateTypeExpression() (*LazyRuntimeValue, Locata
 	caseNames := make([]string, 0, caseCount)
 	for i := 0; i < caseCount; i++ {
 		typeCaseNode := bodyNode.NamedChild(i)
+		if typeCaseNode.Type() == parser.TYPE_NODE_COMMENT {
+			continue
+		}
 		labelNode := typeCaseNode.ChildByFieldName("label")
 		bodyNode := typeCaseNode.ChildByFieldName("body")
 		if labelNode == nil || bodyNode == nil {
