@@ -11,11 +11,12 @@ func (ex *EvaluationContext) RuntimeErrorf(format string, args ...interface{}) L
 
 func (ex *EvaluationContext) RuntimeNonExhaustiveTypeExpression(
 	enumDecl EnumDeclRuntimeValue,
-	typeCases map[string]Evaluatable,
+	caseNames []string,
 ) LocatableError {
 	missing := []string{}
+
 	for caseName := range enumDecl.cases {
-		if _, ok := typeCases[caseName]; !ok {
+		if !contains(caseNames, caseName) {
 			missing = append(missing, caseName)
 		}
 	}
@@ -24,10 +25,10 @@ func (ex *EvaluationContext) RuntimeNonExhaustiveTypeExpression(
 
 func (ex *EvaluationContext) RuntimeInvalidCaseTypeExpression(
 	enumDecl EnumDeclRuntimeValue,
-	typeCases map[string]Evaluatable,
+	caseNames []string,
 ) LocatableError {
 	invalids := []string{}
-	for caseName := range typeCases {
+	for _, caseName := range caseNames {
 		if _, ok := enumDecl.cases[caseName]; !ok && caseName != "Any" {
 			invalids = append(invalids, caseName)
 		}

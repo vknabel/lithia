@@ -7,7 +7,8 @@ var _ Callable = TypeExpression{}
 
 type TypeExpression struct {
 	typeValue EnumDeclRuntimeValue
-	cases     map[string]Evaluatable
+	caseNames []string
+	cases     []Evaluatable
 }
 
 func (TypeExpression) RuntimeType() RuntimeType {
@@ -30,17 +31,25 @@ func (typeExpr TypeExpression) Call(arguments []Evaluatable) (RuntimeValue, erro
 	if err != nil {
 		return nil, err
 	}
-	for caseName, lazyCaseImpl := range typeExpr.cases {
-		caseTypeValue, err := typeExpr.typeValue.cases[caseName].Evaluate()
-		if err != nil {
-			return nil, err
-		}
-		ok, err := RuntimeTypeValueIncludesValue(caseTypeValue, valueArgument)
-		if err != nil {
-			return nil, err
-		}
-		if !ok {
-			continue
+	for i, caseName := range typeExpr.caseNames {
+		lazyCaseImpl := typeExpr.cases[i]
+		caseTypeDef := typeExpr.typeValue.cases[caseName]
+		if caseTypeDef == nil && caseName == "Any" {
+			// always ok
+		} else if caseTypeDef == nil {
+			return nil, fmt.Errorf("case %s not defined", caseName)
+		} else {
+			caseTypeValue, err := caseTypeDef.Evaluate()
+			if err != nil {
+				return nil, err
+			}
+			ok, err := RuntimeTypeValueIncludesValue(caseTypeValue, valueArgument)
+			if err != nil {
+				return nil, err
+			}
+			if !ok {
+				continue
+			}
 		}
 
 		intermediate, err := lazyCaseImpl.Evaluate()
@@ -54,4 +63,13 @@ func (typeExpr TypeExpression) Call(arguments []Evaluatable) (RuntimeValue, erro
 		return callable.Call(arguments)
 	}
 	return nil, fmt.Errorf("no %s has no matching case for value %s of type %s", typeExpr.typeValue.name, fmt.Sprint(valueArgument), fmt.Sprint(valueArgument.RuntimeType().name))
+}
+
+func contains(names []string, name string) bool {
+	for _, n := range names {
+		if n == name {
+			return true
+		}
+	}
+	return false
 }

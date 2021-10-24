@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- fix: type expressions with `Any` were not deterministic
+
 ## v0.0.7
 
 - docs: overall improvements
