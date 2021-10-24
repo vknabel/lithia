@@ -1,0 +1,5 @@
+import tests { test }
+
+test "string comparisions", { fail =>
+    when "" != "", fail "empty strings are not equal"
+}

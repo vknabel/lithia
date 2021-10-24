@@ -4,9 +4,9 @@ module monads
 /// Put simply, a contravariant maps inputs, while a functor maps outputs.
 ///
 /// ```
-/// import equatables
+/// import eq
 /// 
-/// let personByNameEquatbale = equatables.contravariant.pullback { person => person.name }, sameEquatable
+/// let personByNameEquatbale = eq.contravariant.pullback { person => person.name }, strict
 ///
 /// personByNameEquatbale.equal Person "Alice", Person "Bob"
 /// // > False
@@ -22,11 +22,11 @@ data Contravariant {
 /// Defines all valid witnesses for a contravariant.
 ///
 /// ```
-/// import comparables
+/// import cmp
 /// 
-/// pullback { person => person.name }, comparables
-/// pullback { person => person.name }, comparables.pullback
-/// pullback { person => person.name }, comparables.contravariant
+/// pullback { person => person.name }, cmp
+/// pullback { person => person.name }, cmp.pullback
+/// pullback { person => person.name }, cmp.contravariant
 /// ```
 enum ContravariantWitness {
     Contravariant
@@ -48,6 +48,6 @@ func contravariantFrom { moduleWitness =>
     }
 }
 
-func pullback { f, witness, value =>
-    (contravariantFrom witness).pullback f, value
+func pullback { f, witness =>
+    (contravariantFrom witness).pullback f
 }

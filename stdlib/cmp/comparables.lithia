@@ -1,0 +1,49 @@
+/// Defines comparision operations, ascending and descending of values.
+module cmp
+
+data Comparable {
+    compare lhs, rhs
+}
+
+enum Order {
+    data Ascending
+    data Equal
+    data Descending
+}
+
+import tests { test }
+
+test "cmp.Comparable can be constructed", { fail =>
+    let alwaysEqual = Comparable { lhs, rhs => Equal }
+    when (alwaysEqual.compare 1, 2) != Equal, fail "behavior of comparable changed"
+}
+
+test "cmp.Ascending is cmp.Order", { fail =>
+    with Ascending, type Order {
+        Ascending: { _ => /* succeed */ },
+        Any: { unexpected => fail unexpected }
+    }
+}
+
+test "cmp.Equal is cmp.Order", { fail =>
+    with Equal, type Order {
+        Equal: { _ => /* succeed */ },
+        Any: { unexpected => fail unexpected }
+    }
+}
+
+test "cmp.Descending is cmp.Order", { fail =>
+    with Equal, type Order {
+        Equal: { _ => /* succeed */ },
+        Any: { unexpected => fail unexpected }
+    }
+}
+
+test "cmp.Order is only Equal, Ascending, Descending", { fail =>
+    with Equal, type Order {
+        Ascending: { _ => /* succeed */ },
+        Equal: { _ => /* succeed */ },
+        Descending: { _ => /* succeed */ }
+        // type expression will fail
+    }
+}

@@ -1,0 +1,13 @@
+import lists
+import strings
+import tests { test }
+
+test "lists.flatMap", { fail =>
+    func stringifiedReplicate { list =>
+        let replications = lists.flatMap { i => lists.replicate i, i }, list
+        strings.join "", replications
+    }
+    when (stringifiedReplicate []) != "", fail "empty"
+    when (stringifiedReplicate [1]) != "1", fail "one replication"
+    when (stringifiedReplicate [2]) != "22", fail "two replications"
+}

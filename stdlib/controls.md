@@ -13,7 +13,7 @@ _module_
 - _func_ [functorFrom](#functorFrom) moduleWitness
 - _func_ [map](#map) f, witness, value
 - _func_ [monadFrom](#monadFrom) monadWitness
-- _func_ [pullback](#pullback) f, witness, value
+- _func_ [pullback](#pullback) f, witness
 - _func_ [pure](#pure) value, witness
 
 ## Contravariant
@@ -22,9 +22,9 @@ _data_ A contravariant wraps behavior to handle inputs depending on a context.
 Put simply, a contravariant maps inputs, while a functor maps outputs.
 
 ```
-import equatables
+import eq
 
-let personByNameEquatbale = equatables.contravariant.pullback { person => person.name }, sameEquatable
+let personByNameEquatbale = eq.contravariant.pullback { person => person.name }, strict
 
 personByNameEquatbale.equal Person "Alice", Person "Bob"
 // > False
@@ -43,11 +43,11 @@ Invariants:
 _enum_ Defines all valid witnesses for a contravariant.
 
 ```
-import comparables
+import cmp
 
-pullback { person => person.name }, comparables
-pullback { person => person.name }, comparables.pullback
-pullback { person => person.name }, comparables.contravariant
+pullback { person => person.name }, cmp
+pullback { person => person.name }, cmp.pullback
+pullback { person => person.name }, cmp.contravariant
 ```
 
 ### Cases
@@ -167,7 +167,7 @@ _func_ `monadFrom monadWitness`
 
 ## pullback
 
-_func_ `pullback f, witness, value`
+_func_ `pullback f, witness`
 
 
 ## pure

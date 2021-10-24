@@ -3,28 +3,9 @@ module example
 import tests {
     test
 }
-import strings
+import tests.tests_t
 import os
 import lists
-
-test "booleans are cool", { fail =>
-    with True, type Bool {
-        True: { _ => },
-        False: { _ =>
-            fail "type switch not working for Bool"
-        }
-    }
-}
-
-test "strings.concat rocks", { fail =>
-    let expected "Hello!"
-    let actual strings.concat ["Hello", "!"]
-    when expected != actual, fail actual
-}
-
-test "string comparisions", { fail =>
-    when "" != "", fail "empty strings are not equal"
-}
 
 test "any in enums matches all types", { fail =>
     enum AnyEnum {
@@ -53,14 +34,6 @@ test "any allows to use fewer enum cases in type expression", { fail =>
     unless isCorrect, fail "should not be the case"
 }
 
-test "when true succeeds", { fail =>
-    let isTrue = when True, True
-    with isTrue, type Bool {
-        True: { true => "" },
-        False: { false => fail "should be True" }
-    }
-}
-
 test "int comparisions", { fail =>
     unless 1 == 1, fail "1 == 1"
     unless 0 == 0, fail "0 == 0"
@@ -80,14 +53,6 @@ test "int comparisions", { fail =>
     unless (incr 1) == 2, fail "(incr 1) == 2"
 }
 
-test "strings.join", { fail =>
-    when (strings.join ",", []) != "", fail "for empty list"
-    when (strings.join ",", [1]) != "1", fail "string for one non-string"
-    when (strings.join ",", ["1"]) != "1", fail "for one element"
-    when (strings.join ",", ["1", "2"]) != "1,2", fail "for two elements"
-    when (strings.join ",", ["1", "2", "3"]) != "1,2,3", fail "for three elements"
-}
-
 test "lists.replicate", { fail =>
     when (lists.replicate 0, 42) != [], fail "zero elements"
     // TODO: Bug in equal function
@@ -95,18 +60,9 @@ test "lists.replicate", { fail =>
     // when (lists.replicate 2, 42) != [42, 42], fail "two elements"
 }
 
-test "lists.flatMap", { fail =>
-    func stringifiedReplicate { list =>
-        let replications = lists.flatMap { i => lists.replicate i, i }, list
-        strings.join "", replications
-    }
-    when (stringifiedReplicate []) != "", fail "empty"
-    when (stringifiedReplicate [1]) != "1", fail "one replication"
-    when (stringifiedReplicate [2]) != "22", fail "two replications"
-}
-
 func main { =>
-    print "main called"
+    print "main not implemented."
+    print "to run tests, set LITHIA_TESTS=1"
     os.exit 1
 }
 

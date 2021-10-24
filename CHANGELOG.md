@@ -6,6 +6,13 @@
 - fix: type expressions didn't allow comments
 - fix: type expressions didn't always recognize `Module` and `Function`
 - stdlib: renamed `booleans.negated` to `booleans.not`
+- stdlib: fix `comparables.pullback` returned wrong type
+- stdlib: added `comparables.numeric`
+- stdlib: renamed `comparables` to `cmp`
+- stdlib: renamed `equatables` to `eq`
+- stdlib: moved `prelude.Equatable` to `eq.Equatable`
+- stdlib: renamed `prelude.sameEquatable` to `eq.strict`
+- stdlib: added `prelude.Never`
 
 ## v0.0.7
 

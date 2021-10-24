@@ -1,0 +1,18 @@
+/// Dependencies of the `tests` module cannot be tested in place.
+/// Instead there are special `.t` modules for `tests` and its dependencies.
+/// To run these, import `tests.t`.
+module tests_t
+
+import booleans
+import cmp
+import controls
+import docs
+import eq
+import fs
+import lists.lists_t
+import optionals
+import os.os_t
+import prelude.prelude_t
+import results
+import rx.rx_t
+import strings.strings_t

@@ -8,13 +8,13 @@ Will always be imported implicitly.
 - _enum_ [Bool](#Bool)
 - _extern_ [Char](#Char)
 - _data_ [Cons](#Cons)
-- _data_ [Equatable](#Equatable)
 - _data_ [False](#False)
 - _extern_ [Float](#Float)
 - _extern_ [Function](#Function)
 - _extern_ [Int](#Int)
 - _enum_ [List](#List)
 - _extern_ [Module](#Module)
+- _enum_ [Never](#Never)
 - _data_ [Nil](#Nil)
 - _data_ [None](#None)
 - _enum_ [Optional](#Optional)
@@ -27,7 +27,6 @@ Will always be imported implicitly.
 - _func_ [if](#if) condition, then, else
 - _func_ [pipe](#pipe) functions, initial
 - _func_ [print](#print) message
-
 - _func_ [unless](#unless) condition, then
 - _func_ [when](#when) condition, then
 - _func_ [with](#with) value, body
@@ -59,18 +58,6 @@ _data_ Represents a non-empty List.
 - `head` - The first element
 - `tail` - The remaining list.
 @type List
-
-## Equatable
-
-_data_ Allows comparision of values for equality.
-Declare and pass a witness for custom equality.
-
-In contrast to the default equality operator ==, you can define custom equality.
-If you explicitly want the strict behavior, pick the `sameEquatable` witness.
-
-### Properties
-
-- `equal lhs, rhs`
 
 ## False
 
@@ -107,6 +94,10 @@ lists.reduce { l, r => l + r }, 0, myList
 
 _extern_ 
 
+## Never
+
+_enum_ An enum with no valid values.
+Allows empty, but valid type expressions.
 ## Nil
 
 _data_ Marks the end of the list.
@@ -139,7 +130,7 @@ _extern_
 _data_ A constant to represent valid conditions.
 ## Void
 
-_data_ 
+_data_ Representing a single value.
 ## compose
 
 _func_ `compose f, g, value`
@@ -169,7 +160,6 @@ The first function is applied to the value, the second to the result of the firs
 ## print
 
 _func_ `print message`
-
 
 
 ## unless
