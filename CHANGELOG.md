@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- fix: type expressions with `Any` were not deterministic
+- fix: type expressions didn't allow comments
+- fix: type expressions didn't always recognize `Module` and `Function`
+- stdlib: renamed `booleans.negated` to `booleans.not`
+
 ## v0.0.7
 
 - docs: overall improvements

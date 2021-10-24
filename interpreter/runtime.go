@@ -88,6 +88,12 @@ func RuntimeTypeValueIncludesValue(t RuntimeValue, v RuntimeValue) (bool, Locata
 			}
 		}
 		return false, nil
+	} else if _, ok := t.(PreludeModuleType); ok {
+		_, ok := v.(RuntimeModule)
+		return ok, nil
+	} else if _, ok := v.(Callable); ok {
+		_, ok := t.(PreludeFunctionType)
+		return ok, nil
 	} else {
 		if _, ok := t.(RuntimeType); ok {
 			t = t.(RuntimeType).RuntimeTypeValue()

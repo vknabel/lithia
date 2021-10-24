@@ -346,9 +346,13 @@ func (ex *EvaluationContext) EvaluateTypeExpression() (*LazyRuntimeValue, Locata
 	}
 
 	caseCount := int(bodyNode.NamedChildCount())
-	typeCases := make(map[string]Evaluatable, caseCount)
+	typeCases := make([]Evaluatable, 0, caseCount)
+	caseNames := make([]string, 0, caseCount)
 	for i := 0; i < caseCount; i++ {
 		typeCaseNode := bodyNode.NamedChild(i)
+		if typeCaseNode.Type() == parser.TYPE_NODE_COMMENT {
+			continue
+		}
 		labelNode := typeCaseNode.ChildByFieldName("label")
 		bodyNode := typeCaseNode.ChildByFieldName("body")
 		if labelNode == nil || bodyNode == nil {
@@ -361,7 +365,8 @@ func (ex *EvaluationContext) EvaluateTypeExpression() (*LazyRuntimeValue, Locata
 		if err != nil {
 			return nil, err
 		}
-		typeCases[labelNode.Content(ex.source)] = lazyBody
+		caseNames = append(caseNames, labelNode.Content(ex.source))
+		typeCases = append(typeCases, lazyBody)
 	}
 	lazyCheckedTypeExpression := NewLazyRuntimeValue(func() (RuntimeValue, LocatableError) {
 		typeValue, err := lazyTypeValue.Evaluate()
@@ -372,13 +377,13 @@ func (ex *EvaluationContext) EvaluateTypeExpression() (*LazyRuntimeValue, Locata
 		if !ok {
 			return nil, ex.RuntimeErrorf("expected enum type, got %s", typeValue)
 		}
-		typeExpression := TypeExpression{typeValue: enumDecl, cases: typeCases}
-		if len(enumDecl.cases) != len(typeCases) && typeCases["Any"] == nil {
-			return nil, ex.RuntimeNonExhaustiveTypeExpression(enumDecl, typeCases)
+		typeExpression := TypeExpression{typeValue: enumDecl, cases: typeCases, caseNames: caseNames}
+		if len(enumDecl.cases) != len(typeCases) && !contains(caseNames, "Any") {
+			return nil, ex.RuntimeNonExhaustiveTypeExpression(enumDecl, caseNames)
 		}
-		for label := range typeCases {
-			if _, ok := enumDecl.cases[label]; !ok {
-				return nil, ex.RuntimeInvalidCaseTypeExpression(enumDecl, typeCases)
+		for _, label := range caseNames {
+			if _, ok := enumDecl.cases[label]; !ok && label != "Any" {
+				return nil, ex.RuntimeInvalidCaseTypeExpression(enumDecl, caseNames)
 			}
 		}
 		return typeExpression, nil
