@@ -1,6 +1,6 @@
 # cmp
 
-_module_ 
+_module_ Defines comparision operations, ascending and descending of values.
 
 - _data_ [Ascending](#Ascending)
 - _data_ [Comparable](#Comparable)

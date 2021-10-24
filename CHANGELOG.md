@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## v0.0.8
 
 - fix: type expressions with `Any` were not deterministic
 - fix: type expressions didn't allow comments
