@@ -9,7 +9,7 @@ Lithia is designed around a few core concepts in mind all language features cont
 
 ## Is Lithia for you?
 
-No. Unless you want to play around with new language concepts for local non-production projects with a proof of concept programming language. I’d be happy to hear your feedback!
+No, unless you want to play around with new language concepts for local non-production projects with a proof of concept programming language. I’d be happy to hear your feedback!
 
 ### Roadmap
 
@@ -32,9 +32,28 @@ Currently Lithia is an early proof of concept. Basic language features exist, bu
 - [ ] Custom plugins for external declarations
 - [ ] More static type safety
 
-Not all features end up on the list above. Espcially improving the standard libraries and documentation is an ongoing process.
+Not all features end up on the list above. Improving the standard libraries and documentation is an ongoing process.
 
-Lithia will hit **0.1.0** once there is basic tooling support, all language features are implemented and the Standard Library is mature. From there on, every source breaking change will result in a minor release. To reach **1.0.0**, a small ecosystem needs to evolve.
+To hit version **0.1.0**, Lithia needs [all planned language features](https://github.com/vknabel/lithia/milestone/2), a [rich standard library](https://github.com/vknabel/lithia/milestone/1) and at least a [basic language server](https://github.com/vknabel/lithia/milestone/3) implementation.
+To reach **1.0.0**, we need a stable standard library, documentation, solid and broad tooling.
+
+### Breaking Changes
+
+Until we reach **0.1.0** every update is considered breaking.
+Upcoming **0.x.Patch**-updates may fix bugs and add features. Existing Lithia source code will not break, but extensions may.
+**0.Minor.0** releases are breaking updates.
+
+#### What is considered a breaking change?
+
+- renaming, moving or removing declarations
+- adding cases to *enum*s, that do not contain `Any`
+- renaming, adding or removing fields to _data_
+
+#### What is not considered a breaking change?
+
+- renaming function parameters
+- moving parameters through definitions using currying
+- importing new modules
 
 ## Installation
 
@@ -46,9 +65,36 @@ $ brew install vknabel/lithia/lithia
 
 To get syntax highlighting, download and install the latest version of [Syntax Highlighter with Lithia](https://github.com/vknabel/syntax-highlighter/releases) for VS Code.
 
+### Docker
+
+To give Lithia a try, you can use our docker container to start the REPL:
+
+```bash
+$ docker run --rm -it vknabel/lithia
+> print "Hello World"
+Hello World
+Hello World
+>
+```
+
+To deploy your own application built with Lithia, create your own Dockerfile.
+
+```docker
+FROM vknabel/lithia:latest
+
+WORKDIR /app
+ENV LITHIA_PACKAGES /app/packages
+COPY ./packages /app/packages
+ENV LITHIA_LOCALS /app/src
+COPY ./src /app/src
+COPY ./main.lithia /app/main.lithia
+
+RUN lithia main.lithia
+```
+
 ## Which features does Lithia provide?
 
-Lithia is built around the belief, that a language is not only defined by its features, but also by the features it lacks, how it instead approaches these cases and by its ecosystem. And that every feature comes with its own tradeoffs.
+Lithia is built around the belief, that a language is not only defined by its features, but by the features it lacks, how it instead approaches these cases and by its ecosystem. Every feature comes with its own tradeoffs.
 As you might expect there aren’t a lot language features to cover:
 
 - Data and enum types
@@ -153,7 +199,7 @@ nameOf you
 
 If you are interested in special cases, you can use the `Any` case.
 
-> _**Attention:** If the given value is not valid, your programm will crash. If you might have arbitrary values, you can add an `Any` case. As it matches all values, make sure it is always the last value._
+> _**Attention:** If the given value is not valid, your program will crash. If you might have arbitrary values, you can add an `Any` case. As it matches all values, make sure it is always the last value._
 
 ### Modules
 
@@ -201,7 +247,7 @@ Lithia will search for a folder containing source files at the following locatio
 
 > _**Nice to know:** the special module `prelude` will always be imported implicitly. It contains types like `Bool` or `List`. Beyond that Lithia treats the `prelude` as any other module. And you can even override and update the standard library._
 
-Modules and their members can be treated like any other value. Just pass them around as parameters.
+Modules and their members can be treated like any other value. Pass them around as parameters.
 
 ## Why is this feature missing?
 
@@ -238,9 +284,9 @@ with Account 150, pipe [
 
 ### Why no Interfaces?
 
-Interfaces only allow one single implementation per type. The only way to make the implementing types composable is to define more types, requiring more ceremony than plain old functions.
+Interfaces allow one implementation per type. The only way to make the implementing types composable is to define more types, requiring more ceremony than plain old functions.
 
-Instead of an interface you simply create a new data type, assign your implementation and pass it alongside to your argument. The instance containing the implementation is called a witness.
+Instead of an interface you create a new _data_ type, assign your implementation and pass it alongside to your argument. The instance containing the implementation is called a witness.
 
 ```
 data Greetable {
@@ -284,7 +330,7 @@ let uppercased = map strings.uppercased
 let screamed = map strings.append "!"
 ```
 
-As seen above, we can easily rely on existing implementations, compose them and always receive the same data types until we have built complete algorithms!
+As seen above, we can rely on existing implementations, compose them and always receive the same data types until we have built complete algorithms!
 
 ### Why no class inheritance?
 
@@ -292,8 +338,8 @@ Classes and inheritance have their use cases and benefits, but as Lithia separat
 
 For data we have two options:
 
-1.  Copying all members to another data. Though enums must also include this new data type.
-2.  Nesting the data. Especially useful if the data is only used outside the default context. This is especially great if you need to combine many different witnesses or data types as with multi-inheritance.
+1.  Copying all members to another _data_. *enum*s must include this new data type.
+2.  Nesting the data. Especially useful if the data is only used outside the default context. This is great if you need to combine many different witnesses or data types as with multi-inheritance.
 
 ```
 data Base { value }
