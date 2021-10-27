@@ -1,6 +1,6 @@
 module optionals
 
-import comparables
+import eq
 
 func equalFor { someWitness, lhs, rhs =>
   type Optional {
@@ -40,7 +40,7 @@ func equatableFor { someWitness =>
   
 //   it "some and some delegate equality to values" { expect =>
 //     expect numbers, (Some 1), (Some 1)
-//     expect comparables.negated numbers (Some 1) (Some 2)
-//     expect comparables.negated numbers (Some 2) (Some 1)
+//     expect eq.negated numbers (Some 1) (Some 2)
+//     expect eq.negated numbers (Some 2) (Some 1)
 //   }
 // }

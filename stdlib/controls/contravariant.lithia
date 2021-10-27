@@ -1,0 +1,53 @@
+module monads
+
+/// A contravariant wraps behavior to handle inputs depending on a context.
+/// Put simply, a contravariant maps inputs, while a functor maps outputs.
+///
+/// ```
+/// import eq
+/// 
+/// let personByNameEquatbale = eq.contravariant.pullback { person => person.name }, strict
+///
+/// personByNameEquatbale.equal Person "Alice", Person "Bob"
+/// // > False
+/// ```
+///
+/// Invariants:
+/// 1. Identity: `(pullback { a => a }, value) == value`
+/// 2. Associative: `(pipe [pullback f, pullback g], value) == pullback pipe [f, g], value`
+data Contravariant {
+    pullback transform, value
+}
+
+/// Defines all valid witnesses for a contravariant.
+///
+/// ```
+/// import cmp
+/// 
+/// pullback { person => person.name }, cmp
+/// pullback { person => person.name }, cmp.pullback
+/// pullback { person => person.name }, cmp.contravariant
+/// ```
+enum ContravariantWitness {
+    Contravariant
+    /// Only modules containing all members of a contravariant are valid as convenience.
+    Module
+    /// Only pullback functions are valid.
+    Function
+}
+
+func contravariantFrom { moduleWitness =>
+    with moduleWitness, type ContravariantWitness {
+        Contravariant: { witness => witness },
+        Module: { module =>
+            Contravariant module.pullback
+        },
+        Function: { pullback =>
+            Contravariant pullback
+        }
+    }
+}
+
+func pullback { f, witness =>
+    (contravariantFrom witness).pullback f
+}

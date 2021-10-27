@@ -9,6 +9,8 @@ func docsToMarkdown { docs =>
             strings.concat [
                 "# ", d.name, "\n\n",
                 "_module_ ", d.docs, "\n\n",
+                (strings.join "\n" , (lists.map moduleMemberDocsToMarkdown, d.types)),
+                "\n\n",
                 (strings.join "\n" , (lists.map docsToMarkdown, d.types))
             ]
         },
@@ -61,6 +63,44 @@ func docsToMarkdown { docs =>
                 "## ", d.name,"\n\n"
                 "_extern_ ",
                 d.docs, "\n"
+            ]
+        },
+        None: { _ => "" }
+    }
+}
+
+func moduleMemberDocsToMarkdown { member =>
+    with member, type TypeDocs {
+        ModuleDocs: { d =>
+            strings.concat [
+                "- _module_ [", d.name, "](#", d.name, ")"
+            ]
+        },
+        EnumDocs: { d => 
+            strings.concat [
+                "- _enum_ [", d.name, "](#", d.name, ")"
+            ]
+        },
+        DataDocs: { d => 
+            strings.concat [
+                "- _data_ [", d.name, "](#", d.name, ")"
+            ]
+        },
+        FunctionDocs: { d =>
+            strings.concat [
+                "- _func_ [", d.name, "](#", d.name, ")",
+                " ",
+                (strings.join ", ", d.params)
+            ]
+        },
+        ConstantDocs: { d =>
+            strings.concat [
+                "- _let_ [", d.name, "](#", d.name, ")"
+            ]
+        },
+        ExternDocs: { d =>
+            strings.concat [
+                "- _extern_ [", d.name, "](#", d.name, ")"
             ]
         },
         None: { _ => "" }

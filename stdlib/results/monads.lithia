@@ -1,0 +1,32 @@
+module results
+
+import controls
+
+let successMonad = controls.Monad pureSuccess, flatMapSuccess
+
+func pureSuccess { value =>
+    Success value
+}
+
+func flatMapSuccess { transform, result =>
+    with result, type Result {
+        Success: { success => transform success.value },
+        Failure: { failure => failure }
+    }
+}
+
+let failureMonad = controls.Monad pureFailure, flatMapFailure
+
+func pureFailure { error =>
+    Failure error
+}
+
+func flatMapFailure { transform, result =>
+    with result, type Result {
+        Success: { success => success },
+        Failure: { failure => transform failure.error }
+    }
+}
+
+let monad = successMonad
+let flatMap = flatMapSuccess

@@ -1,0 +1,11 @@
+func prependList { prefix, postfix =>
+    foldr { nextHead, postfix =>
+        Cons nextHead, postfix
+    }, postfix, prefix
+}
+
+func concat { nestedLists =>
+    foldr { nextList, appendedLists =>
+        prependList nextList, appendedLists
+    }, Nil, nestedLists
+}

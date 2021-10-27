@@ -1,6 +1,35 @@
 # Changelog
 
-## Unreleased
+## v0.0.8
+
+- fix: type expressions with `Any` were not deterministic
+- fix: type expressions didn't allow comments
+- fix: type expressions didn't always recognize `Module` and `Function`
+- stdlib: renamed `booleans.negated` to `booleans.not`
+- stdlib: fix `comparables.pullback` returned wrong type
+- stdlib: added `comparables.numeric`
+- stdlib: renamed `comparables` to `cmp`
+- stdlib: renamed `equatables` to `eq`
+- stdlib: moved `prelude.Equatable` to `eq.Equatable`
+- stdlib: renamed `prelude.sameEquatable` to `eq.strict`
+- stdlib: added `prelude.Never`
+
+## v0.0.7
+
+- docs: overall improvements
+- stdlib: `strings.join` returns strings when just one element given
+- stdlib: removed `prelude.reduceList`, use `lists.reduce` instead
+- stdlib: moved `prelude.Result` to `results.Result`
+- stdlib: moved `prelude.Functor` and `prelude.Monad` to `controls.Functor` and `controls.Monad`
+- stdlib: moved `comparables.negated` and `comparables.pullback` to `equatables`
+- stdlib: added `controls.Functor`, `controls.Monad` witnesses and implementations for `results.Result` and `lists.List`
+- stdlib: added `comparables.Comparable`, `Order`, `Ascending`, `Equal`, `Descending`, `equatableFrom`
+- stdlib: added `controls.Contravariant` and witnesses `contravariant` and `pullback` in `equatables`, `comparables`
+- stdlib: added `lists.prependList`, `lists.concat`, `lists.replicate`
+- stdlib: `controls` types now define `*From` functions and `*Witness` types declaring compatability regarding `Function` and `Module`
+- stdlib: `controls.map`, `controls.flatMap`, `controls.pure` and `controls.pullback` convert their witness types before accessing the implementation
+
+## v0.0.6
 
 - stdlib: added `comparables.pullback`
 - stdlib: removed `comparables.map`

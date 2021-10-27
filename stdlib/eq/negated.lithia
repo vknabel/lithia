@@ -1,0 +1,8 @@
+import booleans
+
+/// Negates the result of the given `Equatable`.
+func negated { witness =>
+  Equatable { lhs, rhs =>
+    booleans.not (witness lhs, rhs)
+  }
+}

@@ -1,0 +1,32 @@
+module cmp
+
+/// `Comparable` for numbers using < and >.
+/// Not safe for other types.
+let numeric = Comparable { lhs, rhs =>
+    if lhs < rhs, Ascending, (
+        if lhs > rhs, Descending, Equal
+    )
+}
+
+import tests { test }
+
+test "cmp.numeric for Equal", { fail =>
+    when (numeric.compare -42, -42) != Equal, fail "should equal"
+    when (numeric.compare 0, 0) != Equal, fail "should equal"
+    when (numeric.compare 1, 1) != Equal, fail "should equal"
+    when (numeric.compare 300, 300) != Equal, fail "should equal"
+}
+
+test "cmp.numeric for Ascending", { fail =>
+    when (numeric.compare -42, -30) != Ascending, fail "should be ascending"
+    when (numeric.compare 0, 5) != Ascending, fail "should be ascending"
+    when (numeric.compare 1, 2) != Ascending, fail "should be ascending"
+    when (numeric.compare 300, 900) != Ascending, fail "should be ascending"
+}
+
+test "cmp.numeric for Descending", { fail =>
+    when (numeric.compare -42, -80) != Descending, fail "should be descending"
+    when (numeric.compare 0, -5) != Descending, fail "should be descending"
+    when (numeric.compare 1, 0) != Descending, fail "should be descending"
+    when (numeric.compare 300, 13) != Descending, fail "should be descending"
+}

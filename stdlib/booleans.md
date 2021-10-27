@@ -1,10 +1,13 @@
 # booleans
 
-_module_ 
+_module_ The booleans module declares more helpers around `prelude.Bool`.
+Also see `prelude.if`, `prelude.when`, `prelude.unless`.
 
-## negated
+- _func_ [not](#not) flag
 
-_func_ `negated flag`
+## not
+
+_func_ `not flag`
 
 Transforms a given `Bool` into the opposing value.
 When flag is `True`, it will return `False` and vise versa.

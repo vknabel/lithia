@@ -1,0 +1,21 @@
+module cmp
+
+import eq
+
+/// Creates an `eq.Equatable`
+func equatableFrom { comparableWitness =>
+    eq.Equatable { lhs, rhs =>
+        with (comparableWitness.compare lhs, rhs), type Order {
+            Equal: { _ =>  True },
+            Any: { _ => False }
+        }
+    }
+}
+
+import tests { test }
+
+test "cmp.equatableFrom creates an equatable", { fail =>
+    let numericEq = equatableFrom cmp.numeric
+    when (numericEq.equal 1, 2), fail "1 is not 2"
+    unless (numericEq.equal 1, 1), fail "1 should equal 1"
+}

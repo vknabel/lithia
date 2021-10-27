@@ -1,0 +1,10 @@
+import strings
+import tests { test }
+
+test "strings.join", { fail =>
+    when (strings.join ",", []) != "", fail "for empty list"
+    when (strings.join ",", [1]) != "1", fail "string for one non-string"
+    when (strings.join ",", ["1"]) != "1", fail "for one element"
+    when (strings.join ",", ["1", "2"]) != "1,2", fail "for two elements"
+    when (strings.join ",", ["1", "2", "3"]) != "1,2,3", fail "for three elements"
+}

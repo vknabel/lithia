@@ -2,6 +2,22 @@
 
 _module_ 
 
+- _data_ [ConstantDocs](#ConstantDocs)
+- _data_ [DataDocs](#DataDocs)
+- _data_ [DataFieldDocs](#DataFieldDocs)
+- _data_ [EnumCaseDocs](#EnumCaseDocs)
+- _data_ [EnumDocs](#EnumDocs)
+- _data_ [ExternDocs](#ExternDocs)
+- _data_ [FunctionDocs](#FunctionDocs)
+- _data_ [ModuleDocs](#ModuleDocs)
+- _enum_ [TypeDocs](#TypeDocs)
+- _func_ [dataFieldDocsToMarkdown](#dataFieldDocsToMarkdown) field
+- _func_ [docsToMarkdown](#docsToMarkdown) docs
+- _func_ [enumCaseDocsToMarkdown](#enumCaseDocsToMarkdown) case
+- _func_ [inspect](#inspect) value
+- _func_ [markdownDocsSuffix](#markdownDocsSuffix) docsString
+- _func_ [moduleMemberDocsToMarkdown](#moduleMemberDocsToMarkdown) member
+
 ## ConstantDocs
 
 _data_ 
@@ -117,4 +133,9 @@ _func_ `inspect value`
 ## markdownDocsSuffix
 
 _func_ `markdownDocsSuffix docsString`
+
+
+## moduleMemberDocsToMarkdown
+
+_func_ `moduleMemberDocsToMarkdown member`
 

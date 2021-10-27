@@ -1,0 +1,5 @@
+import tests { test }
+
+test "Never allows empty type expressions", { fail =>
+    type Never { }
+}

@@ -1,0 +1,31 @@
+module eq
+
+import controls { Contravariant }
+
+/**
+ * Allows comparision of values for equality.
+ * Declare and pass a witness for custom equality.
+ *
+ * In contrast to the default equality operator ==, you can define custom equality.
+ * If you explicitly want the strict behavior, pick the `strict` witness.
+ */
+data Equatable {
+  equal lhs, rhs
+}
+
+/// An Equatable witness for strict comparision as the == operator does.
+let strict = Equatable { lhs, rhs => lhs == rhs }
+
+import tests { test }
+
+test "eq.strict", { fail =>
+  when (strict.equal 1, 2), fail "1 != 2"
+  when (strict.equal 1, -1), fail "1 != -1"
+  when (strict.equal 1, "1"), fail "1 != '1'"
+  when (strict.equal 0, False), fail "0 != False"
+
+  unless (strict.equal 1, 1), fail "1 == 1"
+  unless (strict.equal "a", "a"), fail "a == a"
+  unless (strict.equal True, True), fail "True == True"
+  unless (strict.equal False, False), fail "False == False"
+}

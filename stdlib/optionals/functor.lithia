@@ -1,6 +1,7 @@
 module optionals
 
 import booleans
+import controls { Functor }
 
 let functor = Functor map
 

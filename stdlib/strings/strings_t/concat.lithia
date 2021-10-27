@@ -1,0 +1,8 @@
+import strings
+import tests { test }
+
+test "strings.concat rocks", { fail =>
+    let expected "Hello!"
+    let actual strings.concat ["Hello", "!"]
+    when expected != actual, fail actual
+}

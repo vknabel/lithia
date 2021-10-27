@@ -1,0 +1,44 @@
+module functors
+
+/// Monads apply a function returning wrapped values to a wrapped value.
+///
+/// Invariants:
+/// 1. Left-Identity: `(pipe [pure, flatMap f], value) == f value`
+/// 2. Right-Identity: `(pipe [pure, flatMap { x => x }], value) == pure value`
+/// 3. Associative: `(pipe [pure, flatMap f, flatMap g], value) == pipe [pure, flatMap g, flatMap f], value`
+data Monad {
+    /// Wraps a value in a neutral context.
+    pure value
+    /// Transforms a wrapped value and merges potential partial results.
+    flatMap f, instance
+}
+
+/// Valid witnesses for a monad.
+///
+/// ```
+/// import lists
+///
+/// flatMap repeat 2, lists
+/// flatMap repeat 2, lists.monad
+/// ```
+enum MonadWitness {
+    Monad
+    Module
+}
+
+func monadFrom { monadWitness =>
+    with monadWitness, type MonadWitness {
+        Monad: { witness => witness },
+        Module: { module =>
+            Monad module.pure, monad.flatMap
+        }
+    }
+}
+
+func pure { value, witness =>
+    (monadFrom witness).pure value
+}
+
+func flatMap { f, witness, instance =>
+    (monadFrom witness).flatMap f, instance
+}

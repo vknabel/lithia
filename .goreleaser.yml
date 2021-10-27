@@ -47,9 +47,20 @@ brews:
       prefix.install "./stdlib"
 
 dockers:
-  dockerfile: Dockerfile
-  image_templates:
-    - "vknabel/lithia:latest"
-    - "vknabel/lithia:{{ .Tag }}"
-    - "vknabel/lithia:v{{ .Major }}"
-    - "vknabel/lithia:v{{ .Major }}.{{ .Minor }}"
+  - image_templates:
+      - "vknabel/lithia:latest"
+      - "vknabel/lithia:{{ .Tag }}"
+      - "vknabel/lithia:v{{ .Major }}"
+      - "vknabel/lithia:v{{ .Major }}.{{ .Minor }}"
+    # different approach needed in future
+    # actually goreleaser should be used to copy the binaries
+    # -> only the second stage
+    extra_files:
+      - stdlib
+      - go.mod
+      - go.sum
+      - go.sum
+      - cmd
+      - interpreter
+      - parser
+      - reporting

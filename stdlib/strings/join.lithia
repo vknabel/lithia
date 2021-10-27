@@ -23,7 +23,7 @@ func join { separator, listOfStrings =>
                         (strings.join separator, lookahead)
                     ]
                 },
-                Nil: { nil => first.head }
+                Nil: { nil => "".append first.head }
             }
         },
         Nil: { nil => "" }

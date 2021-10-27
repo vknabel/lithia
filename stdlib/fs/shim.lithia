@@ -1,5 +1,13 @@
 module fs
 
+// used as returns
+import results {
+    Success,
+    Failure
+}
+
+/// Write a given string to a path.
+/// Returns `results.Result`.
 extern writeString toPath, newContents
 extern readString fromPath
 extern exists atPath

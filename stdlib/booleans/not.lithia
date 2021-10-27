@@ -1,0 +1,20 @@
+module booleans
+
+/// Transforms a given `Bool` into the opposing value.
+/// When flag is `True`, it will return `False` and vise versa.
+func not { flag =>
+  type Bool {
+    True: { _ => False },
+    False: { _ => True }
+  } flag
+}
+
+import tests { test }
+
+test "booleans.not is False for True", { fail =>
+    when booleans.not True, fail "not True should be False"
+}
+
+test "booleans.not is True for False", { fail =>
+    unless booleans.not False, fail "not False should be True"
+}

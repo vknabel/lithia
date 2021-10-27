@@ -1,0 +1,15 @@
+module lists
+
+/**
+ * Starts folding at the end of the list, from the right.
+ * 
+ * `accumulator nextValue, transformedTail`
+ */
+func foldr { accumulator, initial =>
+    type List {
+        Cons: { cons =>
+            accumulator cons.head, (foldr accumulator, initial, cons.tail)
+        },
+        Nil: { nil => initial }
+    }
+}

@@ -4,6 +4,33 @@ _module_ Implements the most basic data types.
 Espcially those needed for built-in functionality and for the compiler.
 Will always be imported implicitly.
 
+- _extern_ [Any](#Any)
+- _enum_ [Bool](#Bool)
+- _extern_ [Char](#Char)
+- _data_ [Cons](#Cons)
+- _data_ [False](#False)
+- _extern_ [Float](#Float)
+- _extern_ [Function](#Function)
+- _extern_ [Int](#Int)
+- _enum_ [List](#List)
+- _extern_ [Module](#Module)
+- _enum_ [Never](#Never)
+- _data_ [Nil](#Nil)
+- _data_ [None](#None)
+- _enum_ [Optional](#Optional)
+- _data_ [Some](#Some)
+- _extern_ [String](#String)
+- _data_ [True](#True)
+- _data_ [Void](#Void)
+- _func_ [compose](#compose) f, g, value
+- _func_ [debug](#debug) message
+- _func_ [if](#if) condition, then, else
+- _func_ [pipe](#pipe) functions, initial
+- _func_ [print](#print) message
+- _func_ [unless](#unless) condition, then
+- _func_ [when](#when) condition, then
+- _func_ [with](#with) value, body
+
 ## Any
 
 _extern_ 
@@ -32,26 +59,6 @@ _data_ Represents a non-empty List.
 - `tail` - The remaining list.
 @type List
 
-## Equatable
-
-_data_ Allows comparision of values for equality.
-Declare and pass a witness for custom equality.
-
-In contrast to the default equality operator ==, you can define custom equality.
-If you explicitly want the strict behavior, pick the `sameEquatable` witness.
-
-### Properties
-
-- `equal lhs, rhs`
-
-## Failure
-
-_data_ 
-
-### Properties
-
-- `error`
-
 ## False
 
 _data_ A constant to represent invalid conditions.
@@ -62,32 +69,6 @@ _extern_
 ## Function
 
 _extern_ 
-
-## Functor
-
-_data_ A functor wraps values in a context and allows different decisions depending on the context.
-For example, the types `Optional` and `List` have functors.
-
-```
-import lists
-import optionals
-
-let incr = { i => i + 1 }
-lists.functor.map incr, [1, 2, 3]
-// > [2, 3, 4]
-optionals.functor.map incr, Some 41
-// > Some 42
-optionals.functor.map incr, None
-// > None
-```
-
-Invariants:
-1. Identity: `(map { a => a}, value) == value`
-2. Associative: `(pipe [map f, map g], value) == map pipe [f, g], value`
-
-### Properties
-
-- `map f, value` - Transforms a wrapped value using a function depending context of the functor
 
 ## Int
 
@@ -113,20 +94,10 @@ lists.reduce { l, r => l + r }, 0, myList
 
 _extern_ 
 
-## Monad
+## Never
 
-_data_ Monads apply a function returning wrapped values to a wrapped value.
-
-Invariants:
-1. Left-Identity: `(pipe [pure, flatMap f], value) == f value`
-2. Right-Identity: `(pipe [pure, flatMap { x => x }], value) == pure value`
-3. Associative: `(pipe [pure, flatMap f, flatMap g], value) == pipe [pure, flatMap g, flatMap f], value`
-
-### Properties
-
-- `pure value`
-- `flatMap f, instance`
-
+_enum_ An enum with no valid values.
+Allows empty, but valid type expressions.
 ## Nil
 
 _data_ Marks the end of the list.
@@ -142,15 +113,6 @@ _enum_
 - [None](#None)
 - [Some](#Some)
 
-## Result
-
-_enum_ 
-
-### Cases
-
-- [Failure](#Failure)
-- [Success](#Success)
-
 ## Some
 
 _data_ 
@@ -163,20 +125,12 @@ _data_
 
 _extern_ 
 
-## Success
-
-_data_ 
-
-### Properties
-
-- `value`
-
 ## True
 
 _data_ A constant to represent valid conditions.
 ## Void
 
-_data_ 
+_data_ Representing a single value.
 ## compose
 
 _func_ `compose f, g, value`
@@ -185,11 +139,6 @@ _func_ `compose f, g, value`
 ## debug
 
 _func_ `debug message`
-
-
-## flatMap
-
-_func_ `flatMap f, witness, instance`
 
 
 ## if
@@ -202,20 +151,6 @@ Both, `then` and `else` are evaluted lazily.
 ```
 if True, print "Succeeded", exit 1
 ```
-## map
-
-_func_ `map f, witness, value`
-
-Transforms a wrapped value using a functor witness.
-Essentially just uses the map of the given witness,
-but allows to defer the decision regarding the witness itself.
-
-```
-import lists
-
-let incr = { i => i + 1 }
-map incr, lists.functor, [1, 2, 3]
-```
 ## pipe
 
 _func_ `pipe functions, initial`
@@ -226,22 +161,6 @@ The first function is applied to the value, the second to the result of the firs
 
 _func_ `print message`
 
-
-## pure
-
-_func_ `pure value, witness`
-
-
-## reduceList
-
-_func_ `reduceList accumulator, initial`
-
-Recursively walk a tree of nodes, calling a function on each node.
-The given accumulator function merges each element into a new one for the next call.
-
-```
-reduceList { into, next => into + next.length }, 0, ["count", "chars"]
-```
 
 ## unless
 

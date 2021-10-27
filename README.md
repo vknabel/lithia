@@ -9,11 +9,11 @@ Lithia is designed around a few core concepts in mind all language features cont
 
 ## Is Lithia for you?
 
-No. Unless you want to play around with new language concepts for some local non-production projects with a proof of concept programming language. If so, I’d be very happy to hear your feedback!
+No, unless you want to play around with new language concepts for local non-production projects with a proof of concept programming language. I’d be happy to hear your feedback!
 
 ### Roadmap
 
-Currently Lithia is just an early proof of concept. Most basic language features exist, but the current tooling and standard libraries are far from being feature complete or stable.
+Currently Lithia is an early proof of concept. Basic language features exist, but the current tooling and standard libraries are far from being feature complete or stable.
 
 - [x] Module imports
 - [x] Testing library
@@ -21,18 +21,40 @@ Currently Lithia is just an early proof of concept. Most basic language features
 - [x] Prebuilt docker image
 - [ ] Prebuilt linux binaries
 - [ ] Docs generator _in progress_
+- [ ] Improved performance
 - [ ] Stack traces
 - [ ] Creating a custom language server
 - [ ] ... with diagnostics
 - [ ] ... with syntax highlighting
 - [ ] ... with auto completion
 - [ ] A package manager
-- [ ] Tuning performance
 - [ ] Move stdlib to a package
 - [ ] Custom plugins for external declarations
 - [ ] More static type safety
 
-Of course, some features don't end up on the above list. Espcially improving the standard libraries and documentation is an ongoing process.
+Not all features end up on the list above. Improving the standard libraries and documentation is an ongoing process.
+
+To hit version **0.1.0**, Lithia needs [all planned language features](https://github.com/vknabel/lithia/milestone/2), a [rich standard library](https://github.com/vknabel/lithia/milestone/1) and at least a [basic language server](https://github.com/vknabel/lithia/milestone/3) implementation.
+To reach **1.0.0**, we need a stable standard library, documentation, solid and broad tooling.
+
+### Breaking Changes
+
+Until we reach **0.1.0** every update is considered breaking.
+Upcoming **0.x.Patch**-updates may fix bugs and add features. Existing Lithia source code will not break, but extensions may.
+**0.Minor.0** releases are breaking updates.
+
+#### What is considered a breaking change?
+
+- renaming, moving or removing declarations
+- adding cases to *enum*s, that do not contain `Any`
+- renaming, adding or removing fields to _data_
+- changing the order of fields to _data_
+
+#### What is not considered a breaking change?
+
+- renaming function parameters
+- moving parameters through definitions using currying
+- importing new modules
 
 ## Installation
 
@@ -44,9 +66,36 @@ $ brew install vknabel/lithia/lithia
 
 To get syntax highlighting, download and install the latest version of [Syntax Highlighter with Lithia](https://github.com/vknabel/syntax-highlighter/releases) for VS Code.
 
+### Docker
+
+To give Lithia a try, you can use our docker container to start the REPL:
+
+```bash
+$ docker run --rm -it vknabel/lithia
+> print "Hello World"
+Hello World
+Hello World
+>
+```
+
+To deploy your own application built with Lithia, create your own Dockerfile.
+
+```docker
+FROM vknabel/lithia:latest
+
+WORKDIR /app
+ENV LITHIA_PACKAGES /app/packages
+COPY ./packages /app/packages
+ENV LITHIA_LOCALS /app/src
+COPY ./src /app/src
+COPY ./main.lithia /app/main.lithia
+
+RUN lithia main.lithia
+```
+
 ## Which features does Lithia provide?
 
-Lithia is built around the belief, that a language is not only defined by its features, but also by the features it lacks, how it instead approaches these cases and by its ecosystem. And that every feature comes with its own tradeoffs.
+Lithia is built around the belief, that a language is not only defined by its features, but by the features it lacks, how it instead approaches these cases and by its ecosystem. Every feature comes with its own tradeoffs.
 As you might expect there aren’t a lot language features to cover:
 
 - Data and enum types
@@ -56,11 +105,11 @@ As you might expect there aren’t a lot language features to cover:
 
 On the other hand we explicitly opted out a pretty long list of features: mutability by default, interfaces, classes, inheritance, type extensions, methods, generics, custom operators, null, instance checks, importing all members of a module, exceptions and tuples.
 
-> Curios? Head over to the generated [Standard Libraray documentation](./stdlib/README.md).
+> Curios? Head over to the generated [Standard Library documentation](./stdlib/README.md).
 
 ### Functions
 
-Lithia supports currying and lazy evaluation: functions can be called parameter by parameter. But only if all parameters have been provided and the value will actually be used, the functions itself will be called.
+Lithia supports currying and lazy evaluation: functions can be called parameter by parameter. If all parameters have been provided and the resulting expression will be used, the functions itself will be called.
 
 To reflect this behavior, functions are called braceless. Every parameter is separated by a comma.
 
@@ -75,7 +124,7 @@ incr 2 // 3
 ```
 
 As parameters of a function call are comma separated, you can compose single arguments.
-Also all operators bind stronger than parameters and function calls.
+All operators bind stronger than parameters and function calls.
 
 ```
 when True, print "will be printed"
@@ -105,7 +154,7 @@ data Person {
 }
 ```
 
-As data types don’t have any methods, you simply declare global functions that act on your data.
+As data types don’t have any methods, you declare global functions that act on your data.
 
 ```
 func greet { person =>
@@ -115,11 +164,11 @@ func greet { person =>
 
 ### Enum Types
 
-in Lithia are a little bit different than you might know them from other languages.
-Some languages define enums just as a list of constant values. Others allow associated values for each named case.
-Though in Lithia, an enum is an enumeration of types.
+in Lithia are different than you might know them from other languages.
+Other languages define enums as a list of constant values. A few allow associated values for each named case.
+A Lithia _enum_ is an enumeration of types.
 
-To make it easier to use for the value enumeration use case, there is a special syntax to directly declare an enum case and the associated type.
+There is syntactic sugar for value enumerations, to directly declare a case and the associated _enum_ or _data_ type.
 
 ```
 enum JuristicPerson {
@@ -149,13 +198,13 @@ let nameOf = type JuristicPerson {
 nameOf you
 ```
 
-If you are just interested in a few cases, you can also use the `Any` case.
+If you are interested in special cases, you can use the `Any` case.
 
-> _**Nice to know:** If the given value is not valid, your programm will crash. If you might have arbitrary values, you can add an `Any` case. As it matches all values, make sure it is always the last value._
+> _**Attention:** If the given value is not valid, your program will crash. If you might have arbitrary values, you can add an `Any` case. As it matches all values, make sure it is always the last value._
 
 ### Modules
 
-are simply defined by the folder structure. Once there is a folder with Lithia files in it, you can import it. No additional configuration overhead required.
+are defined by the folder structure. Once there is a folder with Lithia files in it, you can import it. No additional configuration overhead required.
 
 ```
 import strings
@@ -197,19 +246,19 @@ Lithia will search for a folder containing source files at the following locatio
 - at `$LITHIA_PACKAGES` if set
 - at `$LITHIA_STDLIB` or `/usr/local/opt/lithia/stdlib`
 
-> **\*Nice to know:** there is a special module which will always be imported implicitly, called `prelude`. It contains types like `Bool` or `List`. As Lithia treats the `prelude` as any other module. Therefore you can even override and update the standard library.\*
+> _**Nice to know:** the special module `prelude` will always be imported implicitly. It contains types like `Bool` or `List`. Beyond that Lithia treats the `prelude` as any other module. And you can even override and update the standard library._
 
-Modules and their members can be treated like any other value. Just pass them around as parameters.
+Modules and their members can be treated like any other value. Pass them around as parameters.
 
 ## Why is this feature missing?
 
 ### Why no Methods?
 
-In theory methods are just plain old functions which implicitly receive one additional parameter often called `self` or `this`.
+In theory methods are plain old functions which implicitly receive one additional parameter called `self` or `this`.
 
-In practice you often aren‘t able to compose methods as you can compose free functions.
+In practice you aren‘t able to compose methods as you can compose free functions.
 
-Another important aspect of methods is scoping functions with their data. Here the approach is to simply create more and smaller modules. In practice we‘d create a new file for every class anyway.
+Another important aspect of methods is scoping functions with their data. Here the approach is to create more and smaller modules. In practice we create separate files for every class.
 
 ```
 data Account {
@@ -236,9 +285,9 @@ with Account 150, pipe [
 
 ### Why no Interfaces?
 
-Interfaces only allow one single implementation per type. The only way to make the implementing types composable is to define more types, requiring more ceremony than plain old functions.
+Interfaces allow one implementation per type. The only way to make the implementing types composable is to define more types, requiring more ceremony than plain old functions.
 
-Instead of an interface you simply create a new data type, assign your implementation and pass it alongside to your argument. The instance containing the implementation is called a witness.
+Instead of an interface you create a new _data_ type, assign your implementation and pass it alongside to your argument. The instance containing the implementation is called a witness.
 
 ```
 data Greetable {
@@ -282,16 +331,16 @@ let uppercased = map strings.uppercased
 let screamed = map strings.append "!"
 ```
 
-As seen above, we can easily rely on existing implementations, compose them and always receive the same data types until we have built complete algorithms!
+As seen above, we can rely on existing implementations, compose them and always receive the same data types until we have built complete algorithms!
 
 ### Why no class inheritance?
 
-Classes and inheritance have their use cases and benefits, but as Lithia separates data from behavior, inheritance doesn’t serve us well anymore.
+Classes and inheritance have their use cases and benefits, but as Lithia separates data from behavior, inheritance doesn’t serve us anymore.
 
 For data we have two options:
 
-1.  Copying all members to another data. Though enums must also include this new data type.
-2.  Nesting the data. Especially useful if the data is only used outside the default context. This is especially great if you need to combine many different witnesses or data types as with multi-inheritance.
+1.  Copying all members to another _data_. *enum*s must include this new data type.
+2.  Nesting the data. Useful if the data is used outside the default context and is great if you need to combine many different witnesses or data types as you would with multi-inheritance.
 
 ```
 data Base { value }
@@ -316,25 +365,49 @@ module strings
 
 let map = functor.map
 let flatMap = monad.flatMap
-let reduce = foldable.reduce
 
 doSomething strings, ""
 ```
 
-As witnesses aren’t typically used in enums (and one could also add a `Module` case), we can simply import a whole module and use it as a replacement for multiple witnesses at once.
+The `controls` module explicitly embraces the use of modules as valid witnesses.
+Alongside `Functor` it defines a function `functorFrom` constructing a `Functor` from an enum `FunctorWitness` which allows modules, functors and even monads.
 
-Though the defaults should be used wisely: for example the `Result` type has two different, but valid implementations of `map`! On the other hand `List` only has one valid implementation.
+```
+enum FunctorWitness {
+    Functor
+    Module
+    Function
+    Monad
+}
 
-One additional feature of class inheritance is calling functionality of the super class. In Lithia the approach looks different, but in fact behaves similar:
-We simply create a whole new witness, which calls the initial one under the hood.
+func functorFrom { moduleWitness =>
+    with moduleWitness, type FunctorWitness {
+        Functor: { witness => witness },
+        Module: { module =>
+            Functor module.map
+        },
+        Function: { fmap =>
+            Functor fmap
+        },
+        Monad: { monad =>
+            Functor { f, instance => monad.pure (monad.flatMap f, instance) }
+        }
+    }
+}
+```
+
+Though the defaults should be used wisely: for example the `Result` type has two different valid implementations of `map`! On the other hand `List` has one valid implementation.
+
+One additional feature of class inheritance is calling functionality of the super class. In Lithia the approach looks different, but behaves similar:
+We create a whole new witness, which calls the initial one under the hood.
 
 ### Why no dynamic type tests?
 
 Most languages allow type casts and checks. Lithia does only support the type switch expression for enums.
 
-These checks are unstructured and therefore tempt to be used in the wrong places. Though type checks should be used sparingly. Lithia prefers to move required decisions to the edge of the code. Witnesses should implement decisions according to the provided data and desired behavior.
+These checks are unstructured and therefore tempt to be used in the wrong places. Though type checks should be used sparingly. Lithia prefers to move required decisions to the edge of the code. Witnesses should implement decisions for the provided data and desired behavior.
 
-Also: if there is one single type to focus on, the tooling and the developer can understand all cases much easier and faster.
+If there is one type to focus on, the developer and the tooling can understand all cases much easier and faster.
 
 ## License
 
