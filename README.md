@@ -1,4 +1,4 @@
-# Lithia Programming Language
+# <img src="./assets/lithia.png" width="50"> Lithia Programming Language
 
 Lithia is an experimental functional programming language with an implicit but strong and dynamic type system.
 Lithia is designed around a few core concepts in mind all language features contribute to.
