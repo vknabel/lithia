@@ -48,6 +48,7 @@ Upcoming **0.x.Patch**-updates may fix bugs and add features. Existing Lithia so
 - renaming, moving or removing declarations
 - adding cases to *enum*s, that do not contain `Any`
 - renaming, adding or removing fields to _data_
+- changing the order of fields to _data_
 
 #### What is not considered a breaking change?
 
@@ -164,10 +165,10 @@ func greet { person =>
 ### Enum Types
 
 in Lithia are different than you might know them from other languages.
-Some languages define enums as a list of constant values. Others allow associated values for each named case.
-Though in Lithia, an enum is an enumeration of types.
+Other languages define enums as a list of constant values. A few allow associated values for each named case.
+A Lithia *enum* is an enumeration of types.
 
-To make it easier to use for the value enumeration use case, there is a special syntax to directly declare an enum case and the associated type.
+There is syntactic sugar for value enumerations, to directly declare a case and the associated *enum* or *data* type.
 
 ```
 enum JuristicPerson {
@@ -257,7 +258,7 @@ In theory methods are plain old functions which implicitly receive one additiona
 
 In practice you aren‘t able to compose methods as you can compose free functions.
 
-Another important aspect of methods is scoping functions with their data. Here the approach is to create more and smaller modules. In practice we‘d create a new file for every class anyway.
+Another important aspect of methods is scoping functions with their data. Here the approach is to create more and smaller modules. In practice we create separate files for every class.
 
 ```
 data Account {
@@ -334,12 +335,12 @@ As seen above, we can rely on existing implementations, compose them and always 
 
 ### Why no class inheritance?
 
-Classes and inheritance have their use cases and benefits, but as Lithia separates data from behavior, inheritance doesn’t serve us well anymore.
+Classes and inheritance have their use cases and benefits, but as Lithia separates data from behavior, inheritance doesn’t serve us anymore.
 
 For data we have two options:
 
 1.  Copying all members to another _data_. *enum*s must include this new data type.
-2.  Nesting the data. Especially useful if the data is only used outside the default context. This is great if you need to combine many different witnesses or data types as with multi-inheritance.
+2.  Nesting the data. Useful if the data is used outside the default context and is great if you need to combine many different witnesses or data types as you would with multi-inheritance.
 
 ```
 data Base { value }
@@ -395,7 +396,7 @@ func functorFrom { moduleWitness =>
 }
 ```
 
-Though the defaults should be used wisely: for example the `Result` type has two different valid implementations of `map`! On the other hand `List` only has one valid implementation.
+Though the defaults should be used wisely: for example the `Result` type has two different valid implementations of `map`! On the other hand `List` has one valid implementation.
 
 One additional feature of class inheritance is calling functionality of the super class. In Lithia the approach looks different, but behaves similar:
 We create a whole new witness, which calls the initial one under the hood.
