@@ -11,9 +11,20 @@ type FileParser struct {
 	FunctionCount int
 
 	Node   *sitter.Node
+	Tree   *sitter.Tree
 	Source []byte
 
 	Comments []string
+}
+
+func NewFileParser(moduleName ast.ModuleName, file string, node *sitter.Node, tree *sitter.Tree, source []byte) *FileParser {
+	return &FileParser{
+		ModuleName: moduleName,
+		File:       file,
+		Node:       node,
+		Tree:       tree,
+		Source:     source,
+	}
 }
 
 func (fp *FileParser) ConsumeDocs() *ast.Docs {

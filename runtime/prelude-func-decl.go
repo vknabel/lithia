@@ -7,7 +7,12 @@ import (
 var _ RuntimeValue = PreludeFuncDecl{}
 
 type PreludeFuncDecl struct {
-	Decl ast.DeclFunc
+	Environment *Environment
+	Decl        ast.DeclFunc
+}
+
+func MakePreludeFuncDecl(env *Environment, decl ast.DeclFunc) PreludeFuncDecl {
+	return PreludeFuncDecl{env, decl}
 }
 
 func (PreludeFuncDecl) Lookup(member string) (Evaluatable, error) {

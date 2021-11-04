@@ -90,21 +90,23 @@ func (inter *Interpreter) InterpretEmbed(fileName string, script string) (Runtim
 }
 
 func (inter *Interpreter) LoadFileIntoModule(module *Module, fileName string, script string) (*EvaluationContext, error) {
-	tree, err := inter.parser.Parse(script)
-	if err != nil {
-		return nil, inter.SyntaxParsingError(fileName, script, tree)
-	}
-	ex := inter.NewEvaluationContext(fileName, module, tree.RootNode(), []byte(script), module.environment.Private())
-	return ex, nil
+	panic("deprecated")
+	// tree, err := inter.parser.Parse(ast.ModuleName(module.name), fileName, script)
+	// if err != nil {
+	// 	return nil, inter.SyntaxParsingError(fileName, script, tree)
+	// }
+	// ex := inter.NewEvaluationContext(fileName, module, tree.RootNode(), []byte(script), module.environment.Private())
+	// return ex, nil
 }
 
 func (inter *Interpreter) EmbedFileIntoModule(module *Module, fileName string, script string) (*EvaluationContext, error) {
-	tree, err := inter.parser.Parse(script)
-	if err != nil {
-		return nil, inter.SyntaxParsingError(fileName, script, tree)
-	}
-	ex := inter.NewEvaluationContext(fileName, module, tree.RootNode(), []byte(script), module.environment)
-	return ex, nil
+	panic("deprecated")
+	// tree, err := inter.parser.Parse(script)
+	// if err != nil {
+	// 	return nil, inter.SyntaxParsingError(fileName, script, tree)
+	// }
+	// ex := inter.NewEvaluationContext(fileName, module, tree.RootNode(), []byte(script), module.environment)
+	// return ex, nil
 }
 
 func (ex *EvaluationContext) EvaluateSourceFile() (*LazyRuntimeValue, LocatableError) {

@@ -7,7 +7,12 @@ import (
 var _ RuntimeValue = PreludeTypeSwitchExpr{}
 
 type PreludeTypeSwitchExpr struct {
-	Decl ast.ExprTypeSwitch
+	Environment *Environment
+	Decl        ast.ExprTypeSwitch
+}
+
+func MakePreludeTypeSwitchExpr(environment *Environment, decl ast.ExprTypeSwitch) PreludeTypeSwitchExpr {
+	return PreludeTypeSwitchExpr{environment, decl}
 }
 
 func (PreludeTypeSwitchExpr) Lookup(member string) (Evaluatable, error) {
