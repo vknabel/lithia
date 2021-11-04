@@ -10,7 +10,7 @@ type PreludeEnumDecl struct {
 	Decl ast.DeclEnum
 }
 
-func (PreludeEnumDecl) Lookup(member string) (Evaluatable, error) {
+func (PreludeEnumDecl) Lookup(member string) (Evaluatable, *RuntimeError) {
 	panic("TODO: not implemented")
 }
 

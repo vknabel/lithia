@@ -7,8 +7,8 @@ var PreludeFloatTypeRef = MakeRuntimeTypeRef("Float", "prelude")
 
 type PreludeFloat float64
 
-func (i PreludeFloat) Lookup(member string) (Evaluatable, error) {
-	return nil, fmt.Errorf("float %f has no member %s", i, member)
+func (i PreludeFloat) Lookup(member string) (Evaluatable, *RuntimeError) {
+	return nil, NewRuntimeError(fmt.Errorf("float %f has no member %s", i, member))
 }
 
 func (PreludeFloat) RuntimeType() RuntimeTypeRef {

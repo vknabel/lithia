@@ -21,7 +21,7 @@ func MakeEvaluatableExpr(context *EvaluationContext, expr ast.Expr) EvaluatableE
 }
 
 func (e EvaluatableExpr) Evaluate() (RuntimeValue, *RuntimeError) {
-	return e.cache.Evaluate(func() (RuntimeValue, *RuntimeError) {
+	value, err := e.cache.Evaluate(func() (RuntimeValue, *RuntimeError) {
 		if e.Expr == nil {
 			panic("cannot evaluate nil expr")
 		}
@@ -54,6 +54,8 @@ func (e EvaluatableExpr) Evaluate() (RuntimeValue, *RuntimeError) {
 			panic(fmt.Sprintf("unknown expr: %s", expr))
 		}
 	})
+
+	return value, err.Cascade(*e.Expr.Meta().Source)
 }
 
 func (e EvaluatableExpr) EvaluateExprArray(expr ast.ExprArray) (RuntimeValue, *RuntimeError) {
@@ -77,7 +79,7 @@ func (e EvaluatableExpr) EvaluateExprIdentifier(expr ast.ExprIdentifier) (Runtim
 	if unevaluated, ok := e.Context.GetPrivte(string(expr.Name)); ok {
 		return unevaluated.Evaluate()
 	} else {
-		return nil, NewRuntimeError(fmt.Errorf("undeclared %s", expr.Name), *expr.Meta().Source)
+		return nil, NewRuntimeError(fmt.Errorf("undeclared %s", expr.Name))
 	}
 }
 
@@ -90,7 +92,24 @@ func (e EvaluatableExpr) EvaluateExprInvocation(expr ast.ExprInvocation) (Runtim
 }
 
 func (e EvaluatableExpr) EvaluateExprMemberAccess(expr ast.ExprMemberAccess) (RuntimeValue, *RuntimeError) {
-	panic("not implemented EvaluateExprMemberAccess")
+	evaluatableTargetExpr := MakeEvaluatableExpr(e.Context, *expr.Target)
+	target, err := evaluatableTargetExpr.Evaluate()
+	if err != nil {
+		return nil, err
+	}
+
+	var evaluatableTarget Evaluatable
+	for _, identifier := range expr.AccessPath {
+		evaluatableTarget, err = target.Lookup(string(identifier))
+		if err != nil {
+			return nil, err
+		}
+		target, err = evaluatableTarget.Evaluate()
+		if err != nil {
+			return nil, err
+		}
+	}
+	return target, nil
 }
 
 func (e EvaluatableExpr) EvaluateExprOperatorBinary(expr ast.ExprOperatorBinary) (RuntimeValue, *RuntimeError) {

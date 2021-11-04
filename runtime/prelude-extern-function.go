@@ -6,10 +6,10 @@ var _ RuntimeValue = PreludeExternFunction{}
 
 type PreludeExternFunction struct {
 	Decl *ast.DeclExternFunc
-	Impl func(args []Evaluatable) (RuntimeValue, error)
+	Impl func(args []Evaluatable) (RuntimeValue, *RuntimeError)
 }
 
-func (PreludeExternFunction) Lookup(member string) (Evaluatable, error) {
+func (PreludeExternFunction) Lookup(member string) (Evaluatable, *RuntimeError) {
 	panic("TODO: not implemented")
 }
 

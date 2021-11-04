@@ -8,7 +8,7 @@ type PreludeCurriedCallable struct {
 	RemainingArity int
 }
 
-func (PreludeCurriedCallable) Lookup(member string) (Evaluatable, error) {
+func (PreludeCurriedCallable) Lookup(member string) (Evaluatable, *RuntimeError) {
 	panic("TODO: not implemented")
 }
 

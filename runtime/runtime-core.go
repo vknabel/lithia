@@ -12,7 +12,7 @@ type RuntimeValue interface {
 	// for printing
 	String() string
 	// Member access
-	Lookup(name string) (Evaluatable, error)
+	Lookup(name string) (Evaluatable, *RuntimeError)
 	RuntimeType() RuntimeTypeRef
 }
 

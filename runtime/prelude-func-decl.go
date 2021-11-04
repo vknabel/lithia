@@ -15,7 +15,7 @@ func MakePreludeFuncDecl(env *Environment, decl ast.DeclFunc) PreludeFuncDecl {
 	return PreludeFuncDecl{env, decl}
 }
 
-func (PreludeFuncDecl) Lookup(member string) (Evaluatable, error) {
+func (PreludeFuncDecl) Lookup(member string) (Evaluatable, *RuntimeError) {
 	panic("TODO: not implemented")
 }
 

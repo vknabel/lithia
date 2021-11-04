@@ -15,7 +15,7 @@ func MakePreludeFuncExpr(env *Environment, expr ast.ExprFunc) PreludeFuncExpr {
 	return PreludeFuncExpr{env, expr}
 }
 
-func (PreludeFuncExpr) Lookup(member string) (Evaluatable, error) {
+func (PreludeFuncExpr) Lookup(member string) (Evaluatable, *RuntimeError) {
 	panic("TODO: not implemented")
 }
 

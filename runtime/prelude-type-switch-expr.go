@@ -15,7 +15,7 @@ func MakePreludeTypeSwitchExpr(environment *Environment, decl ast.ExprTypeSwitch
 	return PreludeTypeSwitchExpr{environment, decl}
 }
 
-func (PreludeTypeSwitchExpr) Lookup(member string) (Evaluatable, error) {
+func (PreludeTypeSwitchExpr) Lookup(member string) (Evaluatable, *RuntimeError) {
 	panic("TODO: not implemented")
 }
 

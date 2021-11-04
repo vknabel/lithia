@@ -10,7 +10,7 @@ type PreludeDataDecl struct {
 	Decl ast.DeclData
 }
 
-func (PreludeDataDecl) Lookup(member string) (Evaluatable, error) {
+func (PreludeDataDecl) Lookup(member string) (Evaluatable, *RuntimeError) {
 	panic("TODO: not implemented")
 }
 

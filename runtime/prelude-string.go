@@ -13,6 +13,6 @@ func (s PreludeString) String() string {
 	return string(s)
 }
 
-func (i PreludeString) Lookup(member string) (Evaluatable, error) {
+func (i PreludeString) Lookup(member string) (Evaluatable, *RuntimeError) {
 	panic("TODO: length, append, chars")
 }
