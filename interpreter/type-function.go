@@ -61,6 +61,12 @@ func (f Function) Call(arguments []Evaluatable) (RuntimeValue, error) {
 		if err != nil {
 			return nil, err
 		}
+		if dataDecl, ok := lastValue.(DataDeclRuntimeValue); ok && len(dataDecl.fields) == 0 {
+			lastValue = DataRuntimeValue{
+				typeValue: &dataDecl,
+				members:   make(map[string]Evaluatable),
+			}
+		}
 	}
 
 	if len(arguments) == len(f.arguments) {
