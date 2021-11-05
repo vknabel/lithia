@@ -1,0 +1,15 @@
+import tests { test }
+
+test "binary || operator", { fail =>
+    when False || False, fail "(False || False) == False"
+    unless True || False, fail "(True || False) == True"
+    unless False || True, fail "(False || True) == True"
+    unless True || True, fail "(True || True) == True"
+}
+
+test "binary && operator", { fail =>
+    when False && False, fail "(False && False) == False"
+    when True && False, fail "(True && False) == False"
+    when False && True, fail "(False && True) == False"
+    unless True && True, fail "(True && True) == True"
+}

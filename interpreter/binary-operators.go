@@ -261,7 +261,7 @@ func (ex *EvaluationContext) lazyLogicComparision(
 		moduleName: "prelude",
 		typeValue:  &trueTypeValue,
 	}
-	if ok, err := boolType.IncludesValue(left); !ok || err != nil {
+	if ok, err := RuntimeTypeValueIncludesValue(boolType, left); !ok || err != nil {
 		return nil, ex.RuntimeBinaryOperatorOnlySupportsType(
 			operator,
 			[]RuntimeType{boolType},
@@ -279,7 +279,16 @@ func (ex *EvaluationContext) lazyLogicComparision(
 		if err != nil {
 			return false, nil
 		}
-		isRightTrue, err := boolType.IncludesValue(right)
+
+		if ok, err := RuntimeTypeValueIncludesValue(boolType, right); !ok || err != nil {
+			return false, ex.RuntimeBinaryOperatorOnlySupportsType(
+				operator,
+				[]RuntimeType{boolType},
+				right,
+			)
+		}
+
+		isRightTrue, err := trueType.IncludesValue(right)
 		if err != nil {
 			return false, nil
 		}
