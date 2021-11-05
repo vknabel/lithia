@@ -3,6 +3,7 @@
 ## Unreleased
 
 - fix: `==` didn't work for independent values
+- stdlib: tests will now print all messages
 
 ## v0.0.8
 
