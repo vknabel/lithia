@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- fix: `==` didn't work for independent values
+
 ## v0.0.8
 
 - fix: type expressions with `Any` were not deterministic
