@@ -1,0 +1,10 @@
+module lists
+
+/// Gets the first element of the list as `Optional`.
+/// When empty `Nil`, otherwise `Some`.
+func first { list =>
+    with list, type List {
+        Cons: { cons => Some cons.head },
+        Nil: { cons => None }
+    }
+}

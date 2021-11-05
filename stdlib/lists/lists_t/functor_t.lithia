@@ -1,0 +1,33 @@
+import tests { test }
+import controls { map }
+import lists
+
+test "lists.map", { fail =>
+    lists.map { i =>
+        fail strings.concat ["should not call when empty, but did with ", i] 
+    }, []
+
+    let incr = { i => i + 1 }
+    let identity = { i => i }
+    unless (lists.map incr, []) == [], fail "empty list stays empty"
+    unless (lists.map incr, [1, 2]) == [2, 3], fail "list with elements return applied results"
+    unless (lists.map identity, [1, 2]) == [1, 2], fail "identity"
+}
+
+test "lists.functor", { fail =>
+    map { i =>
+        fail strings.concat ["should not call when empty, but did with ", i] 
+    }, lists, []
+
+    let incr = { i => i + 1 }
+    let identity = { i => i }
+    unless (map incr, lists, []) == [], fail "empty list stays empty"
+    unless (map incr, lists, [1, 2]) == [2, 3], fail "list with elements return applied results"
+    unless (map identity, lists, [1, 2]) == [1, 2], fail "identity"
+}
+
+test "lists is a functor instance", { fail =>
+    unless (controls.functorFrom lists) != Void, fail "module lists is a functor"
+    unless (controls.functorFrom lists.functor) != Void, fail "var lists.functor is a functor"
+    unless (controls.functorFrom lists.map) != Void, fail "func lists.map is a functor"
+}

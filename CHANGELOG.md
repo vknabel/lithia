@@ -4,7 +4,8 @@
 
 - fix: `==` didn't work for independent values
 - fix: `||` sometimes lead to wrong results
-- stdlib: tests will now print all messages
+- stdlib: tests will now print all error messages
+- stdlib: adds new functions to `lists`: `dropFirst`, `dropN`, `dropWhile`, `filter`, `first`, `isEmpty` and `zipWith`
 
 ## v0.0.8
 

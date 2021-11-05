@@ -1,0 +1,8 @@
+module lists
+
+func isEmpty { list =>
+    with list, type List {
+        Cons: { _ => False },
+        Nil: { _ => True }
+    }
+}

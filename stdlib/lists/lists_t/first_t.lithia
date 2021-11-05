@@ -1,0 +1,9 @@
+import lists
+import strings
+import tests { test }
+
+test "lists.first", { fail =>
+    unless (lists.first []) == None, fail "should be nil for empty list"
+    unless (lists.first ["Hello"]).value == (Some "Hello").value, fail "should return Some head for Cons"
+    unless (lists.first [42]).value == 42, fail "should return Some head for Cons"
+}

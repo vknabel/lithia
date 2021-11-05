@@ -1,0 +1,10 @@
+import tests { test }
+import lists
+
+test "lists.zipWith", { fail =>
+    let sum = { l, r => l + r }
+    unless (lists.zipWith sum, [], []) == [], fail "all empty lists stay empty"
+    unless (lists.zipWith sum, [], [1]) == [], fail "left empty list stays empty"
+    unless (lists.zipWith sum, [1], []) == [], fail "right empty list stays empty"
+    unless (lists.zipWith sum, [1], [2]) == [3], fail "combines values"
+}

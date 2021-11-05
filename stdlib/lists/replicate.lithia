@@ -1,3 +1,7 @@
+module lists
+
+/// Creates a list with a count of `n`. Every item will be the given element.
+/// Negative numbers will be treated as `0`.
 func replicate { n, element =>
     if n <= 0, Nil, (
         Cons element, (

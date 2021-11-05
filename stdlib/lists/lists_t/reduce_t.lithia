@@ -1,0 +1,12 @@
+import tests { test }
+import lists
+import strings
+
+test "lists.reduce", { fail =>
+    let concatAllAsStrings = lists.reduce { into, next =>
+        strings.concat [into, next]
+    }
+    unless (concatAllAsStrings "", []) == "", fail "no elements and no suffix empty"
+    unless (concatAllAsStrings "!", []) == "!", fail "no elements is only suffix"
+    unless (concatAllAsStrings "!", [1, 2, 3]) == "!123", fail "concats elements to suffix"
+}

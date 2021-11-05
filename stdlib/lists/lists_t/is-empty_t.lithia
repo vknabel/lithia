@@ -1,0 +1,7 @@
+import tests { test }
+import lists
+
+test "lists.isEmpty", { fail =>
+    unless (lists.isEmpty []), fail "empty list is empty"
+    when (lists.isEmpty [1]), fail "non empty list is not empty"
+}
