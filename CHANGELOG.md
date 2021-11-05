@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## v0.0.9
 
 - fix: `==` didn't work for independent values
 - fix: `||` sometimes lead to wrong results
