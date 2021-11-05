@@ -23,7 +23,9 @@ Will always be imported implicitly.
 - _data_ [True](#True)
 - _data_ [Void](#Void)
 - _func_ [compose](#compose) f, g, value
+- _func_ [const](#const) value, _
 - _func_ [debug](#debug) message
+- _func_ [identity](#identity) value
 - _func_ [if](#if) condition, then, else
 - _func_ [pipe](#pipe) functions, initial
 - _func_ [print](#print) message
@@ -135,12 +137,23 @@ _data_ Representing a single value.
 
 _func_ `compose f, g, value`
 
+Composes two given functions.
+Calls the second function first and pipes the result into the second one.
+## const
 
+_func_ `const value, _`
+
+Always returns the first argument.
 ## debug
 
 _func_ `debug message`
 
 
+## identity
+
+_func_ `identity value`
+
+Always returns the given argument.
 ## if
 
 _func_ `if condition, then, else`
