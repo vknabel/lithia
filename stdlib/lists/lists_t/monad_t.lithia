@@ -1,6 +1,7 @@
 import lists
 import strings
 import tests { test }
+import controls
 
 test "lists.flatMap", { fail =>
     func stringifiedReplicate { list =>
@@ -10,4 +11,9 @@ test "lists.flatMap", { fail =>
     when (stringifiedReplicate []) != "", fail "empty"
     when (stringifiedReplicate [1]) != "1", fail "one replication"
     when (stringifiedReplicate [2]) != "22", fail "two replications"
+}
+
+test "lists is a monad instance", { fail =>
+    unless (controls.monadFrom lists) != Void, fail "module lists is a monad"
+    unless (controls.monadFrom lists.monad) != Void, fail "var lists.monad is a monad"
 }

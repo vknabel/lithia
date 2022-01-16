@@ -73,13 +73,18 @@ func RuntimeTypeValueIncludesValue(t RuntimeValue, v RuntimeValue) (bool, Locata
 	if _, ok := t.(PreludeAnyType); ok {
 		return true, nil
 	}
+	if runtimeType, ok := t.(RuntimeType); ok && runtimeType.typeValue != nil {
+		if enum, ok := (*runtimeType.typeValue).(EnumDeclRuntimeValue); ok {
+			return RuntimeTypeValueIncludesValue(enum, v)
+		}
+	}
 	if enumDecl, ok := t.(EnumDeclRuntimeValue); ok {
 		for _, lazyValue := range enumDecl.cases {
 			value, err := lazyValue.Evaluate()
 			if err != nil {
 				return false, err
 			}
-			ok, err := value.RuntimeType().IncludesValue(v)
+			ok, err := RuntimeTypeValueIncludesValue(value, v)
 			if err != nil {
 				return false, err
 			}

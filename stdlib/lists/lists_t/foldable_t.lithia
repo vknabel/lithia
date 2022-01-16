@@ -1,0 +1,12 @@
+import tests { test }
+import lists
+import strings
+
+test "lists.foldr", { fail =>
+    let concatAllAsStrings = lists.foldr { next, transformed =>
+        strings.concat [next, transformed]
+    }
+    unless (concatAllAsStrings "", []) == "", fail "no elements and no suffix empty"
+    unless (concatAllAsStrings "!", []) == "!", fail "no elements is only suffix"
+    unless (concatAllAsStrings "!", [1, 2, 3]) == "123!", fail "concats elements to suffix"
+}

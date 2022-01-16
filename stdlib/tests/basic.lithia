@@ -109,7 +109,13 @@ func runTests { =>
 func runTestCase { summary, testCase =>
     let testNumber = summary.ok + summary.notOk + 1
     let failure = rx.Variable None
-    testCase.impl { message => failure.accept Some message }
+    testCase.impl { message =>
+        let combined = with failure.current, type Optional {
+            Some: { previous => Some strings.concat [previous.value, "; ", message] },
+            None: { _ => Some message }
+        }
+        failure.accept combined
+    }
 
     with failure.current, type Optional {
         Some: { some => 

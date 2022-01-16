@@ -1,0 +1,16 @@
+import lists
+import strings
+import tests { test }
+
+test "lists.filter", { fail =>
+    func constTrue { _ => True }
+    func constFalse { _ => False }
+    func greaterThan { n, i => i > n }
+
+    unless (lists.filter constFalse, []) == [], fail "filter none when empty is empty"
+    unless (lists.filter constFalse, [1, 2, 3]) == [], fail "const false is empty"
+    unless (lists.filter constTrue, [1, 2, 3]) == [1, 2, 3], fail "const true is equal"
+
+    unless (lists.filter greaterThan 1, [2, 1, 3]) == [2, 3], fail "should filter to [2, 3]"
+    unless (lists.filter greaterThan 1, [3, 2, 1]) == [3, 2], fail "should filter to [3, 2]"
+}

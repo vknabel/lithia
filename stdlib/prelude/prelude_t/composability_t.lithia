@@ -1,0 +1,33 @@
+import tests { test }
+
+test "pipe", { fail =>
+    func incr { i => i + 1 }
+    func double { i => 2 * i }
+
+    unless (pipe [incr, double], 0) == 2, fail "2 * (1 + 0)"
+    unless (pipe [double, incr], 0) == 1, fail "1 + (2 * 0)"
+}
+
+test "with", { fail =>
+    func incr { i => i + 1 }
+
+    unless (with 3, incr) == 4, fail "just applies"
+}
+
+test "compose", { fail =>
+    func incr { i => i + 1 }
+    func double { i => 2 * i }
+
+    unless (compose incr, double, 0) == 1, fail "1 + (2 * 0)"
+    unless (compose double, incr, 0) == 2, fail "2 * (1 + 0)"
+}
+
+test "identity", { fail =>
+    unless (identity 1) == 1, fail "return first for int"
+    unless (identity "2") == "2", fail "return first for strings"
+}
+
+test "const", { fail =>
+    unless (const True, False), fail "return first"
+    when (const False, True), fail "return first"
+}

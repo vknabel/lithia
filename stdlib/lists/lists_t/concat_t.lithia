@@ -1,0 +1,14 @@
+import tests { test }
+import lists
+
+test "lists.prependList", { fail =>
+    unless (lists.prependList [], []) == [], fail "prepends two empty lists to one empty"
+    unless (lists.prependList [1, 2], [3, 4]) == [1, 2, 3, 4], fail "prepends two lists"
+}
+
+test "lists.concat", { fail =>
+    unless (lists.concat []) == [], fail "is empty for empty lists"
+    unless (lists.concat [[], []]) == [], fail "list of empty lists is empty"
+    unless (lists.concat [[[]], []]) == [[]], fail "more deeply nested lists are elements"
+    unless (lists.concat [[1, 2], [3], [4]]) == [1, 2, 3, 4], fail "concats three elements"
+}

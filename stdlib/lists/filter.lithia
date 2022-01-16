@@ -1,0 +1,15 @@
+module lists
+
+/// Returns the list only with elements where the given predicate is True.
+func filter { predicate, list =>
+    with list, type List {
+        Cons: { cons =>
+            let filteredTail = filter predicate, cons.tail
+
+            (if predicate cons.head,
+                (Cons cons.head, filteredTail),
+                filteredTail)
+        },
+        Nil: { _ => Nil }
+    }
+}

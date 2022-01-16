@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.0.9
+
+- fix: `==` didn't work for independent values
+- fix: `||` sometimes lead to wrong results
+- stdlib: tests will now print all error messages
+- stdlib: adds new functions to `lists`: `dropFirst`, `dropN`, `dropWhile`, `filter`, `first`, `isEmpty` and `zipWith`
+- stdlib: adds new functions to `prelude`: `identity` and `const`
+
 ## v0.0.8
 
 - fix: type expressions with `Any` were not deterministic

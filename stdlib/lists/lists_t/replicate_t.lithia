@@ -1,0 +1,9 @@
+import tests { test }
+import lists
+
+test "lists.replicate", { fail =>
+    unless (lists.replicate -1, "hi") == [], fail "negative replications are empty"
+    unless (lists.replicate 0, "hi") == [], fail "zero replications are empty"
+    unless (lists.replicate 1, "hi") == ["hi"], fail "one replication is one element"
+    unless (lists.replicate 3, "hi") == ["hi", "hi", "hi"], fail "multiple replications"
+}

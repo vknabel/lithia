@@ -1,0 +1,10 @@
+import lists
+import strings
+import tests { test }
+
+test "lists.count", { fail =>
+    unless (lists.count []) == 0, fail "count starts at 0"
+    unless (lists.count [0]) == 1, fail "one element has a count 1"
+    unless (lists.count [[42, 13]]) == 1, fail "does not merge children"
+    unless (lists.count ["abc", "def"]) == 2, fail "two elements have count 2"
+}

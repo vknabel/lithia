@@ -1,0 +1,12 @@
+module lists
+
+/// Combines two lists pairwise. Has the length of the shortest list.
+/// `combine left, right`.
+func zipWith { combine, left, right =>
+    (if (isEmpty left) || (isEmpty right),
+        Nil,
+        (Cons
+            (combine left.head, right.head),
+            (zipWith combine, left.tail, right.tail)
+        ))
+}

@@ -1,0 +1,31 @@
+module lists
+
+/// Returns the list without the first element.
+func dropFirst { list =>
+    with list, type List {
+        Cons: { cons => cons.tail },
+        Nil: { _ => Nil }
+    }
+}
+
+/// Returns the list without the first `n` elements.
+/// Negative numbers will be treated as `0`.
+func dropN { n, list =>
+    let zeroResult = list
+    let positiveResult = with list, type List {
+        Cons: { cons => dropN n - 1, cons.tail },
+        Nil: { _ => Nil }
+    }
+
+    if n > 0, positiveResult, zeroResult
+}
+
+/// Returns the list without the first elements where the given predicate is True.
+func dropWhile { predicate, list =>
+    with list, type List {
+        Cons: { cons =>
+            (if (predicate cons.head), (dropWhile predicate, cons.tail), list)
+        },
+        Nil: { _ => Nil }
+    }
+}
