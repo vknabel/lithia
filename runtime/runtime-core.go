@@ -16,20 +16,9 @@ type RuntimeValue interface {
 	RuntimeType() RuntimeTypeRef
 }
 
-type RuntimeTypeRef struct {
-	Name   ast.Identifier
-	Module ast.ModuleName
-}
-
-func MakeRuntimeTypeRef(name ast.Identifier, module ast.ModuleName) RuntimeTypeRef {
-	return RuntimeTypeRef{name, module}
-}
-
 type RuntimeType interface {
-	RuntimeValue
-
-	Declaration() *ast.Decl
-	IncludesValue(value RuntimeValue) bool
+	Declaration(*Interpreter) (ast.Decl, *RuntimeError)
+	IncludesValue(interpreter *Interpreter, value RuntimeValue) (bool, *RuntimeError)
 }
 
 type CallableRuntimeValue interface {

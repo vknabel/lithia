@@ -10,6 +10,8 @@ type Module struct {
 	Environment *Environment
 	Files       map[FileName]*InterpreterContext
 
+	Decl *ast.ContextModule
+
 	// docs can be derived from the files
 }
 
@@ -18,6 +20,7 @@ func (inter *Interpreter) NewModule(name ast.ModuleName) *Module {
 		Name:        name,
 		Environment: NewEnvironment(inter.NewPreludeEnvironment()),
 		Files:       make(map[FileName]*InterpreterContext),
+		// TODO: Decl
 	}
 	inter.Modules[name] = module
 	return module

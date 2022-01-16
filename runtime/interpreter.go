@@ -1,8 +1,10 @@
 package runtime
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/vknabel/go-lithia/ast"
 	"github.com/vknabel/go-lithia/parser"
@@ -50,7 +52,7 @@ func NewInterpreter(importRoots ...string) *Interpreter {
 		ExternalDefinitions: make(map[ast.ModuleName]ExternalDefinition),
 	}
 	// TODO: External definitions
-	// inter.ExternalDefinitions["prelude"] = ExternalPrelude{}
+	inter.ExternalDefinitions["prelude"] = ExternalPrelude{}
 	// inter.ExternalDefinitions["os"] = ExternalOS{}
 	// inter.ExternalDefinitions["rx"] = ExternalRx{}
 	// inter.ExternalDefinitions["docs"] = ExternalDocs{}
@@ -58,99 +60,96 @@ func NewInterpreter(importRoots ...string) *Interpreter {
 	return inter
 }
 
-// func (inter *Interpreter) Interpret(fileName string, script string) (RuntimeValue, error) {
-// 	moduleName := ast.ModuleName(strings.ReplaceAll(filepath.Base(fileName), ".", "_"))
-// 	module := inter.NewModule(moduleName)
-// 	ex, err := inter.LoadFileIntoModule(module, fileName, script)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	lazyValue, err := ex.EvaluateNode()
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return lazyValue.Evaluate()
-// }
-// func (inter *Interpreter) InterpretEmbed(fileName string, script string) (RuntimeValue, error) {
-// 	moduleName := ast.ModuleName(strings.ReplaceAll(filepath.Base(fileName), ".", "_"))
-// 	module := inter.Modules[moduleName]
-// 	if module == nil {
-// 		module = inter.NewModule(moduleName)
-// 	}
-// 	ex, err := inter.EmbedFileIntoModule(module, fileName, script)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	lazyValue, err := ex.EvaluateNode()
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return lazyValue.Evaluate()
-// }
+func (inter *Interpreter) LoadExternalDefinition(name ast.ModuleName, definition ExternalDefinition) {
+	inter.ExternalDefinitions[name] = definition
+}
 
-// func (inter *Interpreter) LoadFileIntoModule(module *Module, fileName string, script string) (*InterpreterContext, error) {
-// 	fileParser, err := inter.Parser.Parse(module.Name, fileName, script)
-// 	sourceFile, errs := fileParser.ParseSourceFile()
-// 	if err != nil {
-// 		return nil, inter.SyntaxParsingError(fileName, script, tree)
-// 	}
-// 	ex := inter.NewInterpreterContext(fileName, module, tree.RootNode(), []byte(script), module.environment.Private())
-// 	return ex, nil
-// }
+func (inter *Interpreter) Interpret(fileName string, script string) (RuntimeValue, error) {
+	moduleName := ast.ModuleName(strings.ReplaceAll(filepath.Base(fileName), ".", "_"))
+	module := inter.NewModule(moduleName)
+	ix, err := inter.LoadFileIntoModule(module, fileName, script)
+	if err != nil {
+		return nil, err
+	}
+	return ix.Evaluate()
+}
 
-// func (inter *Interpreter) EmbedFileIntoModule(module *Module, fileName string, script string) (*InterpreterContext, error) {
-// 	tree, err := inter.Parser.Parse(script)
-// 	if err != nil {
-// 		return nil, inter.SyntaxParsingError(fileName, script, tree)
-// 	}
-// 	ex := inter.NewInterpreterContext(fileName, module, tree.Node, []byte(script), module.environment)
-// 	return ex, nil
-// }
+func (inter *Interpreter) InterpretEmbed(fileName string, script string) (RuntimeValue, error) {
+	moduleName := ast.ModuleName(strings.ReplaceAll(filepath.Base(fileName), ".", "_"))
+	module := inter.Modules[moduleName]
+	if module == nil {
+		module = inter.NewModule(moduleName)
+	}
+	ex, err := inter.EmbedFileIntoModule(module, fileName, script)
+	if err != nil {
+		return nil, err
+	}
+	return ex.Evaluate()
+}
 
-// func (inter *Interpreter) LoadModuleIfNeeded(moduleName ast.ModuleName) (*Module, error) {
-// 	if module, ok := inter.Modules[moduleName]; ok {
-// 		return module, nil
-// 	}
-// 	for _, root := range inter.ImportRoots {
-// 		relativeModulePath := strings.ReplaceAll(string(moduleName), ".", string(filepath.Separator))
-// 		modulePath := filepath.Join(root, relativeModulePath)
-// 		matches, err := filepath.Glob(filepath.Join(modulePath, "*.lithia"))
-// 		if err != nil {
-// 			continue
-// 		}
-// 		if len(matches) == 0 {
-// 			continue
-// 		}
+func (inter *Interpreter) LoadFileIntoModule(module *Module, fileName string, script string) (*InterpreterContext, error) {
+	fileParser, err := inter.Parser.Parse(module.Name, fileName, script)
+	if err != nil {
+		return nil, fileParser.SyntaxErrorOrConvert(err)
+	}
+	sourceFile, errs := fileParser.ParseSourceFile()
+	if sourceFile == nil {
+		return nil, errs[0] // TODO: Multiple Errors!
+	}
+	ix := inter.NewInterpreterContext(sourceFile, module, fileParser.Tree.RootNode(), []byte(script), module.Environment.Private())
+	module.Files[FileName(fileName)] = ix
+	return ix, nil
+}
 
-// 		module := inter.NewModule(moduleName)
-// 		err = inter.LoadFilesIntoModule(module, matches)
-// 		if err != nil {
-// 			return module, err
-// 		}
+func (inter *Interpreter) EmbedFileIntoModule(module *Module, fileName string, script string) (*InterpreterContext, error) {
+	fileParser, err := inter.Parser.Parse(module.Name, fileName, script)
+	if err != nil {
+		return nil, fileParser.SyntaxErrorOrConvert(err)
+	}
+	sourceFile, errs := fileParser.ParseSourceFile()
+	if sourceFile == nil {
+		return nil, errs[0] // TODO: Multiple Errors!
+	}
+	ex := inter.NewInterpreterContext(sourceFile, module, fileParser.Tree.RootNode(), []byte(script), module.Environment)
+	return ex, nil
+}
 
-// 		return module, nil
-// 	}
-// 	return nil, fmt.Errorf("module %s not found", moduleName)
-// }
+func (inter *Interpreter) LoadModuleIfNeeded(moduleName ast.ModuleName) (*Module, error) {
+	if module, ok := inter.Modules[moduleName]; ok {
+		return module, nil
+	}
+	for _, root := range inter.ImportRoots {
+		relativeModulePath := strings.ReplaceAll(string(moduleName), ".", string(filepath.Separator))
+		modulePath := filepath.Join(root, relativeModulePath)
+		matches, err := filepath.Glob(filepath.Join(modulePath, "*.lithia"))
+		if err != nil {
+			continue
+		}
+		if len(matches) == 0 {
+			continue
+		}
 
-// func (inter *Interpreter) LoadFilesIntoModule(module *Module, files []string) error {
-// 	for _, file := range files {
-// 		scriptData, err := os.ReadFile(file)
-// 		if err != nil {
-// 			return err
-// 		}
-// 		childContext, err := inter.LoadFileIntoModule(module, file, string(scriptData))
-// 		if err != nil {
-// 			return err
-// 		}
-// 		source, err := childContext.EvaluateNode()
-// 		if err != nil {
-// 			return err
-// 		}
-// 		_, err = source.Evaluate()
-// 		if err != nil {
-// 			return err
-// 		}
-// 	}
-// 	return nil
-// }
+		module := inter.NewModule(moduleName)
+		err = inter.LoadFilesIntoModule(module, matches)
+		if err != nil {
+			return module, err
+		}
+
+		return module, nil
+	}
+	return nil, fmt.Errorf("module %s not found", moduleName)
+}
+
+func (inter *Interpreter) LoadFilesIntoModule(module *Module, files []string) error {
+	for _, file := range files {
+		scriptData, err := os.ReadFile(file)
+		if err != nil {
+			return err
+		}
+		_, err = inter.LoadFileIntoModule(module, file, string(scriptData))
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}

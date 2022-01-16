@@ -8,6 +8,7 @@ import (
 
 type EvaluationContext struct {
 	*Environment
+	*Interpreter
 }
 
 type EvaluatableExpr struct {
@@ -20,8 +21,14 @@ func MakeEvaluatableExpr(context *EvaluationContext, expr ast.Expr) EvaluatableE
 	return EvaluatableExpr{context, expr, NewLazyEvaluationCache()}
 }
 
-func (e EvaluatableExpr) Evaluate() (RuntimeValue, *RuntimeError) {
+func (e EvaluatableExpr) Evaluate() (value RuntimeValue, error *RuntimeError) {
 	value, err := e.cache.Evaluate(func() (RuntimeValue, *RuntimeError) {
+		defer func() {
+			if err := recover(); err != nil {
+				error = NewRuntimeError(fmt.Errorf("panic: %q", err))
+			}
+		}()
+
 		if e.Expr == nil {
 			panic("cannot evaluate nil expr")
 		}
@@ -59,7 +66,7 @@ func (e EvaluatableExpr) Evaluate() (RuntimeValue, *RuntimeError) {
 }
 
 func (e EvaluatableExpr) EvaluateExprArray(expr ast.ExprArray) (RuntimeValue, *RuntimeError) {
-	panic("not implemented EvaluateExprArray")
+	panic("TODO: not implemented EvaluateExprArray")
 }
 
 func (e EvaluatableExpr) EvaluateExprFloat(expr ast.ExprFloat) (RuntimeValue, *RuntimeError) {
@@ -88,7 +95,7 @@ func (e EvaluatableExpr) EvaluateExprInt(expr ast.ExprInt) (RuntimeValue, *Runti
 }
 
 func (e EvaluatableExpr) EvaluateExprInvocation(expr ast.ExprInvocation) (RuntimeValue, *RuntimeError) {
-	panic("not implemented EvaluateExprInvocation")
+	panic("TODO: not implemented EvaluateExprInvocation")
 }
 
 func (e EvaluatableExpr) EvaluateExprMemberAccess(expr ast.ExprMemberAccess) (RuntimeValue, *RuntimeError) {
@@ -113,11 +120,18 @@ func (e EvaluatableExpr) EvaluateExprMemberAccess(expr ast.ExprMemberAccess) (Ru
 }
 
 func (e EvaluatableExpr) EvaluateExprOperatorBinary(expr ast.ExprOperatorBinary) (RuntimeValue, *RuntimeError) {
-	panic("not implemented EvaluateExprOperatorBinary")
+	impl, err := e.Context.BinaryOperatorFunction(string(expr.Operator))
+	if err != nil {
+		return nil, err
+	}
+	leftEvalExpr := MakeEvaluatableExpr(e.Context, *expr.Left)
+	rightEvalExpr := MakeEvaluatableExpr(e.Context, *expr.Right)
+
+	return impl(leftEvalExpr, rightEvalExpr)
 }
 
 func (e EvaluatableExpr) EvaluateExprOperatorUnary(expr ast.ExprOperatorUnary) (RuntimeValue, *RuntimeError) {
-	panic("not implemented EvaluateExprOperatorUnary")
+	panic("TODO: not implemented EvaluateExprOperatorUnary")
 }
 
 func (e EvaluatableExpr) EvaluateExprString(expr ast.ExprString) (RuntimeValue, *RuntimeError) {

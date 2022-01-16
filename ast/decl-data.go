@@ -4,7 +4,7 @@ var _ Decl = DeclData{}
 
 type DeclData struct {
 	Name   Identifier
-	Fields map[Identifier]*DeclField
+	Fields []*DeclField
 
 	Docs     *Docs
 	MetaInfo *MetaDecl
@@ -17,7 +17,7 @@ func (e DeclData) Meta() *MetaDecl {
 func MakeDeclData(name Identifier, source *Source) *DeclData {
 	return &DeclData{
 		Name:   name,
-		Fields: map[Identifier]*DeclField{},
+		Fields: []*DeclField{},
 		MetaInfo: &MetaDecl{
 			Source: source,
 		},
@@ -25,5 +25,5 @@ func MakeDeclData(name Identifier, source *Source) *DeclData {
 }
 
 func (e *DeclData) AddField(field *DeclField) {
-	e.Fields[field.Name] = field
+	e.Fields = append(e.Fields, field)
 }

@@ -12,6 +12,8 @@ type InterpreterContext struct {
 
 	path        []string
 	environment *Environment
+
+	evalCache *LazyEvaluationCache
 }
 
 func (inter *Interpreter) NewInterpreterContext(fileDef *ast.SourceFile, module *Module, node *sitter.Node, source []byte, environment *Environment) *InterpreterContext {
@@ -24,6 +26,7 @@ func (inter *Interpreter) NewInterpreterContext(fileDef *ast.SourceFile, module 
 		module:      module,
 		path:        []string{},
 		environment: environment,
+		evalCache:   NewLazyEvaluationCache(),
 	}
 }
 
@@ -34,5 +37,25 @@ func (i *InterpreterContext) NestedInterpreterContext(name string) *InterpreterC
 		module:      i.module,
 		path:        append(i.path, name),
 		environment: NewEnvironment(i.environment),
+		evalCache:   NewLazyEvaluationCache(),
 	}
+}
+
+func (i *InterpreterContext) Evaluate() (RuntimeValue, *RuntimeError) {
+	return i.evalCache.Evaluate(func() (RuntimeValue, *RuntimeError) {
+		if len(i.fileDef.Statements) == 0 {
+			return nil, nil // TODO: Return Void?
+		}
+		ex := &EvaluationContext{i.environment, i.interpreter}
+		var result RuntimeValue
+		for _, stmt := range i.fileDef.Statements {
+			expr := MakeEvaluatableExpr(ex, *stmt)
+			value, err := expr.Evaluate()
+			if err != nil {
+				return nil, err
+			}
+			result = value
+		}
+		return result, nil
+	})
 }
