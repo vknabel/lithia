@@ -17,6 +17,9 @@ func (fp *FileParser) ParseFunctionExpr() (*ast.ExprFunc, []SyntaxError) {
 		return nil, errors
 	}
 	function := ast.MakeExprFunc(params, fp.AstSource())
+	if bodyNode == nil {
+		return function, nil
+	}
 	bodyParser := fp.ChildParser(bodyNode)
 	for i := 0; i < int(bodyNode.NamedChildCount()); i++ {
 		child := bodyNode.NamedChild(i)

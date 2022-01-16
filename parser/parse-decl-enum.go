@@ -1,6 +1,8 @@
 package parser
 
-import "github.com/vknabel/go-lithia/ast"
+import (
+	"github.com/vknabel/go-lithia/ast"
+)
 
 func (fp *FileParser) ParseEnumDeclaration() (*ast.DeclEnum, []ast.Decl, []SyntaxError) {
 	enumName := ast.Identifier(fp.Node.ChildByFieldName("name").Content(fp.Source))
@@ -11,7 +13,14 @@ func (fp *FileParser) ParseEnumDeclaration() (*ast.DeclEnum, []ast.Decl, []Synta
 
 	allChildDecls := []ast.Decl{}
 	errors := []SyntaxError{}
-	for i := 0; i < int(caseList.NamedChildCount()); i++ {
+
+	var caseCount int
+	if caseList != nil {
+		caseCount = int(caseList.NamedChildCount())
+	} else {
+		caseCount = 0
+	}
+	for i := 0; i < caseCount; i++ {
 		childNode := caseList.NamedChild(i)
 		if childNode.Type() == TYPE_NODE_COMMENT {
 			casep.Comments = append(casep.Comments, childNode.Content(fp.Source))

@@ -1,8 +1,6 @@
 package parser
 
 import (
-	"fmt"
-
 	"github.com/vknabel/go-lithia/ast"
 )
 
@@ -14,7 +12,7 @@ func (fp *FileParser) ParseSourceFile() (*ast.SourceFile, []SyntaxError) {
 
 	sourceFile := ast.MakeSourceFile(fp.File, fp.AstSource())
 	parsingErrors := []SyntaxError{}
-	fmt.Println(sourceFile.FileName)
+
 	for i := 0; i < int(fp.Node.NamedChildCount()); i++ {
 		child := fp.Node.NamedChild(i)
 		if child.Type() == TYPE_NODE_COMMENT {

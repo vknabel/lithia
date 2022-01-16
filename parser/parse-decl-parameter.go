@@ -6,7 +6,9 @@ import (
 
 func (fp *FileParser) ParseParameterDeclaration() (*ast.DeclParameter, []SyntaxError) {
 	name := ast.Identifier(fp.Node.Content(fp.Source))
-	return ast.MakeDeclParameter(name, fp.AstSource()), nil
+	param := ast.MakeDeclParameter(name, fp.AstSource())
+	param.Docs = fp.ConsumeDocs()
+	return param, nil
 }
 
 func (fp *FileParser) ParseParameterDeclarationList() ([]ast.DeclParameter, []SyntaxError) {

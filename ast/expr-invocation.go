@@ -13,10 +13,10 @@ func (e ExprInvocation) Meta() *MetaExpr {
 	return e.MetaInfo
 }
 
-func MakeExprInvocation(function Expr) *ExprInvocation {
+func MakeExprInvocation(function Expr, source *Source) *ExprInvocation {
 	return &ExprInvocation{
 		Function: function,
-		MetaInfo: &MetaExpr{},
+		MetaInfo: &MetaExpr{Source: source},
 	}
 }
 

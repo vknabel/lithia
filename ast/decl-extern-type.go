@@ -12,3 +12,15 @@ type DeclExternType struct {
 func (e DeclExternType) Meta() *MetaDecl {
 	return e.MetaInfo
 }
+
+func MakeDeclExternType(name Identifier, source *Source) *DeclExternType {
+	return &DeclExternType{
+		Name:     name,
+		Fields:   make(map[Identifier]*DeclField),
+		MetaInfo: &MetaDecl{source},
+	}
+}
+
+func (e *DeclExternType) AddField(name Identifier, decl *DeclField) {
+	e.Fields[name] = decl
+}

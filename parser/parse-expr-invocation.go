@@ -1,6 +1,8 @@
 package parser
 
-import "github.com/vknabel/go-lithia/ast"
+import (
+	"github.com/vknabel/go-lithia/ast"
+)
 
 func (fp *FileParser) ParseInvocationExpr() (*ast.ExprInvocation, []SyntaxError) {
 	errors := []SyntaxError{}
@@ -14,9 +16,9 @@ func (fp *FileParser) ParseInvocationExpr() (*ast.ExprInvocation, []SyntaxError)
 		return nil, errors
 	}
 
-	function := ast.MakeExprInvocation(*functionExpr)
-	for i := 0; i < int(functionParser.Node.NamedChildCount()); i++ {
-		child := functionParser.Node.NamedChild(i)
+	function := ast.MakeExprInvocation(*functionExpr, functionParser.AstSource())
+	for i := 0; i < int(fp.Node.NamedChildCount()); i++ {
+		child := fp.Node.NamedChild(i)
 		if fp.ParseChildCommentIfNeeded(child) {
 			continue
 		}

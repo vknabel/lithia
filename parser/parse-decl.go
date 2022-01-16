@@ -25,7 +25,8 @@ func (fp *FileParser) ParseDeclsIfGiven() ([]ast.Decl, []SyntaxError) {
 		stmt, err := fp.ParseFunctionDeclaration()
 		return []ast.Decl{*stmt}, err
 	case TYPE_NODE_EXTERN_DECLARATION:
-		panic("not implemented")
+		stmt, err := fp.ParseExternDeclaration()
+		return []ast.Decl{*stmt}, err
 
 	default:
 		return nil, nil
