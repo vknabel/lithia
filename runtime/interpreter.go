@@ -52,7 +52,7 @@ func NewInterpreter(importRoots ...string) *Interpreter {
 		ExternalDefinitions: make(map[ast.ModuleName]ExternalDefinition),
 	}
 	// TODO: External definitions
-	inter.ExternalDefinitions["prelude"] = ExternalPrelude{}
+	// inter.ExternalDefinitions["prelude"] = ExternalPrelude{}
 	// inter.ExternalDefinitions["os"] = ExternalOS{}
 	// inter.ExternalDefinitions["rx"] = ExternalRx{}
 	// inter.ExternalDefinitions["docs"] = ExternalDocs{}
@@ -71,7 +71,12 @@ func (inter *Interpreter) Interpret(fileName string, script string) (RuntimeValu
 	if err != nil {
 		return nil, err
 	}
-	return ix.Evaluate()
+	rval, rerr := ix.Evaluate()
+	if rerr != nil {
+		return rval, *rerr
+	} else {
+		return rval, nil
+	}
 }
 
 func (inter *Interpreter) InterpretEmbed(fileName string, script string) (RuntimeValue, error) {
@@ -84,7 +89,12 @@ func (inter *Interpreter) InterpretEmbed(fileName string, script string) (Runtim
 	if err != nil {
 		return nil, err
 	}
-	return ex.Evaluate()
+	rval, rerr := ex.Evaluate()
+	if rerr != nil {
+		return rval, *rerr
+	} else {
+		return rval, nil
+	}
 }
 
 func (inter *Interpreter) LoadFileIntoModule(module *Module, fileName string, script string) (*InterpreterContext, error) {

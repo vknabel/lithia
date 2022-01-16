@@ -4,7 +4,7 @@ import "github.com/vknabel/go-lithia/ast"
 
 func (fp *FileParser) ParseEnumDeclaration() (*ast.DeclEnum, []ast.Decl, []SyntaxError) {
 	enumName := ast.Identifier(fp.Node.ChildByFieldName("name").Content(fp.Source))
-	caseList := fp.Node.ChildByFieldName(TYPE_NODE_ENUM_CASE_LIST)
+	caseList := fp.Node.ChildByFieldName("cases")
 	casep := fp.ChildParser(caseList)
 	decl := ast.MakeDeclEnum(enumName, fp.AstSource())
 	decl.Docs = fp.ConsumeDocs()

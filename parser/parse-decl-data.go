@@ -10,8 +10,14 @@ func (fp *FileParser) ParseDataDeclaration() (*ast.DeclData, []SyntaxError) {
 	dataDecl := ast.MakeDeclData(name, fp.AstSource())
 	dataDecl.Docs = fp.ConsumeDocs()
 
+	var numberOfFields int
+	if propertiesNode != nil {
+		numberOfFields = int(propertiesNode.ChildCount())
+	} else {
+		numberOfFields = 0
+	}
 	errors := []SyntaxError{}
-	for i := 0; i < int(propertiesNode.NamedChildCount()); i++ {
+	for i := 0; i < numberOfFields; i++ {
 		child := propertiesNode.NamedChild(i)
 		if child.Type() == TYPE_NODE_COMMENT {
 			propsp.Comments = append(propsp.Comments, child.Content(fp.Source))

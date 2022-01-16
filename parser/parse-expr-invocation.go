@@ -5,7 +5,7 @@ import "github.com/vknabel/go-lithia/ast"
 func (fp *FileParser) ParseInvocationExpr() (*ast.ExprInvocation, []SyntaxError) {
 	errors := []SyntaxError{}
 	functionParser := fp.ChildParser(fp.Node.ChildByFieldName("function"))
-	functionExpr, functionErrors := functionParser.ParseFunctionExpr()
+	functionExpr, functionErrors := functionParser.ParseExpression()
 
 	if functionErrors != nil {
 		errors = append(errors, functionErrors...)
