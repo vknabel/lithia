@@ -1,3 +1,1 @@
-import prelude
-
 print "Hello World"

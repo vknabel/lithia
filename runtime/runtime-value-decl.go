@@ -19,7 +19,19 @@ func MakeRuntimeValueDecl(context *InterpreterContext, decl ast.Decl) Evaluatabl
 			Environment: context.environment.Private(),
 			Decl:        decl,
 		})
+	case ast.DeclExternFunc, ast.DeclExternType:
+		definition, ok := context.interpreter.ExternalDefinitions[context.module.Name]
+		if !ok {
+			panic(fmt.Sprintf("extern definitions not found for module %s. assumed by extern %s", context.module.Name, decl.DeclName()))
+		}
+		value, ok := definition.Lookup(string(decl.DeclName()), context.environment, decl)
+		if !ok {
+			panic(fmt.Sprintf("extern definition not found in module %s: extern %s", context.module.Name, decl.DeclName()))
+		}
+		return NewConstantRuntimeValue(value)
+	case ast.DeclModule:
+		return NewConstantRuntimeValue(PreludeModule{Module: context.module})
 	default:
-		panic(fmt.Sprintf("unknown decl: %s", decl))
+		panic(fmt.Sprintf("unknown decl: %T %s", decl, decl.DeclName()))
 	}
 }

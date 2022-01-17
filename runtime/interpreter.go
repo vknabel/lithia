@@ -52,7 +52,7 @@ func NewInterpreter(importRoots ...string) *Interpreter {
 		ExternalDefinitions: make(map[ast.ModuleName]ExternalDefinition),
 	}
 	// TODO: External definitions
-	// inter.ExternalDefinitions["prelude"] = ExternalPrelude{}
+	inter.ExternalDefinitions["prelude"] = ExternalPrelude{}
 	// inter.ExternalDefinitions["os"] = ExternalOS{}
 	// inter.ExternalDefinitions["rx"] = ExternalRx{}
 	// inter.ExternalDefinitions["docs"] = ExternalDocs{}

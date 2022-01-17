@@ -23,5 +23,6 @@ type RuntimeType interface {
 
 type CallableRuntimeValue interface {
 	RuntimeValue
+	Arity() int
 	Call(args []Evaluatable) (RuntimeValue, *RuntimeError)
 }
