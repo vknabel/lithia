@@ -1,8 +1,6 @@
 package runtime
 
 import (
-	"fmt"
-
 	sitter "github.com/smacker/go-tree-sitter"
 	"github.com/vknabel/go-lithia/ast"
 )
@@ -46,8 +44,7 @@ func (i *InterpreterContext) NestedInterpreterContext(name string) *InterpreterC
 func (i *InterpreterContext) Evaluate() (RuntimeValue, *RuntimeError) {
 	return i.evalCache.Evaluate(func() (RuntimeValue, *RuntimeError) {
 		if len(i.fileDef.Statements) == 0 {
-			fmt.Println("No statements", i.fileDef)
-			return nil, nil // TODO: Return Void?
+			return nil, nil
 		}
 		var result RuntimeValue
 		for _, stmt := range i.fileDef.Statements {
