@@ -19,7 +19,7 @@ func (e RuntimeError) Error() string {
 			"\t%s:%d:%d %s\n",
 			source.FileName,
 			source.Start.Line+1,
-			source.Start.Column,
+			source.Start.Column+1,
 			source.ModuleName,
 		)
 	}

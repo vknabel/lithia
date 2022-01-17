@@ -15,10 +15,7 @@ func MakeRuntimeValueDecl(context *InterpreterContext, decl ast.Decl) Evaluatabl
 	case ast.DeclEnum:
 		return NewConstantRuntimeValue(PreludeEnumDecl{Decl: decl})
 	case ast.DeclFunc:
-		return NewConstantRuntimeValue(PreludeFuncDecl{
-			Environment: context.environment.Private(),
-			Decl:        decl,
-		})
+		return NewConstantRuntimeValue(MakePreludeFuncDecl(context, decl))
 	case ast.DeclExternFunc, ast.DeclExternType:
 		definition, ok := context.interpreter.ExternalDefinitions[context.module.Name]
 		if !ok {

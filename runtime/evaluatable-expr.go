@@ -96,7 +96,7 @@ func (e EvaluatableExpr) EvaluateExprInvocation(expr ast.ExprInvocation) (Runtim
 	}
 	callable, ok := function.(CallableRuntimeValue)
 	if !ok {
-		return nil, NewRuntimeErrorf("cannot call %s", callable)
+		return nil, NewRuntimeErrorf("cannot call %T %s", function, function)
 	}
 	args := make([]Evaluatable, len(expr.Arguments))
 	for i, argExpr := range expr.Arguments {

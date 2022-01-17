@@ -19,7 +19,7 @@ func (fp *FileParser) ParseParameterDeclarationList() ([]ast.DeclParameter, []Sy
 		if child.Type() == TYPE_NODE_COMMENT {
 			continue
 		}
-		param, errs := fp.ParseParameterDeclaration()
+		param, errs := fp.ChildParserConsumingComments(child).ParseParameterDeclaration()
 		if errs != nil {
 			errors = append(errors, errs...)
 		}

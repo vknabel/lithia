@@ -34,7 +34,7 @@ func (fp *FileParser) ParseFunctionExpr() (*ast.ExprFunc, []SyntaxError) {
 		}
 		if decls != nil {
 			for _, decl := range decls {
-				function.AddDecl(&decl)
+				function.AddDecl(decl)
 			}
 			continue
 		}
@@ -44,7 +44,7 @@ func (fp *FileParser) ParseFunctionExpr() (*ast.ExprFunc, []SyntaxError) {
 			errors = append(errors, exprErrors...)
 		}
 		if expr != nil {
-			function.AddExpr(&expr)
+			function.AddExpr(expr)
 			continue
 		}
 
