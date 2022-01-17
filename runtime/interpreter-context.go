@@ -49,10 +49,9 @@ func (i *InterpreterContext) Evaluate() (RuntimeValue, *RuntimeError) {
 			fmt.Println("No statements", i.fileDef)
 			return nil, nil // TODO: Return Void?
 		}
-		ex := &EvaluationContext{i.environment, i.interpreter}
 		var result RuntimeValue
 		for _, stmt := range i.fileDef.Statements {
-			expr := MakeEvaluatableExpr(ex, stmt)
+			expr := MakeEvaluatableExpr(i, stmt)
 			value, err := expr.Evaluate()
 			if err != nil {
 				return nil, err

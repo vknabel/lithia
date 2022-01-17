@@ -52,7 +52,7 @@ func (env *Environment) GetExported(name string) (Evaluatable, bool) {
 	return nil, false
 }
 
-func (env *Environment) GetPrivte(name string) (Evaluatable, bool) {
+func (env *Environment) GetPrivate(name string) (Evaluatable, bool) {
 	if value, ok := env.Scope[name]; ok {
 		return value, true
 	}
@@ -61,7 +61,7 @@ func (env *Environment) GetPrivte(name string) (Evaluatable, bool) {
 	}
 
 	if env.Parent != nil {
-		return env.Parent.GetPrivte(name)
+		return env.Parent.GetPrivate(name)
 	}
 
 	return nil, false

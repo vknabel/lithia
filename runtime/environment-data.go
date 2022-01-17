@@ -1,7 +1,7 @@
 package runtime
 
 func (env *Environment) MakeEmptyDataRuntimeValue(name string) (DataRuntimeValue, *RuntimeError) {
-	evaluatable, ok := env.GetPrivte(name)
+	evaluatable, ok := env.GetPrivate(name)
 	if !ok {
 		return DataRuntimeValue{}, NewRuntimeErrorf("not declared: %s", name)
 	}

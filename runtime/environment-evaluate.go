@@ -1,7 +1,7 @@
 package runtime
 
 func (env *Environment) GetEvaluatedRuntimeValue(key string) (RuntimeValue, *RuntimeError) {
-	if lazyValue, ok := env.GetPrivte(key); ok {
+	if lazyValue, ok := env.GetPrivate(key); ok {
 		value, err := lazyValue.Evaluate()
 		if err != nil {
 			return nil, err
@@ -13,7 +13,7 @@ func (env *Environment) GetEvaluatedRuntimeValue(key string) (RuntimeValue, *Run
 }
 
 func (env *Environment) GetExportedEvaluatedRuntimeValue(key string) (RuntimeValue, *RuntimeError) {
-	if lazyValue, ok := env.GetPrivte(key); ok {
+	if lazyValue, ok := env.GetPrivate(key); ok {
 		value, err := lazyValue.Evaluate()
 		if err != nil {
 			return nil, err

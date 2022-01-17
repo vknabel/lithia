@@ -6,18 +6,13 @@ import (
 	"github.com/vknabel/go-lithia/ast"
 )
 
-type EvaluationContext struct {
-	*Environment
-	*Interpreter
-}
-
 type EvaluatableExpr struct {
-	Context *EvaluationContext
+	Context *InterpreterContext
 	Expr    ast.Expr
 	cache   *LazyEvaluationCache
 }
 
-func MakeEvaluatableExpr(context *EvaluationContext, expr ast.Expr) EvaluatableExpr {
+func MakeEvaluatableExpr(context *InterpreterContext, expr ast.Expr) EvaluatableExpr {
 	return EvaluatableExpr{context, expr, NewLazyEvaluationCache()}
 }
 
@@ -74,7 +69,7 @@ func (e EvaluatableExpr) EvaluateExprFloat(expr ast.ExprFloat) (RuntimeValue, *R
 }
 
 func (e EvaluatableExpr) EvaluateExprFunc(expr ast.ExprFunc) (RuntimeValue, *RuntimeError) {
-	return MakePreludeFuncExpr(e.Context.Environment, expr), nil
+	return MakePreludeFuncExpr(e.Context.environment, expr), nil
 }
 
 func (e EvaluatableExpr) EvaluateExprGroup(expr ast.ExprGroup) (RuntimeValue, *RuntimeError) {
@@ -83,7 +78,7 @@ func (e EvaluatableExpr) EvaluateExprGroup(expr ast.ExprGroup) (RuntimeValue, *R
 }
 
 func (e EvaluatableExpr) EvaluateExprIdentifier(expr ast.ExprIdentifier) (RuntimeValue, *RuntimeError) {
-	if unevaluated, ok := e.Context.GetPrivte(string(expr.Name)); ok {
+	if unevaluated, ok := e.Context.environment.GetPrivate(string(expr.Name)); ok {
 		return unevaluated.Evaluate()
 	} else {
 		return nil, NewRuntimeError(fmt.Errorf("undeclared %s", expr.Name))
@@ -151,5 +146,5 @@ func (e EvaluatableExpr) EvaluateExprString(expr ast.ExprString) (RuntimeValue, 
 }
 
 func (e EvaluatableExpr) EvaluateExprTypeSwitch(expr ast.ExprTypeSwitch) (RuntimeValue, *RuntimeError) {
-	return MakePreludeTypeSwitchExpr(e.Context.Environment, expr), nil
+	return MakePreludeTypeSwitchExpr(e.Context.environment, expr), nil
 }

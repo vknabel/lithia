@@ -2,7 +2,7 @@ package runtime
 
 import "reflect"
 
-func (ex *EvaluationContext) BinaryOperatorFunction(operator string) (func(Evaluatable, Evaluatable) (RuntimeValue, *RuntimeError), *RuntimeError) {
+func (ex *InterpreterContext) BinaryOperatorFunction(operator string) (func(Evaluatable, Evaluatable) (RuntimeValue, *RuntimeError), *RuntimeError) {
 	switch operator {
 	case "==":
 		return func(lazyLeft, lazyRight Evaluatable) (RuntimeValue, *RuntimeError) {
@@ -106,7 +106,7 @@ func (ex *EvaluationContext) BinaryOperatorFunction(operator string) (func(Evalu
 	}
 }
 
-func (ex *EvaluationContext) genericGreedyComparision(
+func (ex *InterpreterContext) genericGreedyComparision(
 	lazyLeft, lazyRight Evaluatable,
 	compare func(RuntimeValue, RuntimeValue) bool,
 ) (RuntimeValue, *RuntimeError) {
@@ -121,7 +121,7 @@ func (ex *EvaluationContext) genericGreedyComparision(
 	return ex.boolToRuntimeValue(compare(left, right))
 }
 
-func (ex *EvaluationContext) numericGreedyComparision(
+func (ex *InterpreterContext) numericGreedyComparision(
 	operator string,
 	lazyLeft, lazyRight Evaluatable,
 	compareInt func(PreludeInt, PreludeInt) bool,
@@ -175,7 +175,7 @@ func (ex *EvaluationContext) numericGreedyComparision(
 	}
 }
 
-func (ex *EvaluationContext) numericGreedyOperation(
+func (ex *InterpreterContext) numericGreedyOperation(
 	operator string,
 	lazyLeft, lazyRight Evaluatable,
 	combineInt func(PreludeInt, PreludeInt) PreludeInt,
@@ -229,7 +229,7 @@ func (ex *EvaluationContext) numericGreedyOperation(
 	}
 }
 
-func (ex *EvaluationContext) lazyLogicComparision(
+func (ex *InterpreterContext) lazyLogicComparision(
 	operator string,
 	lazyLeft, lazyRight Evaluatable,
 	compare func(bool, func() (bool, *RuntimeError)) (bool, *RuntimeError),
@@ -249,7 +249,7 @@ func (ex *EvaluationContext) lazyLogicComparision(
 	// // 	moduleName: "prelude",
 	// // 	typeValue:  &trueTypeValue,
 	// // }
-	if ok, err := boolRef.IncludesValue(ex.Interpreter, left); !ok || err != nil {
+	if ok, err := boolRef.IncludesValue(ex.interpreter, left); !ok || err != nil {
 		return nil, RuntimeBinaryOperatorOnlySupportsType(
 			operator,
 			[]RuntimeTypeRef{boolRef},
@@ -258,7 +258,7 @@ func (ex *EvaluationContext) lazyLogicComparision(
 	}
 
 	trueRef := MakeRuntimeTypeRef("True", "prelude")
-	isLeftTrue, err := trueRef.IncludesValue(ex.Interpreter, left)
+	isLeftTrue, err := trueRef.IncludesValue(ex.interpreter, left)
 	if err != nil {
 		return nil, NewRuntimeError(err)
 	}
@@ -268,7 +268,7 @@ func (ex *EvaluationContext) lazyLogicComparision(
 		if err != nil {
 			return false, nil
 		}
-		isRightTrue, err := boolRef.IncludesValue(ex.Interpreter, right)
+		isRightTrue, err := boolRef.IncludesValue(ex.interpreter, right)
 		if err != nil {
 			return false, nil
 		}
@@ -290,6 +290,6 @@ func (env *Environment) boolToRuntimeValue(value bool) (RuntimeValue, *RuntimeEr
 	}
 }
 
-func (ex *EvaluationContext) boolToRuntimeValue(value bool) (RuntimeValue, *RuntimeError) {
-	return ex.Environment.boolToRuntimeValue(value)
+func (ex *InterpreterContext) boolToRuntimeValue(value bool) (RuntimeValue, *RuntimeError) {
+	return ex.environment.boolToRuntimeValue(value)
 }

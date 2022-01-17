@@ -6,7 +6,7 @@ import (
 	"github.com/vknabel/go-lithia/ast"
 )
 
-func MakeRuntimeValueDecl(context *EvaluationContext, decl ast.Decl) Evaluatable {
+func MakeRuntimeValueDecl(context *InterpreterContext, decl ast.Decl) Evaluatable {
 	switch decl := decl.(type) {
 	case ast.DeclConstant:
 		return MakeEvaluatableExpr(context, *decl.Value)
@@ -16,7 +16,7 @@ func MakeRuntimeValueDecl(context *EvaluationContext, decl ast.Decl) Evaluatable
 		return NewConstantRuntimeValue(PreludeEnumDecl{Decl: decl})
 	case ast.DeclFunc:
 		return NewConstantRuntimeValue(PreludeFuncDecl{
-			Environment: context.Environment.Private(),
+			Environment: context.environment.Private(),
 			Decl:        decl,
 		})
 	default:
