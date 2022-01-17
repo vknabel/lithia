@@ -10,6 +10,10 @@ type DeclFunc struct {
 	MetaInfo *MetaDecl
 }
 
+func (e DeclFunc) DeclName() Identifier {
+	return e.Name
+}
+
 func (e DeclFunc) Meta() *MetaDecl {
 	return e.MetaInfo
 }

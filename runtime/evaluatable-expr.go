@@ -21,8 +21,8 @@ func MakeEvaluatableExpr(context *EvaluationContext, expr ast.Expr) EvaluatableE
 	return EvaluatableExpr{context, expr, NewLazyEvaluationCache()}
 }
 
-func (e EvaluatableExpr) Evaluate() (value RuntimeValue, error *RuntimeError) {
-	value, err := e.cache.Evaluate(func() (RuntimeValue, *RuntimeError) {
+func (e EvaluatableExpr) Evaluate() (RuntimeValue, *RuntimeError) {
+	value, err := e.cache.Evaluate(func() (value RuntimeValue, error *RuntimeError) {
 		defer func() {
 			if err := recover(); err != nil {
 				error = NewRuntimeError(fmt.Errorf("panic: %q", err))
@@ -33,32 +33,32 @@ func (e EvaluatableExpr) Evaluate() (value RuntimeValue, error *RuntimeError) {
 			panic("cannot evaluate nil expr")
 		}
 		switch expr := e.Expr.(type) {
-		case ast.ExprArray:
-			return e.EvaluateExprArray(expr)
-		case ast.ExprFloat:
-			return e.EvaluateExprFloat(expr)
-		case ast.ExprFunc:
-			return e.EvaluateExprFunc(expr)
-		case ast.ExprGroup:
-			return e.EvaluateExprGroup(expr)
-		case ast.ExprIdentifier:
-			return e.EvaluateExprIdentifier(expr)
-		case ast.ExprInt:
-			return e.EvaluateExprInt(expr)
-		case ast.ExprInvocation:
-			return e.EvaluateExprInvocation(expr)
-		case ast.ExprMemberAccess:
-			return e.EvaluateExprMemberAccess(expr)
-		case ast.ExprOperatorBinary:
-			return e.EvaluateExprOperatorBinary(expr)
-		case ast.ExprOperatorUnary:
-			return e.EvaluateExprOperatorUnary(expr)
-		case ast.ExprString:
-			return e.EvaluateExprString(expr)
-		case ast.ExprTypeSwitch:
-			return e.EvaluateExprTypeSwitch(expr)
+		case *ast.ExprArray:
+			return e.EvaluateExprArray(*expr)
+		case *ast.ExprFloat:
+			return e.EvaluateExprFloat(*expr)
+		case *ast.ExprFunc:
+			return e.EvaluateExprFunc(*expr)
+		case *ast.ExprGroup:
+			return e.EvaluateExprGroup(*expr)
+		case *ast.ExprIdentifier:
+			return e.EvaluateExprIdentifier(*expr)
+		case *ast.ExprInt:
+			return e.EvaluateExprInt(*expr)
+		case *ast.ExprInvocation:
+			return e.EvaluateExprInvocation(*expr)
+		case *ast.ExprMemberAccess:
+			return e.EvaluateExprMemberAccess(*expr)
+		case *ast.ExprOperatorBinary:
+			return e.EvaluateExprOperatorBinary(*expr)
+		case *ast.ExprOperatorUnary:
+			return e.EvaluateExprOperatorUnary(*expr)
+		case *ast.ExprString:
+			return e.EvaluateExprString(*expr)
+		case *ast.ExprTypeSwitch:
+			return e.EvaluateExprTypeSwitch(*expr)
 		default:
-			panic(fmt.Sprintf("unknown expr: %s", expr))
+			panic(fmt.Sprintf("unknown expr: %T %s", expr, expr))
 		}
 	})
 
@@ -95,7 +95,19 @@ func (e EvaluatableExpr) EvaluateExprInt(expr ast.ExprInt) (RuntimeValue, *Runti
 }
 
 func (e EvaluatableExpr) EvaluateExprInvocation(expr ast.ExprInvocation) (RuntimeValue, *RuntimeError) {
-	panic("TODO: not implemented EvaluateExprInvocation")
+	function, err := MakeEvaluatableExpr(e.Context, expr.Function).Evaluate()
+	if err != nil {
+		return nil, err
+	}
+	callable, ok := function.(CallableRuntimeValue)
+	if !ok {
+		return nil, NewRuntimeErrorf("cannot call %s", callable)
+	}
+	args := make([]Evaluatable, len(expr.Arguments))
+	for i, argExpr := range expr.Arguments {
+		args[i] = MakeEvaluatableExpr(e.Context, *argExpr)
+	}
+	return callable.Call(args)
 }
 
 func (e EvaluatableExpr) EvaluateExprMemberAccess(expr ast.ExprMemberAccess) (RuntimeValue, *RuntimeError) {

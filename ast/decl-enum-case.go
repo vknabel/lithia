@@ -9,6 +9,10 @@ type DeclEnumCase struct {
 	MetaInfo *MetaDecl
 }
 
+func (e DeclEnumCase) DeclName() Identifier {
+	return e.Name
+}
+
 func (e DeclEnumCase) Meta() *MetaDecl {
 	return e.MetaInfo
 }

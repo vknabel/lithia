@@ -9,6 +9,10 @@ type DeclModule struct {
 	MetaInfo *MetaDecl
 }
 
+func (e DeclModule) DeclName() Identifier {
+	return e.Name
+}
+
 func (e DeclModule) Meta() *MetaDecl {
 	return e.MetaInfo
 }

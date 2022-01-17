@@ -28,7 +28,7 @@ func (fp *FileParser) ParseSourceFile() (*ast.SourceFile, []SyntaxError) {
 		}
 		if parsedDecls != nil {
 			for _, decl := range parsedDecls {
-				sourceFile.AddDecl(&decl)
+				sourceFile.AddDecl(decl)
 			}
 			continue
 		}
@@ -38,7 +38,7 @@ func (fp *FileParser) ParseSourceFile() (*ast.SourceFile, []SyntaxError) {
 			continue
 		}
 		if expr != nil {
-			sourceFile.AddExpr(&expr)
+			sourceFile.AddExpr(expr)
 			continue
 		}
 		parsingErrors = append(parsingErrors, fp.SyntaxErrorf("unexpected %q, expected module, import, enum, data, func, let or an expression", child.Type()))

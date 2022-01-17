@@ -52,7 +52,7 @@ func (i *InterpreterContext) Evaluate() (RuntimeValue, *RuntimeError) {
 		ex := &EvaluationContext{i.environment, i.interpreter}
 		var result RuntimeValue
 		for _, stmt := range i.fileDef.Statements {
-			expr := MakeEvaluatableExpr(ex, *stmt)
+			expr := MakeEvaluatableExpr(ex, stmt)
 			value, err := expr.Evaluate()
 			if err != nil {
 				return nil, err

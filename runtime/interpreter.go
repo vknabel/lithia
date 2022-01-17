@@ -108,6 +108,18 @@ func (inter *Interpreter) LoadFileIntoModule(module *Module, fileName string, sc
 	}
 	ix := inter.NewInterpreterContext(sourceFile, module, fileParser.Tree.RootNode(), []byte(script), module.Environment.Private())
 	module.Files[FileName(fileName)] = ix
+	// TODO: Modules?
+	// for _, moduleImport := range sourceFile.Imports {
+	// 	ix.environment.DeclareUnexported(string(moduleImport), moduleImport)
+	// }
+	for _, decl := range sourceFile.Declarations {
+		ex := &EvaluationContext{
+			Environment: ix.environment,
+			Interpreter: ix.interpreter,
+		}
+		declValue := MakeRuntimeValueDecl(ex, decl)
+		ix.environment.DeclareExported(string(decl.DeclName()), declValue)
+	}
 	return ix, nil
 }
 

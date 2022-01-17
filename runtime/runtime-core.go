@@ -23,5 +23,5 @@ type RuntimeType interface {
 
 type CallableRuntimeValue interface {
 	RuntimeValue
-	Call(args []Evaluatable) (RuntimeValue, RuntimeError)
+	Call(args []Evaluatable) (RuntimeValue, *RuntimeError)
 }

@@ -8,6 +8,10 @@ type DeclImportMember struct {
 	MetaInfo *MetaDecl
 }
 
+func (e DeclImportMember) DeclName() Identifier {
+	return e.Name
+}
+
 func (e DeclImportMember) Meta() *MetaDecl {
 	return e.MetaInfo
 }
