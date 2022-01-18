@@ -1,5 +1,7 @@
 package ast
 
+import "fmt"
+
 var _ Decl = DeclEnum{}
 
 type DeclEnum struct {
@@ -30,4 +32,16 @@ func MakeDeclEnum(name Identifier, source *Source) *DeclEnum {
 
 func (e *DeclEnum) AddCase(case_ *DeclEnumCase) {
 	e.Cases = append(e.Cases, case_)
+}
+
+func (e DeclEnum) String() string {
+	declarationClause := fmt.Sprintf("enum %s", e.Name)
+	if len(e.Cases) == 0 {
+		return declarationClause
+	}
+	declarationClause += " { "
+	for _, caseDecl := range e.Cases {
+		declarationClause += string(caseDecl.Name) + "; "
+	}
+	return declarationClause + "}"
 }

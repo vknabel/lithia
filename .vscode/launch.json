@@ -39,7 +39,7 @@
             "mode": "auto",
             "program": "${workspaceFolder}/cmd/lithia/main.go",
             "args": [
-                "${workspaceFolder}/examples/syntax.lithia"
+                "${workspaceFolder}/examples/fib-type.lithia"
             ],
             "env": {
                 "LITHIA_STDLIB": "${workspaceFolder}/stdlib"

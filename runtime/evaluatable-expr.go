@@ -69,11 +69,11 @@ func (e EvaluatableExpr) EvaluateExprFloat(expr ast.ExprFloat) (RuntimeValue, *R
 }
 
 func (e EvaluatableExpr) EvaluateExprFunc(expr ast.ExprFunc) (RuntimeValue, *RuntimeError) {
-	return MakePreludeFuncExpr(e.Context.environment, expr), nil
+	return MakePreludeFuncExpr(e.Context, expr), nil
 }
 
 func (e EvaluatableExpr) EvaluateExprGroup(expr ast.ExprGroup) (RuntimeValue, *RuntimeError) {
-	var inner ast.Expr = expr
+	var inner ast.Expr = expr.Expr
 	return MakeEvaluatableExpr(e.Context, inner).Evaluate()
 }
 
@@ -106,7 +106,7 @@ func (e EvaluatableExpr) EvaluateExprInvocation(expr ast.ExprInvocation) (Runtim
 }
 
 func (e EvaluatableExpr) EvaluateExprMemberAccess(expr ast.ExprMemberAccess) (RuntimeValue, *RuntimeError) {
-	evaluatableTargetExpr := MakeEvaluatableExpr(e.Context, *expr.Target)
+	evaluatableTargetExpr := MakeEvaluatableExpr(e.Context, expr.Target)
 	target, err := evaluatableTargetExpr.Evaluate()
 	if err != nil {
 		return nil, err
@@ -131,8 +131,8 @@ func (e EvaluatableExpr) EvaluateExprOperatorBinary(expr ast.ExprOperatorBinary)
 	if err != nil {
 		return nil, err
 	}
-	leftEvalExpr := MakeEvaluatableExpr(e.Context, *expr.Left)
-	rightEvalExpr := MakeEvaluatableExpr(e.Context, *expr.Right)
+	leftEvalExpr := MakeEvaluatableExpr(e.Context, expr.Left)
+	rightEvalExpr := MakeEvaluatableExpr(e.Context, expr.Right)
 
 	return impl(leftEvalExpr, rightEvalExpr)
 }
@@ -146,5 +146,5 @@ func (e EvaluatableExpr) EvaluateExprString(expr ast.ExprString) (RuntimeValue, 
 }
 
 func (e EvaluatableExpr) EvaluateExprTypeSwitch(expr ast.ExprTypeSwitch) (RuntimeValue, *RuntimeError) {
-	return MakePreludeTypeSwitchExpr(e.Context.environment, expr), nil
+	return MakePreludeTypeSwitchExpr(e.Context, expr), nil
 }

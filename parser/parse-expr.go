@@ -104,10 +104,10 @@ func (fp *FileParser) ParseExpressionIfGiven() (ast.Expr, []SyntaxError) {
 	}
 }
 
-func (fp *FileParser) ParseExpression() (*ast.Expr, []SyntaxError) {
+func (fp *FileParser) ParseExpression() (ast.Expr, []SyntaxError) {
 	expr, errs := fp.ParseExpressionIfGiven()
 	if expr != nil || errs != nil {
-		return &expr, errs
+		return expr, errs
 	}
 	return nil, []SyntaxError{fp.SyntaxErrorf("expected expression, got %s", fp.Node.Type())}
 }

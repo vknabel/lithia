@@ -5,4 +5,4 @@ func fib { n =>
     } (n <= 1)
 }
 
-print fib 28
+print fib 30

@@ -6,7 +6,7 @@ import (
 
 func (fp *FileParser) ParseExprArray() (*ast.ExprArray, []SyntaxError) {
 	numberOfElements := int(fp.Node.NamedChildCount())
-	elements := make([]*ast.Expr, 0, numberOfElements)
+	elements := make([]ast.Expr, 0, numberOfElements)
 	for i := 0; i < numberOfElements; i++ {
 		elementNode := fp.Node.NamedChild(i)
 		if elementNode.Type() == TYPE_NODE_COMMENT {

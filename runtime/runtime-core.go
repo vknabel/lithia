@@ -26,3 +26,8 @@ type CallableRuntimeValue interface {
 	Arity() int
 	Call(args []Evaluatable) (RuntimeValue, *RuntimeError)
 }
+
+type DeclRuntimeValue interface {
+	RuntimeValue
+	HasInstance(value RuntimeValue) (bool, *RuntimeError)
+}

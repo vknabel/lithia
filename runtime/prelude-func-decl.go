@@ -24,7 +24,7 @@ func MakePreludeFuncDecl(context *InterpreterContext, decl ast.DeclFunc) Prelude
 }
 
 func (PreludeFuncDecl) Lookup(member string) (Evaluatable, *RuntimeError) {
-	panic("TODO: not implemented")
+	panic("TODO: not implemented PreludeFuncDecl")
 }
 
 func (PreludeFuncDecl) RuntimeType() RuntimeTypeRef {
@@ -32,7 +32,7 @@ func (PreludeFuncDecl) RuntimeType() RuntimeTypeRef {
 }
 
 func (PreludeFuncDecl) String() string {
-	panic("TODO: not implemented")
+	panic("TODO: not implemented PreludeFuncDecl")
 }
 
 func (f PreludeFuncDecl) Arity() int {

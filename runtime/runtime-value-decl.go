@@ -9,11 +9,11 @@ import (
 func MakeRuntimeValueDecl(context *InterpreterContext, decl ast.Decl) Evaluatable {
 	switch decl := decl.(type) {
 	case ast.DeclConstant:
-		return MakeEvaluatableExpr(context, *decl.Value)
+		return MakeEvaluatableExpr(context, decl.Value)
 	case ast.DeclData:
 		return NewConstantRuntimeValue(PreludeDataDecl{Decl: decl})
 	case ast.DeclEnum:
-		return NewConstantRuntimeValue(PreludeEnumDecl{Decl: decl})
+		return NewConstantRuntimeValue(MakeEnumDecl(context, decl))
 	case ast.DeclFunc:
 		return NewConstantRuntimeValue(MakePreludeFuncDecl(context, decl))
 	case ast.DeclExternFunc, ast.DeclExternType:

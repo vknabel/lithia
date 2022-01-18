@@ -16,7 +16,7 @@ func (fp *FileParser) ParseInvocationExpr() (*ast.ExprInvocation, []SyntaxError)
 		return nil, errors
 	}
 
-	function := ast.MakeExprInvocation(*functionExpr, functionParser.AstSource())
+	function := ast.MakeExprInvocation(functionExpr, functionParser.AstSource())
 	for i := 1; i < int(fp.Node.NamedChildCount()); i++ {
 		child := fp.Node.NamedChild(i)
 		if fp.ParseChildCommentIfNeeded(child) {
@@ -28,7 +28,7 @@ func (fp *FileParser) ParseInvocationExpr() (*ast.ExprInvocation, []SyntaxError)
 			errors = append(errors, childErrs...)
 		}
 		if expr != nil {
-			function.AddArgument(*expr)
+			function.AddArgument(expr)
 		}
 	}
 	return function, errors

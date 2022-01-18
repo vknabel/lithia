@@ -18,7 +18,7 @@ func MakeCurriedCallable(actual CallableRuntimeValue, arguments []Evaluatable) P
 }
 
 func (PreludeCurriedCallable) Lookup(member string) (Evaluatable, *RuntimeError) {
-	panic("TODO: not implemented")
+	panic("TODO: not implemented PreludeCurriedCallable")
 }
 
 func (PreludeCurriedCallable) RuntimeType() RuntimeTypeRef {
@@ -26,7 +26,7 @@ func (PreludeCurriedCallable) RuntimeType() RuntimeTypeRef {
 }
 
 func (PreludeCurriedCallable) String() string {
-	panic("TODO: not implemented")
+	panic("TODO: not implemented PreludeCurriedCallable")
 }
 
 func (f PreludeCurriedCallable) Arity() int {

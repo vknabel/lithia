@@ -30,7 +30,7 @@ func MakeExternFunction(
 }
 
 func (PreludeExternFunction) Lookup(member string) (Evaluatable, *RuntimeError) {
-	panic("TODO: not implemented")
+	panic("TODO: not implemented PreludeExternFunction")
 }
 
 func (PreludeExternFunction) RuntimeType() RuntimeTypeRef {

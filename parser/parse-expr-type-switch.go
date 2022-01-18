@@ -17,7 +17,7 @@ func (fp *FileParser) ParseExprTypeSwitch() (*ast.ExprTypeSwitch, []SyntaxError)
 		return nil, errs
 	}
 
-	typeSwitchExpr := ast.MakeExprTypeSwitch(*typeExpr, fp.AstSource())
+	typeSwitchExpr := ast.MakeExprTypeSwitch(typeExpr, fp.AstSource())
 
 	caseCount := int(bodyNode.NamedChildCount())
 	errs = []SyntaxError{}

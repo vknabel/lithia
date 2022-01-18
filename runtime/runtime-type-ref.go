@@ -38,6 +38,7 @@ func (r RuntimeTypeRef) Declaration(interpreter *Interpreter) (ast.Decl, *Runtim
 }
 
 func (ref RuntimeTypeRef) IncludesValue(interpreter *Interpreter, value RuntimeValue) (bool, *RuntimeError) {
+	// TODO: Enums
 	if ref == value.RuntimeType() {
 		return true, nil
 	}
