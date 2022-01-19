@@ -18,6 +18,9 @@ type FileParser struct {
 }
 
 func NewFileParser(moduleName ast.ModuleName, file string, node *sitter.Node, tree *sitter.Tree, source []byte) *FileParser {
+	if node == nil {
+		panic("node is nil")
+	}
 	return &FileParser{
 		ModuleName: moduleName,
 		File:       file,
@@ -34,6 +37,9 @@ func (fp *FileParser) ConsumeDocs() *ast.Docs {
 }
 
 func (fp *FileParser) ChildParser(node *sitter.Node) *FileParser {
+	if node == nil {
+		panic("node is nil")
+	}
 	return &FileParser{
 		ModuleName:    fp.ModuleName,
 		File:          fp.File,
@@ -45,6 +51,9 @@ func (fp *FileParser) ChildParser(node *sitter.Node) *FileParser {
 }
 
 func (fp *FileParser) ChildParserConsumingComments(node *sitter.Node) *FileParser {
+	if node == nil {
+		panic("node is nil")
+	}
 	comments := fp.Comments
 	fp.Comments = []string{}
 	return &FileParser{

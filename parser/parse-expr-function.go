@@ -9,7 +9,14 @@ func (fp *FileParser) ParseFunctionExpr() (*ast.ExprFunc, []SyntaxError) {
 	bodyNode := fp.Node.ChildByFieldName("body")
 
 	errors := []SyntaxError{}
-	params, paramsErrors := fp.ChildParser(parametersNode).ParseParameterDeclarationList()
+	var params []ast.DeclParameter
+	var paramsErrors []SyntaxError
+	if parametersNode != nil {
+		params, paramsErrors = fp.ChildParser(parametersNode).ParseParameterDeclarationList()
+	} else {
+		params = []ast.DeclParameter{}
+		paramsErrors = []SyntaxError{}
+	}
 	if paramsErrors != nil {
 		errors = append(errors, paramsErrors...)
 	}

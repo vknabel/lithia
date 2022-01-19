@@ -4,11 +4,15 @@ import "github.com/vknabel/go-lithia/ast"
 
 func (fp *FileParser) ParseDataDeclaration() (*ast.DeclData, []SyntaxError) {
 	name := ast.Identifier(fp.Node.ChildByFieldName("name").Content(fp.Source))
-	propertiesNode := fp.Node.ChildByFieldName("properties")
-	propsp := fp.ChildParser(propertiesNode)
 
 	dataDecl := ast.MakeDeclData(name, fp.AstSource())
 	dataDecl.Docs = fp.ConsumeDocs()
+
+	propertiesNode := fp.Node.ChildByFieldName("properties")
+	if propertiesNode == nil {
+		return dataDecl, nil
+	}
+	propsp := fp.ChildParser(propertiesNode)
 
 	var numberOfFields int
 	if propertiesNode != nil {

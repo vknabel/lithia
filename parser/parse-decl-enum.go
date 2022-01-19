@@ -6,9 +6,13 @@ import (
 
 func (fp *FileParser) ParseEnumDeclaration() (*ast.DeclEnum, []ast.Decl, []SyntaxError) {
 	enumName := ast.Identifier(fp.Node.ChildByFieldName("name").Content(fp.Source))
-	caseList := fp.Node.ChildByFieldName("cases")
-	casep := fp.ChildParser(caseList)
 	decl := ast.MakeDeclEnum(enumName, fp.AstSource())
+
+	caseList := fp.Node.ChildByFieldName("cases")
+	if caseList == nil {
+		return decl, nil, nil
+	}
+	casep := fp.ChildParser(caseList)
 	decl.Docs = fp.ConsumeDocs()
 
 	allChildDecls := []ast.Decl{}
