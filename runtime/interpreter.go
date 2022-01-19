@@ -53,7 +53,7 @@ func NewInterpreter(importRoots ...string) *Interpreter {
 	}
 	// TODO: External definitions
 	inter.ExternalDefinitions["prelude"] = ExternalPrelude{}
-	// inter.ExternalDefinitions["os"] = ExternalOS{}
+	inter.ExternalDefinitions["os"] = ExternalOS{}
 	inter.ExternalDefinitions["rx"] = ExternalRx{}
 	// inter.ExternalDefinitions["docs"] = ExternalDocs{}
 	// inter.ExternalDefinitions["fs"] = ExternalFS{}

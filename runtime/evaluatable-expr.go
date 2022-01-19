@@ -61,7 +61,12 @@ func (e EvaluatableExpr) Evaluate() (RuntimeValue, *RuntimeError) {
 }
 
 func (e EvaluatableExpr) EvaluateExprArray(expr ast.ExprArray) (RuntimeValue, *RuntimeError) {
-	panic("TODO: not implemented EvaluateExprArray")
+	evaluatables := make([]Evaluatable, len(expr.Elements))
+	for i, element := range expr.Elements {
+		evaluatables[i] = MakeEvaluatableExpr(e.Context, element)
+	}
+	list, err := e.Context.environment.MakeList(evaluatables)
+	return list, err.Cascade(*expr.Meta().Source)
 }
 
 func (e EvaluatableExpr) EvaluateExprFloat(expr ast.ExprFloat) (RuntimeValue, *RuntimeError) {
