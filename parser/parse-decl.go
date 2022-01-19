@@ -14,9 +14,13 @@ func (fp *FileParser) ParseDeclsIfGiven() ([]ast.Decl, []SyntaxError) {
 			return []ast.Decl{}, err
 		}
 	case TYPE_NODE_IMPORT_DECLARATION:
-		stmt, err := fp.ParseImportDeclaration()
-		if stmt != nil {
-			return []ast.Decl{*stmt}, err
+		importDecl, err := fp.ParseImportDeclaration()
+		if importDecl != nil {
+			memberImportDecls := make([]ast.Decl, len(importDecl.Members))
+			for i, member := range importDecl.Members {
+				memberImportDecls[i] = member
+			}
+			return append(memberImportDecls, *importDecl), err
 		} else {
 			return []ast.Decl{}, err
 		}

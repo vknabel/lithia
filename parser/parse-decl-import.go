@@ -27,7 +27,7 @@ func (fp *FileParser) ParseImportDeclaration() (*ast.DeclImport, []SyntaxError) 
 		child := membersNode.NamedChild(i)
 		if child.Type() == TYPE_NODE_IDENTIFIER {
 			name := ast.Identifier(child.Content(fp.Source))
-			member := ast.MakeDeclImportMember(name, fp.ChildParser(child).AstSource())
+			member := ast.MakeDeclImportMember(moduleName, name, fp.ChildParser(child).AstSource())
 			importDecl.AddMember(member)
 		}
 	}

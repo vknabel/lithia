@@ -3,7 +3,8 @@ package ast
 var _ Decl = DeclImportMember{}
 
 type DeclImportMember struct {
-	Name Identifier
+	Name       Identifier
+	ModuleName ModuleName
 
 	MetaInfo *MetaDecl
 }
@@ -16,9 +17,10 @@ func (e DeclImportMember) Meta() *MetaDecl {
 	return e.MetaInfo
 }
 
-func MakeDeclImportMember(name Identifier, source *Source) *DeclImportMember {
-	return &DeclImportMember{
-		Name:     name,
-		MetaInfo: &MetaDecl{source},
+func MakeDeclImportMember(moduleName ModuleName, name Identifier, source *Source) DeclImportMember {
+	return DeclImportMember{
+		Name:       name,
+		ModuleName: moduleName,
+		MetaInfo:   &MetaDecl{source},
 	}
 }

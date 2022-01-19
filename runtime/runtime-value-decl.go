@@ -28,6 +28,23 @@ func MakeRuntimeValueDecl(context *InterpreterContext, decl ast.Decl) Evaluatabl
 		return NewConstantRuntimeValue(value)
 	case ast.DeclModule:
 		return NewConstantRuntimeValue(PreludeModule{Module: context.module})
+	case ast.DeclImport:
+		return NewLazyRuntimeValue(func() (RuntimeValue, *RuntimeError) {
+			module, err := context.interpreter.LoadModuleIfNeeded(decl.ModuleName)
+			if err != nil {
+				return nil, NewRuntimeError(err).Cascade(*decl.Meta().Source)
+			}
+			return PreludeModule{Module: module}, nil
+		})
+	case ast.DeclImportMember:
+		return NewLazyRuntimeValue(func() (RuntimeValue, *RuntimeError) {
+			module, err := context.interpreter.LoadModuleIfNeeded(decl.ModuleName)
+			if err != nil {
+				return nil, NewRuntimeError(err).Cascade(*decl.Meta().Source)
+			}
+			value, err := module.Environment.GetEvaluatedRuntimeValue(string(decl.DeclName()))
+			return value, NewRuntimeError(err).Cascade(*decl.Meta().Source)
+		})
 	default:
 		panic(fmt.Sprintf("unknown decl: %T %s", decl, decl.DeclName()))
 	}
