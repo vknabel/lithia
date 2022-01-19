@@ -18,6 +18,10 @@ func (e DeclConstant) Meta() *MetaDecl {
 	return e.MetaInfo
 }
 
+func (e DeclConstant) IsExportedDecl() bool {
+	return true
+}
+
 func MakeDeclConstant(name Identifier, value Expr, source *Source) *DeclConstant {
 	return &DeclConstant{
 		Name:     name,

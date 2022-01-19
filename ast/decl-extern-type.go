@@ -17,6 +17,10 @@ func (e DeclExternType) Meta() *MetaDecl {
 	return e.MetaInfo
 }
 
+func (e DeclExternType) IsExportedDecl() bool {
+	return true
+}
+
 func MakeDeclExternType(name Identifier, source *Source) *DeclExternType {
 	return &DeclExternType{
 		Name:     name,

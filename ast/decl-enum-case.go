@@ -17,6 +17,10 @@ func (e DeclEnumCase) Meta() *MetaDecl {
 	return e.MetaInfo
 }
 
+func (e DeclEnumCase) IsExportedDecl() bool {
+	return true
+}
+
 func MakeDeclEnumCase(name Identifier) *DeclEnumCase {
 	return &DeclEnumCase{
 		Name:     name,

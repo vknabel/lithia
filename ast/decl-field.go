@@ -18,6 +18,10 @@ func (e DeclField) Meta() *MetaDecl {
 	return e.MetaInfo
 }
 
+func (e DeclField) IsExportedDecl() bool {
+	return true
+}
+
 func MakeDeclField(name Identifier, params []*DeclParameter, source *Source) *DeclField {
 	return &DeclField{
 		Name:       name,

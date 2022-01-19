@@ -20,6 +20,10 @@ func (e DeclEnum) Meta() *MetaDecl {
 	return e.MetaInfo
 }
 
+func (e DeclEnum) IsExportedDecl() bool {
+	return true
+}
+
 func MakeDeclEnum(name Identifier, source *Source) *DeclEnum {
 	return &DeclEnum{
 		Name:  name,

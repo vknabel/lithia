@@ -18,6 +18,10 @@ func (e DeclData) Meta() *MetaDecl {
 	return e.MetaInfo
 }
 
+func (e DeclData) IsExportedDecl() bool {
+	return true
+}
+
 func MakeDeclData(name Identifier, source *Source) *DeclData {
 	return &DeclData{
 		Name:   name,

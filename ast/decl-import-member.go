@@ -17,6 +17,10 @@ func (e DeclImportMember) Meta() *MetaDecl {
 	return e.MetaInfo
 }
 
+func (e DeclImportMember) IsExportedDecl() bool {
+	return true
+}
+
 func MakeDeclImportMember(moduleName ModuleName, name Identifier, source *Source) DeclImportMember {
 	return DeclImportMember{
 		Name:       name,

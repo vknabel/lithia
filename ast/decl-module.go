@@ -17,6 +17,10 @@ func (e DeclModule) Meta() *MetaDecl {
 	return e.MetaInfo
 }
 
+func (e DeclModule) IsExportedDecl() bool {
+	return false
+}
+
 func MakeDeclModule(internalName Identifier, source *Source) *DeclModule {
 	return &DeclModule{Name: internalName, MetaInfo: &MetaDecl{source}}
 }

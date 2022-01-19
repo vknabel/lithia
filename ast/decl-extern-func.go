@@ -17,6 +17,10 @@ func (e DeclExternFunc) Meta() *MetaDecl {
 	return e.MetaInfo
 }
 
+func (e DeclExternFunc) IsExportedDecl() bool {
+	return true
+}
+
 func MakeDeclExternFunc(name Identifier, params []DeclParameter, source *Source) *DeclExternFunc {
 	return &DeclExternFunc{
 		Name:       name,

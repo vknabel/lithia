@@ -24,7 +24,7 @@ func (fp *FileParser) ParseInvocationExpr() (*ast.ExprInvocation, []SyntaxError)
 		}
 		childParser := fp.ChildParser(child)
 		expr, childErrs := childParser.ParseExpression()
-		if childErrs != nil {
+		if len(childErrs) > 0 {
 			errors = append(errors, childErrs...)
 		}
 		if expr != nil {

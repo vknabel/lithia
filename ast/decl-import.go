@@ -20,6 +20,10 @@ func (e DeclImport) Meta() *MetaDecl {
 	return e.MetaInfo
 }
 
+func (e DeclImport) IsExportedDecl() bool {
+	return false
+}
+
 func (e *DeclImport) AddMember(member DeclImportMember) {
 	e.Members = append(e.Members, member)
 }

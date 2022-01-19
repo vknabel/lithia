@@ -14,7 +14,7 @@ func (fp *FileParser) ParseExprArray() (*ast.ExprArray, []SyntaxError) {
 			continue
 		}
 		expr, errs := fp.ChildParserConsumingComments(elementNode).ParseExpression()
-		if errs != nil {
+		if len(errs) > 0 {
 			return nil, errs
 		}
 		elements = append(elements, expr)

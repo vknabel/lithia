@@ -114,7 +114,11 @@ func (inter *Interpreter) LoadFileIntoModule(module *Module, fileName string, sc
 	// }
 	for _, decl := range sourceFile.Declarations {
 		declValue := MakeRuntimeValueDecl(ix, decl)
-		ix.environment.DeclareExported(string(decl.DeclName()), declValue)
+		if decl.IsExportedDecl() {
+			ix.environment.DeclareExported(string(decl.DeclName()), declValue)
+		} else {
+			ix.environment.DeclareUnexported(string(decl.DeclName()), declValue)
+		}
 	}
 	return ix, nil
 }

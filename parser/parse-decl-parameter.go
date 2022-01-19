@@ -20,7 +20,7 @@ func (fp *FileParser) ParseParameterDeclarationList() ([]ast.DeclParameter, []Sy
 			continue
 		}
 		param, errs := fp.ChildParserConsumingComments(child).ParseParameterDeclaration()
-		if errs != nil {
+		if len(errs) > 0 {
 			errors = append(errors, errs...)
 		}
 		params = append(params, *param)
