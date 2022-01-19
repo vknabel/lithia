@@ -4,8 +4,9 @@ var _ Decl = DeclExternType{}
 
 type DeclExternType struct {
 	Name   Identifier
-	Fields map[Identifier]*DeclField
+	Fields map[Identifier]DeclField
 
+	Docs     *Docs
 	MetaInfo *MetaDecl
 }
 
@@ -24,11 +25,12 @@ func (e DeclExternType) IsExportedDecl() bool {
 func MakeDeclExternType(name Identifier, source *Source) *DeclExternType {
 	return &DeclExternType{
 		Name:     name,
-		Fields:   make(map[Identifier]*DeclField),
+		Fields:   make(map[Identifier]DeclField),
+		Docs:     nil,
 		MetaInfo: &MetaDecl{source},
 	}
 }
 
-func (e *DeclExternType) AddField(name Identifier, decl *DeclField) {
-	e.Fields[name] = decl
+func (e *DeclExternType) AddField(decl DeclField) {
+	e.Fields[decl.Name] = decl
 }

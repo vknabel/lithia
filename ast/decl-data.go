@@ -4,7 +4,7 @@ var _ Decl = DeclData{}
 
 type DeclData struct {
 	Name   Identifier
-	Fields []*DeclField
+	Fields []DeclField
 
 	Docs     *Docs
 	MetaInfo *MetaDecl
@@ -25,13 +25,13 @@ func (e DeclData) IsExportedDecl() bool {
 func MakeDeclData(name Identifier, source *Source) *DeclData {
 	return &DeclData{
 		Name:   name,
-		Fields: []*DeclField{},
+		Fields: []DeclField{},
 		MetaInfo: &MetaDecl{
 			Source: source,
 		},
 	}
 }
 
-func (e *DeclData) AddField(field *DeclField) {
+func (e *DeclData) AddField(field DeclField) {
 	e.Fields = append(e.Fields, field)
 }

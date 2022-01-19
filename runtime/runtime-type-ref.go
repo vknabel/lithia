@@ -1,6 +1,8 @@
 package runtime
 
 import (
+	"fmt"
+
 	"github.com/vknabel/go-lithia/ast"
 )
 
@@ -14,6 +16,10 @@ type RuntimeTypeRef struct {
 
 func MakeRuntimeTypeRef(name ast.Identifier, module ast.ModuleName) RuntimeTypeRef {
 	return RuntimeTypeRef{name, module}
+}
+
+func (r RuntimeTypeRef) String() string {
+	return fmt.Sprintf("%s.%s", r.Module, r.Name)
 }
 
 func (r RuntimeTypeRef) Declaration(interpreter *Interpreter) (ast.Decl, *RuntimeError) {

@@ -19,18 +19,16 @@ func (fp *FileParser) ParseExternDeclaration() (*ast.Decl, []SyntaxError) {
 		return &decl, nil
 	}
 
-	var decl ast.Decl
 	typeDecl := ast.MakeDeclExternType(name, fp.AstSource())
-	decl = *typeDecl
+	typeDecl.Docs = fp.ConsumeDocs()
 
 	propertiesNode := fp.Node.ChildByFieldName("properties")
 	if propertiesNode == nil {
+		var decl ast.Decl
+		decl = *typeDecl
 		return &decl, nil
 	}
 	propsp := fp.ChildParser(propertiesNode)
-
-	dataDecl := ast.MakeDeclData(name, fp.AstSource())
-	dataDecl.Docs = fp.ConsumeDocs()
 
 	var numberOfFields int
 	if propertiesNode != nil {
@@ -43,15 +41,19 @@ func (fp *FileParser) ParseExternDeclaration() (*ast.Decl, []SyntaxError) {
 		child := propertiesNode.NamedChild(i)
 		if child.Type() == TYPE_NODE_COMMENT {
 			propsp.Comments = append(propsp.Comments, child.Content(fp.Source))
+			continue
 		}
 
 		childp := propsp.ChildParserConsumingComments(child)
 		field, propErrors := childp.ParseFieldDeclaration()
-		if propErrors != nil {
+		if len(propErrors) > 0 {
 			errors = append(errors, propErrors...)
 		}
-
-		dataDecl.AddField(field)
+		if field != nil {
+			typeDecl.AddField(*field)
+		}
 	}
+	var decl ast.Decl
+	decl = *typeDecl
 	return &decl, errors
 }

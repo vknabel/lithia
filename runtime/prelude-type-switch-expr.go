@@ -105,5 +105,5 @@ func (t PreludeTypeSwitchExpr) Call(args []Evaluatable) (RuntimeValue, *RuntimeE
 		}
 		return fun.Call(args)
 	}
-	return nil, NewRuntimeErrorf("no matching case").Cascade(*t.Decl.Meta().Source)
+	return nil, NewRuntimeErrorf("no matching case %s", primaryArg).Cascade(*t.Decl.Meta().Source)
 }

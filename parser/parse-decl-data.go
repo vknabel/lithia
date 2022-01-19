@@ -25,15 +25,17 @@ func (fp *FileParser) ParseDataDeclaration() (*ast.DeclData, []SyntaxError) {
 		child := propertiesNode.NamedChild(i)
 		if child.Type() == TYPE_NODE_COMMENT {
 			propsp.Comments = append(propsp.Comments, child.Content(fp.Source))
+			continue
 		}
 
 		childp := propsp.ChildParserConsumingComments(child)
 		field, propErrors := childp.ParseFieldDeclaration()
-		if propErrors != nil {
+		if len(propErrors) > 0 {
 			errors = append(errors, propErrors...)
 		}
-
-		dataDecl.AddField(field)
+		if field != nil {
+			dataDecl.AddField(*field)
+		}
 	}
 
 	return dataDecl, errors

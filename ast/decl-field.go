@@ -4,7 +4,7 @@ var _ Decl = DeclField{}
 
 type DeclField struct {
 	Name       Identifier
-	Parameters []*DeclParameter
+	Parameters []DeclParameter
 
 	Docs     *Docs
 	MetaInfo *MetaDecl
@@ -22,7 +22,7 @@ func (e DeclField) IsExportedDecl() bool {
 	return true
 }
 
-func MakeDeclField(name Identifier, params []*DeclParameter, source *Source) *DeclField {
+func MakeDeclField(name Identifier, params []DeclParameter, source *Source) *DeclField {
 	return &DeclField{
 		Name:       name,
 		Parameters: params,

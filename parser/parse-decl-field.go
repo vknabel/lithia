@@ -24,7 +24,7 @@ func (fp *FileParser) parseDataPropertyFunction() (*ast.DeclField, []SyntaxError
 	name := ast.Identifier(fp.Node.ChildByFieldName("name").Content(fp.Source))
 	paramsNode := fp.Node.ChildByFieldName("parameters")
 
-	params := make([]*ast.DeclParameter, 0)
+	params := make([]ast.DeclParameter, 0)
 	errors := []SyntaxError{}
 	for i := 0; i < int(paramsNode.NamedChildCount()); i++ {
 		child := paramsNode.NamedChild(i)
@@ -33,7 +33,7 @@ func (fp *FileParser) parseDataPropertyFunction() (*ast.DeclField, []SyntaxError
 			errors = append(errors, paramErrors...)
 		}
 		if param != nil {
-			params = append(params, param)
+			params = append(params, *param)
 		}
 	}
 

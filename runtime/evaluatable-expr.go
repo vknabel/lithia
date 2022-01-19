@@ -79,7 +79,16 @@ func (e EvaluatableExpr) EvaluateExprGroup(expr ast.ExprGroup) (RuntimeValue, *R
 
 func (e EvaluatableExpr) EvaluateExprIdentifier(expr ast.ExprIdentifier) (RuntimeValue, *RuntimeError) {
 	if unevaluated, ok := e.Context.environment.GetPrivate(string(expr.Name)); ok {
-		return unevaluated.Evaluate()
+		value, err := unevaluated.Evaluate()
+		if err != nil {
+			return nil, err
+		}
+		if fun, ok := value.(CallableRuntimeValue); ok {
+			if fun.Arity() == 0 {
+				return fun.Call(nil)
+			}
+		}
+		return value, nil
 	} else {
 		return nil, NewRuntimeError(fmt.Errorf("undeclared %s", expr.Name))
 	}
