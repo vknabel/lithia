@@ -34,15 +34,30 @@ enum TypeDocs {
         name
         docs
     }
-    data ExternDocs {
+    data ExternTypeDocs {
         name
         docs
+        fields
+    }
+    data ExternFunctionDocs {
+        name
+        docs
+        /// a list of ExternFieldDocs
+        fields
     }
     None
 }
 
 /// Describes a field of a data type
 data DataFieldDocs {
+    /// name of the data property
+    name
+    docs
+    params
+}
+
+/// Describes a field of a data type
+data ExternFieldDocs {
     /// name of the data property
     name
     docs
@@ -71,7 +86,8 @@ tests.test "inspect for TypeDocs returns string", { fail =>
         ModuleDocs: { _ => fail "ModuleDocs given" },
         FunctionDocs: { _ => fail "FunctionDocs given" },
         ConstantDocs: { _ => fail "ConstantDocs given" },
-        ExternDocs: { _ => fail "ExternDocs given" },
+        ExternTypeDocs: { _ => fail "ExternTypeDocs given" },
+        ExternFunctionDocs: { _ => fail "ExternFunctionDocs given" },
         None: { _ => fail "None given" }
     }
 }
@@ -89,7 +105,8 @@ tests.test "inspect for EnumDocs returns DataDocs", { fail =>
         ModuleDocs: { _ => fail "ModuleDocs given" },
         FunctionDocs: { _ => fail "FunctionDocs given" },
         ConstantDocs: { _ => fail "ConstantDocs given" },
-        ExternDocs: { _ => fail "ExternDocs given" },
+        ExternTypeDocs: { _ => fail "ExternTypeDocs given" },
+        ExternFunctionDocs: { _ => fail "ExternFunctionDocs given" },
         None: { _ => fail "None given" }
     }
 }
@@ -107,7 +124,8 @@ tests.test "inspect for EnumCaseDocs returns DataDocs", { fail =>
         ModuleDocs: { _ => fail "ModuleDocs given" },
         FunctionDocs: { _ => fail "FunctionDocs given" },
         ConstantDocs: { _ => fail "ConstantDocs given" },
-        ExternDocs: { _ => fail "ExternDocs given" },
+        ExternTypeDocs: { _ => fail "ExternTypeDocs given" },
+        ExternFunctionDocs: { _ => fail "ExternFunctionDocs given" },
         None: { _ => fail "None given" }
     }
 }

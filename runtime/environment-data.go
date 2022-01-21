@@ -32,3 +32,16 @@ func (env *Environment) MakeList(slice []Evaluatable) (DataRuntimeValue, *Runtim
 		})
 	}
 }
+
+func (env *Environment) MakeEagerList(slice []RuntimeValue) (DataRuntimeValue, *RuntimeError) {
+	if len(slice) == 0 {
+		return env.MakeEmptyDataRuntimeValue("Nil")
+	} else {
+		return env.MakeDataRuntimeValue("Cons", map[string]Evaluatable{
+			"head": NewConstantRuntimeValue(slice[0]),
+			"tail": NewLazyRuntimeValue(func() (RuntimeValue, *RuntimeError) {
+				return env.MakeEagerList(slice[1:])
+			}),
+		})
+	}
+}

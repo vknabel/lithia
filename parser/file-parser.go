@@ -102,3 +102,13 @@ func (fp *FileParser) CountFunction() int {
 	*fp.functionCount = *fp.functionCount + 1
 	return *count
 }
+
+func (fp *FileParser) addAllChildComments() {
+	caseCount := int(fp.Node.NamedChildCount())
+	for i := 0; i < caseCount; i++ {
+		childNode := fp.Node.NamedChild(i)
+		if childNode.Type() == TYPE_NODE_COMMENT {
+			fp.Comments = append(fp.Comments, childNode.Content(fp.Source))
+		}
+	}
+}

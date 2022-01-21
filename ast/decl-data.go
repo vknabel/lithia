@@ -26,6 +26,7 @@ func MakeDeclData(name Identifier, source *Source) *DeclData {
 	return &DeclData{
 		Name:   name,
 		Fields: []DeclField{},
+		Docs:   MakeDocs([]string{}),
 		MetaInfo: &MetaDecl{
 			Source: source,
 		},

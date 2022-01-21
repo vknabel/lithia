@@ -30,9 +30,9 @@ func (e EvaluatableExpr) Evaluate() (RuntimeValue, *RuntimeError) {
 			panic("Mixing files in declared evaluatable expr!")
 		}
 		defer func() {
-			if err := recover(); err != nil {
-				error = NewRuntimeError(fmt.Errorf("panic: %q", err))
-			}
+			// if err := recover(); err != nil {
+			// 	error = NewRuntimeError(fmt.Errorf("panic: %q", err))
+			// }
 		}()
 
 		if e.Expr == nil {

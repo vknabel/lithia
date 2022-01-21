@@ -22,5 +22,6 @@ func (fp *FileParser) ParseEnumCaseDeclaration() (*ast.DeclEnumCase, []ast.Decl,
 
 func (fp *FileParser) parseEnumCaseReference() (*ast.DeclEnumCase, []ast.Decl, []SyntaxError) {
 	enumCase := ast.MakeDeclEnumCase(ast.Identifier(fp.Node.Content(fp.Source)))
+	enumCase.Docs = fp.ConsumeDocs()
 	return enumCase, nil, nil
 }

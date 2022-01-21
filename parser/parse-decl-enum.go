@@ -7,13 +7,14 @@ import (
 func (fp *FileParser) ParseEnumDeclaration() (*ast.DeclEnum, []ast.Decl, []SyntaxError) {
 	enumName := ast.Identifier(fp.Node.ChildByFieldName("name").Content(fp.Source))
 	decl := ast.MakeDeclEnum(enumName, fp.AstSource())
+	decl.Docs = fp.ConsumeDocs()
 
 	caseList := fp.Node.ChildByFieldName("cases")
 	if caseList == nil {
 		return decl, nil, nil
 	}
-	casep := fp.NewScopeChildParser(caseList)
-	decl.Docs = fp.ConsumeDocs()
+	fp.addAllChildComments()
+	casep := fp.ChildParserConsumingComments(caseList)
 
 	allChildDecls := []ast.Decl{}
 	errors := []SyntaxError{}
@@ -32,7 +33,7 @@ func (fp *FileParser) ParseEnumDeclaration() (*ast.DeclEnum, []ast.Decl, []Synta
 		}
 
 		docs := ast.MakeDocs(fp.Comments)
-		caseDecl, childDecls, err := fp.ChildParserConsumingComments(childNode).ParseEnumCaseDeclaration()
+		caseDecl, childDecls, err := casep.ChildParserConsumingComments(childNode).ParseEnumCaseDeclaration()
 		if err != nil {
 			errors = append(errors, err...)
 		}

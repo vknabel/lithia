@@ -18,7 +18,7 @@ func (e DeclImportMember) Meta() *MetaDecl {
 }
 
 func (e DeclImportMember) IsExportedDecl() bool {
-	return true
+	return false
 }
 
 func MakeDeclImportMember(moduleName ModuleName, name Identifier, source *Source) DeclImportMember {

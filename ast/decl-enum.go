@@ -28,6 +28,7 @@ func MakeDeclEnum(name Identifier, source *Source) *DeclEnum {
 	return &DeclEnum{
 		Name:  name,
 		Cases: []*DeclEnumCase{},
+		Docs:  MakeDocs([]string{}),
 		MetaInfo: &MetaDecl{
 			Source: source,
 		},

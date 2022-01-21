@@ -6,7 +6,7 @@ module tests_t
 import booleans
 import cmp
 import controls
-// TODO: external import docs
+import docs
 import eq
 import fs
 import lists.lists_t

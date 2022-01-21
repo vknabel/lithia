@@ -26,6 +26,7 @@ func MakeDeclField(name Identifier, params []DeclParameter, source *Source) *Dec
 	return &DeclField{
 		Name:       name,
 		Parameters: params,
+		Docs:       MakeDocs([]string{}),
 		MetaInfo: &MetaDecl{
 			Source: source,
 		},
