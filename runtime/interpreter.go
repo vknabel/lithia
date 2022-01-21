@@ -152,9 +152,16 @@ func (inter *Interpreter) LoadModuleIfNeeded(moduleName ast.ModuleName) (*Module
 		}
 
 		module := inter.NewModule(moduleName)
-		err = inter.LoadFilesIntoModule(module, matches)
+		contexts, err := inter.LoadFilesIntoModule(module, matches)
 		if err != nil {
 			return module, err
+		}
+
+		for _, context := range contexts {
+			_, err := context.Evaluate()
+			if err != nil {
+				return module, err
+			}
 		}
 
 		return module, nil
@@ -162,16 +169,20 @@ func (inter *Interpreter) LoadModuleIfNeeded(moduleName ast.ModuleName) (*Module
 	return nil, fmt.Errorf("module %s not found", moduleName)
 }
 
-func (inter *Interpreter) LoadFilesIntoModule(module *Module, files []string) error {
+func (inter *Interpreter) LoadFilesIntoModule(module *Module, files []string) ([]InterpreterContext, error) {
+	var contexts []InterpreterContext
 	for _, file := range files {
 		scriptData, err := os.ReadFile(file)
 		if err != nil {
-			return err
+			return nil, err
 		}
-		_, err = inter.LoadFileIntoModule(module, file, string(scriptData))
+		context, err := inter.LoadFileIntoModule(module, file, string(scriptData))
 		if err != nil {
-			return err
+			return nil, err
+		}
+		if context != nil {
+			contexts = append(contexts, *context)
 		}
 	}
-	return nil
+	return contexts, nil
 }

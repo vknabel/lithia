@@ -28,7 +28,7 @@ func (RxVariable) RuntimeType() RuntimeTypeRef {
 func (v RxVariable) String() string {
 	v.lock.RLock()
 	defer v.lock.RUnlock()
-	return fmt.Sprintf("(%s %s)", v.RuntimeType().Name, v.current)
+	return fmt.Sprintf("(%s %s)", v.RuntimeType().Name, *v.current)
 }
 
 func (v RxVariable) Lookup(member string) (Evaluatable, *RuntimeError) {
