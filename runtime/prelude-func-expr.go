@@ -17,10 +17,12 @@ type PreludeFuncExpr struct {
 func MakePreludeFuncExpr(context *InterpreterContext, expr ast.ExprFunc) PreludeFuncExpr {
 	fx := context.NestedInterpreterContext(string(expr.Name))
 	for _, decl := range expr.Declarations {
-		if _, ok := decl.(ast.DeclConstant); ok {
+		switch decl := decl.(type) {
+		case ast.DeclConstant, ast.DeclFunc:
 			continue
+		default:
+			fx.environment.DeclareExported(string(decl.DeclName()), MakeRuntimeValueDecl(fx, decl))
 		}
-		fx.environment.DeclareExported(string(decl.DeclName()), MakeRuntimeValueDecl(fx, decl))
 	}
 	return PreludeFuncExpr{
 		fx,
@@ -53,8 +55,11 @@ func (f PreludeFuncExpr) Call(args []Evaluatable) (RuntimeValue, *RuntimeError) 
 
 	ex := f.context.NestedInterpreterContext("()")
 	for _, decl := range f.Decl.Declarations {
-		if _, ok := decl.(ast.DeclConstant); ok {
+		switch decl := decl.(type) {
+		case ast.DeclConstant, ast.DeclFunc:
 			ex.environment.DeclareExported(string(decl.DeclName()), MakeRuntimeValueDecl(ex, decl))
+		default:
+			continue
 		}
 	}
 	for i, param := range f.Decl.Parameters {

@@ -3,9 +3,11 @@ package runtime
 import "github.com/vknabel/go-lithia/ast"
 
 var _ RuntimeValue = PreludePrimitiveExternType{}
+var _ DeclRuntimeValue = PreludePrimitiveExternType{}
 
 type PreludePrimitiveExternType struct {
 	*ast.DeclExternType
+	hasInstance func(value RuntimeValue) (bool, *RuntimeError)
 }
 
 func (t PreludePrimitiveExternType) String() string {
@@ -18,4 +20,8 @@ func (t PreludePrimitiveExternType) Lookup(name string) (Evaluatable, *RuntimeEr
 
 func (t PreludePrimitiveExternType) RuntimeType() RuntimeTypeRef {
 	return PreludeAnyTypeRef
+}
+
+func (t PreludePrimitiveExternType) HasInstance(interpreter *Interpreter, value RuntimeValue) (bool, *RuntimeError) {
+	return t.hasInstance(value)
 }

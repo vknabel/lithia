@@ -23,38 +23,41 @@ func (r RuntimeTypeRef) String() string {
 }
 
 func (r RuntimeTypeRef) Declaration(interpreter *Interpreter) (ast.Decl, *RuntimeError) {
+	valueType, err := r.ResolveType(interpreter)
+	if err != nil {
+		return nil, err
+	}
+	return valueType.Declaration(interpreter)
+}
+
+func (r RuntimeTypeRef) ResolveType(interpreter *Interpreter) (RuntimeType, *RuntimeError) {
 	module, ok := interpreter.Modules[r.Module]
 	if !ok {
 		return nil, NewRuntimeErrorf("module not found %s", r.Module)
 	}
+	// TODO: non-local types!
 	value, err := module.Environment.GetExportedEvaluatedRuntimeValue(string(r.Name))
 	if err != nil {
 		return nil, err
 	}
 
-	switch value := value.(type) {
-	case PreludeEnumDecl:
-		return value.Decl, nil
-	case PreludeDataDecl:
-		return value.Decl, nil
-	default:
-		// TODO: External Data?
-		return nil, NewRuntimeErrorf("not a valid type %s", r.Name)
+	if typeValue, ok := value.(RuntimeType); ok {
+		return typeValue, nil
+	} else {
+		return nil, NewRuntimeErrorf("not a valid type %s", r)
 	}
 }
 
-func (ref RuntimeTypeRef) IncludesValue(interpreter *Interpreter, value RuntimeValue) (bool, *RuntimeError) {
-	// TODO: Enums
+func (ref RuntimeTypeRef) HasInstance(interpreter *Interpreter, value RuntimeValue) (bool, *RuntimeError) {
+	if ref == PreludeAnyTypeRef {
+		return true, nil
+	}
 	if ref == value.RuntimeType() {
 		return true, nil
 	}
-	refDecl, err := ref.Declaration(interpreter)
+	runtimeType, err := ref.ResolveType(interpreter)
 	if err != nil {
 		return false, err
 	}
-	valueDecl, err := value.RuntimeType().Declaration(interpreter)
-	if err != nil {
-		return false, err
-	}
-	return refDecl == valueDecl, nil
+	return runtimeType.HasInstance(interpreter, value)
 }

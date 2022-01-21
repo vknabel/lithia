@@ -9,14 +9,14 @@ var _ RuntimeValue = RxVariable{}
 
 type RxVariable struct {
 	lock         *sync.RWMutex
-	current      RuntimeValue
+	current      *RuntimeValue
 	variableType *RxVariableType
 }
 
 func MakeRxVariable(variableType *RxVariableType, current RuntimeValue) RxVariable {
 	return RxVariable{
 		lock:         &sync.RWMutex{},
-		current:      current,
+		current:      &current,
 		variableType: variableType,
 	}
 }
@@ -37,8 +37,6 @@ func (v RxVariable) Lookup(member string) (Evaluatable, *RuntimeError) {
 		return NewConstantRuntimeValue(MakeExternTypeMethod(
 			v.variableType.Fields["accept"],
 			func(args []Evaluatable) (RuntimeValue, *RuntimeError) {
-				if len(args) == 1 {
-				}
 				return v.Accept(args[0])
 			},
 		)), nil
@@ -58,12 +56,12 @@ func (v *RxVariable) Accept(lazyValue Evaluatable) (RuntimeValue, *RuntimeError)
 	}
 	v.lock.Lock()
 	defer v.lock.Unlock()
-	v.current = value
+	*v.current = value
 	return value, nil
 }
 
 func (v *RxVariable) Current() (RuntimeValue, *RuntimeError) {
 	v.lock.RLock()
 	defer v.lock.RUnlock()
-	return v.current, nil
+	return *v.current, nil
 }

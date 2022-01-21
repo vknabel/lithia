@@ -82,13 +82,13 @@ func (t PreludeTypeSwitchExpr) Call(args []Evaluatable) (RuntimeValue, *RuntimeE
 		runtimeDecl, ok := caseValue.(DeclRuntimeValue)
 		if !ok {
 			return nil, NewRuntimeErrorf(
-				"case %s is not a type, got: %s",
+				"case %s is not a type in %s",
 				caseIdentifier,
 				enumDefValue,
 			).Cascade(*t.Decl.Meta().Source)
 		}
 
-		ok, err = runtimeDecl.HasInstance(primaryArg)
+		ok, err = runtimeDecl.HasInstance(t.context.interpreter, primaryArg)
 		if err != nil {
 			return nil, err.Cascade(*t.Decl.Meta().Source)
 		}

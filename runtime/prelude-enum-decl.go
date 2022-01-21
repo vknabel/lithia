@@ -54,7 +54,7 @@ func (e PreludeEnumDecl) String() string {
 	return fmt.Sprint(e.Decl)
 }
 
-func (e PreludeEnumDecl) HasInstance(value RuntimeValue) (bool, *RuntimeError) {
+func (e PreludeEnumDecl) HasInstance(interpreter *Interpreter, value RuntimeValue) (bool, *RuntimeError) {
 	for identifier, evalCase := range e.caseLookups {
 		caseValue, err := evalCase.Evaluate()
 		if err != nil {
@@ -64,7 +64,7 @@ func (e PreludeEnumDecl) HasInstance(value RuntimeValue) (bool, *RuntimeError) {
 		if !ok {
 			return false, NewRuntimeErrorf("enum case not a declaration %s, got: %s", identifier, caseDeclValue).Cascade(*e.Decl.MetaInfo.Source)
 		}
-		ok, err = caseDeclValue.HasInstance(value)
+		ok, err = caseDeclValue.HasInstance(interpreter, value)
 		if err != nil {
 			return false, err.Cascade(*e.Decl.MetaInfo.Source)
 		}
