@@ -6,15 +6,18 @@ func (ex *InterpreterContext) BinaryOperatorFunction(operator string) (func(Eval
 	switch operator {
 	case "==":
 		return func(lazyLeft, lazyRight Evaluatable) (RuntimeValue, *RuntimeError) {
-			return ex.genericGreedyComparision(lazyLeft, lazyRight, func(left, right RuntimeValue) bool {
-				return reflect.DeepEqual(left, right)
+			return ex.genericGreedyComparision(lazyLeft, lazyRight, func(left, right RuntimeValue) (bool, *RuntimeError) {
+				return ex.DeepEqual(left, right)
 			})
 		}, nil
 	case "!=":
 		return func(lazyLeft, lazyRight Evaluatable) (RuntimeValue, *RuntimeError) {
-			return ex.genericGreedyComparision(lazyLeft, lazyRight, func(left, right RuntimeValue) bool {
-
-				return !reflect.DeepEqual(left, right)
+			return ex.genericGreedyComparision(lazyLeft, lazyRight, func(left, right RuntimeValue) (bool, *RuntimeError) {
+				result, err := ex.DeepEqual(left, right)
+				if err != nil {
+					return false, err
+				}
+				return !result, nil
 			})
 		}, nil
 	case "&&":
@@ -108,7 +111,7 @@ func (ex *InterpreterContext) BinaryOperatorFunction(operator string) (func(Eval
 
 func (ex *InterpreterContext) genericGreedyComparision(
 	lazyLeft, lazyRight Evaluatable,
-	compare func(RuntimeValue, RuntimeValue) bool,
+	compare func(RuntimeValue, RuntimeValue) (bool, *RuntimeError),
 ) (RuntimeValue, *RuntimeError) {
 	left, err := lazyLeft.Evaluate()
 	if err != nil {
@@ -118,7 +121,11 @@ func (ex *InterpreterContext) genericGreedyComparision(
 	if err != nil {
 		return nil, err
 	}
-	return ex.boolToRuntimeValue(compare(left, right))
+	flag, err := compare(left, right)
+	if err != nil {
+		return nil, err
+	}
+	return ex.boolToRuntimeValue(flag)
 }
 
 func (ex *InterpreterContext) numericGreedyComparision(
@@ -271,7 +278,7 @@ func (ex *InterpreterContext) lazyLogicComparision(
 		if err != nil {
 			return false, nil
 		}
-		isRightTrue, err := boolRef.HasInstance(ex.interpreter, right)
+		isRightTrue, err := trueRef.HasInstance(ex.interpreter, right)
 		if err != nil {
 			return false, nil
 		}
@@ -295,4 +302,49 @@ func (env *Environment) boolToRuntimeValue(value bool) (RuntimeValue, *RuntimeEr
 
 func (ex *InterpreterContext) boolToRuntimeValue(value bool) (RuntimeValue, *RuntimeError) {
 	return ex.environment.boolToRuntimeValue(value)
+}
+
+func (ex *InterpreterContext) DeepEqual(left, right RuntimeValue) (bool, *RuntimeError) {
+	switch left := left.(type) {
+	case DataRuntimeValue:
+		right, ok := right.(DataRuntimeValue)
+		if !ok {
+			return false, nil
+		}
+		if len(left.Members) != len(left.Members) {
+			return false, nil
+		}
+		ok, err := ex.DeepEqual(left.TypeDecl, right.TypeDecl)
+		if err != nil {
+			return false, err
+		}
+		if !ok {
+			return false, nil
+		}
+		for memberName, lazyLeftMemeberValue := range left.Members {
+			lazyRightMemberValue, ok := right.Members[memberName]
+			if !ok {
+				return false, nil
+			}
+			leftMemberValue, err := lazyLeftMemeberValue.Evaluate()
+			if err != nil {
+				return false, err
+			}
+			rightMemberValue, err := lazyRightMemberValue.Evaluate()
+			if err != nil {
+				return false, err
+			}
+
+			areEqual, err := ex.DeepEqual(leftMemberValue, rightMemberValue)
+			if err != nil {
+				return false, err
+			}
+			if !areEqual {
+				return false, nil
+			}
+		}
+		return true, nil
+	default:
+		return reflect.DeepEqual(left, right), nil
+	}
 }

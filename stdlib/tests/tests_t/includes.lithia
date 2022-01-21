@@ -15,4 +15,4 @@ import os.os_t
 import prelude.prelude_t
 import results
 import rx.rx_t
-// TODO: bug import strings.strings_t
+import strings.strings_t

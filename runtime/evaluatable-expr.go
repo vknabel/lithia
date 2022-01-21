@@ -14,11 +14,21 @@ type EvaluatableExpr struct {
 }
 
 func MakeEvaluatableExpr(context *InterpreterContext, expr ast.Expr) EvaluatableExpr {
-	return EvaluatableExpr{context, expr, NewLazyEvaluationCache()}
+	copy := *context
+	if context.fileDef.Path != expr.Meta().Source.FileName {
+		panic("Mixing files in declared evaluatable expr!")
+	}
+	return EvaluatableExpr{&copy, expr, NewLazyEvaluationCache()}
 }
 
 func (e EvaluatableExpr) Evaluate() (RuntimeValue, *RuntimeError) {
+	if e.Context.fileDef.Path != e.Expr.Meta().Source.FileName {
+		panic("Mixing files in declared evaluatable expr!")
+	}
 	value, err := e.cache.Evaluate(func() (value RuntimeValue, error *RuntimeError) {
+		if e.Context.fileDef.Path != e.Expr.Meta().Source.FileName {
+			panic("Mixing files in declared evaluatable expr!")
+		}
 		defer func() {
 			if err := recover(); err != nil {
 				error = NewRuntimeError(fmt.Errorf("panic: %q", err))
@@ -75,6 +85,9 @@ func (e EvaluatableExpr) EvaluateExprFloat(expr ast.ExprFloat) (RuntimeValue, *R
 }
 
 func (e EvaluatableExpr) EvaluateExprFunc(expr ast.ExprFunc) (RuntimeValue, *RuntimeError) {
+	if e.Context.fileDef.Path != expr.Meta().Source.FileName {
+		panic("Mixing files in function expressions!")
+	}
 	return MakePreludeFuncExpr(e.Context, expr), nil
 }
 

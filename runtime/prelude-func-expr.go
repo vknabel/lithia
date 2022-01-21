@@ -15,6 +15,9 @@ type PreludeFuncExpr struct {
 }
 
 func MakePreludeFuncExpr(context *InterpreterContext, expr ast.ExprFunc) PreludeFuncExpr {
+	if context.fileDef.Path != expr.Meta().Source.FileName {
+		panic("Mixing files in function expressions!")
+	}
 	fx := context.NestedInterpreterContext(string(expr.Name))
 	for _, decl := range expr.Declarations {
 		switch decl := decl.(type) {

@@ -13,6 +13,9 @@ type PreludeFuncDecl struct {
 }
 
 func MakePreludeFuncDecl(context *InterpreterContext, decl ast.DeclFunc) PreludeFuncDecl {
+	if context.fileDef.Path != decl.Meta().FileName {
+		panic("Mixing files in declared functions!")
+	}
 	fx := context.NestedInterpreterContext(string(decl.DeclName()))
 	for _, decl := range decl.Impl.Declarations {
 		switch decl := decl.(type) {

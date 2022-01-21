@@ -71,6 +71,17 @@ func (t PreludeTypeSwitchExpr) Call(args []Evaluatable) (RuntimeValue, *RuntimeE
 	// TODO: optimization can be cached
 	// TODO: more validation
 	for _, caseIdentifier := range t.Decl.CaseOrder {
+		if caseIdentifier == "Any" {
+			intermediate, err := t.caseValue[caseIdentifier].Evaluate()
+			if err != nil {
+				return nil, err.Cascade(*t.Decl.Meta().Source)
+			}
+			fun, ok := intermediate.(CallableRuntimeValue)
+			if !ok {
+				return nil, NewRuntimeErrorf("cannot call non function %T", intermediate).Cascade(*t.Decl.Meta().Source)
+			}
+			return fun.Call(args)
+		}
 		lazyCaseValue, err := enumDef.Lookup(string(caseIdentifier))
 		if err != nil {
 			return nil, err.Cascade(*t.Decl.Meta().Source)
