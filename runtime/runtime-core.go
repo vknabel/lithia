@@ -1,9 +1,5 @@
 package runtime
 
-import (
-	"github.com/vknabel/go-lithia/ast"
-)
-
 type Evaluatable interface {
 	Evaluate() (RuntimeValue, *RuntimeError)
 }
@@ -17,7 +13,7 @@ type RuntimeValue interface {
 }
 
 type RuntimeType interface {
-	Declaration(*Interpreter) (ast.Decl, *RuntimeError)
+	// Declaration(*Interpreter) (ast.Decl, *RuntimeError)
 	HasInstance(interpreter *Interpreter, value RuntimeValue) (bool, *RuntimeError)
 }
 

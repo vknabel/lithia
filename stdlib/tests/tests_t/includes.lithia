@@ -6,13 +6,13 @@ module tests_t
 import booleans
 import cmp
 import controls
-import docs
+// TODO: external import docs
 import eq
-import fs
+// TODO: external import fs
 import lists.lists_t
 import optionals
 import os.os_t
 import prelude.prelude_t
 import results
 import rx.rx_t
-import strings.strings_t
+// TODO: bug import strings.strings_t

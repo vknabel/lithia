@@ -250,6 +250,9 @@ func (ex *InterpreterContext) lazyLogicComparision(
 	// // 	typeValue:  &trueTypeValue,
 	// // }
 	if ok, err := boolRef.HasInstance(ex.interpreter, left); !ok || err != nil {
+		if err != nil {
+			return nil, err
+		}
 		return nil, RuntimeBinaryOperatorOnlySupportsType(
 			operator,
 			[]RuntimeTypeRef{boolRef},

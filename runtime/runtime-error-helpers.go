@@ -51,10 +51,9 @@ func RuntimeBinaryOperatorOnlySupportsType(operator string, supportedTypes []Run
 		supportedTypesNames = append(supportedTypesNames, string(supported.Name))
 	}
 	return NewRuntimeErrorf(
-		"binary operator %q only supports %s; value of type %s given: %q",
+		"binary operator %q only supports %s; value given: %q",
 		operator,
 		strings.Join(supportedTypesNames, ", "),
-		gotValue.RuntimeType().Name,
 		gotValue.String(),
 	)
 }

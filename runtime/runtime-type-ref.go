@@ -22,15 +22,15 @@ func (r RuntimeTypeRef) String() string {
 	return fmt.Sprintf("%s.%s", r.Module, r.Name)
 }
 
-func (r RuntimeTypeRef) Declaration(interpreter *Interpreter) (ast.Decl, *RuntimeError) {
-	valueType, err := r.ResolveType(interpreter)
-	if err != nil {
-		return nil, err
-	}
-	return valueType.Declaration(interpreter)
-}
+// func (r RuntimeTypeRef) Declaration(interpreter *Interpreter) (ast.Decl, *RuntimeError) {
+// 	valueType, err := r.ResolveType(interpreter)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	return valueType.Declaration(interpreter)
+// }
 
-func (r RuntimeTypeRef) ResolveType(interpreter *Interpreter) (RuntimeType, *RuntimeError) {
+func (r RuntimeTypeRef) ResolveType(interpreter *Interpreter) (DeclRuntimeValue, *RuntimeError) {
 	module, ok := interpreter.Modules[r.Module]
 	if !ok {
 		return nil, NewRuntimeErrorf("module not found %s", r.Module)
@@ -41,7 +41,7 @@ func (r RuntimeTypeRef) ResolveType(interpreter *Interpreter) (RuntimeType, *Run
 		return nil, err
 	}
 
-	if typeValue, ok := value.(RuntimeType); ok {
+	if typeValue, ok := value.(DeclRuntimeValue); ok {
 		return typeValue, nil
 	} else {
 		return nil, NewRuntimeErrorf("not a valid type %s", r)
@@ -50,9 +50,6 @@ func (r RuntimeTypeRef) ResolveType(interpreter *Interpreter) (RuntimeType, *Run
 
 func (ref RuntimeTypeRef) HasInstance(interpreter *Interpreter, value RuntimeValue) (bool, *RuntimeError) {
 	if ref == PreludeAnyTypeRef {
-		return true, nil
-	}
-	if ref == value.RuntimeType() {
 		return true, nil
 	}
 	runtimeType, err := ref.ResolveType(interpreter)
