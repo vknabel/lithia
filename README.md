@@ -20,9 +20,9 @@ Currently Lithia is an early proof of concept. Basic language features exist, bu
 - [x] Easy installation
 - [x] Prebuilt docker image
 - [ ] Prebuilt linux binaries
-- [ ] Docs generator _in progress_
-- [ ] Improved performance
-- [ ] Stack traces
+- [ ] Docs generator _in progress_, improved in [#20](https://github.com/vknabel/lithia/pull/20)
+- [ ] Improved performance _in progress_ in [#20](https://github.com/vknabel/lithia/pull/20)
+- [ ] Stack traces _in progress_ in [#20](https://github.com/vknabel/lithia/pull/20)
 - [ ] Creating a custom language server
 - [ ] ... with diagnostics
 - [ ] ... with syntax highlighting
