@@ -63,6 +63,14 @@ func (r *RuntimeError) CascadeDecl(decl ast.Decl) *RuntimeError {
 	}
 }
 
+func (r *RuntimeError) CascadeExpr(expr ast.Expr) *RuntimeError {
+	if expr.Meta().Source == nil {
+		return r
+	} else {
+		return r.Cascade(*expr.Meta().Source)
+	}
+}
+
 func stackTraceEntryString(source ast.Source) string {
 	return fmt.Sprintf(
 		"\t%s:%d:%d %s\n",

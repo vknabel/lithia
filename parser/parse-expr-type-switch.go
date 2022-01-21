@@ -12,7 +12,7 @@ func (fp *FileParser) ParseExprTypeSwitch() (*ast.ExprTypeSwitch, []SyntaxError)
 		return nil, []SyntaxError{fp.SyntaxErrorf("expected type and body")}
 	}
 
-	typeExpr, errs := fp.ChildParser(typeNode).ParseExpression()
+	typeExpr, errs := fp.SameScopeChildParser(typeNode).ParseExpression()
 	if len(errs) > 0 {
 		return nil, errs
 	}
@@ -33,7 +33,7 @@ func (fp *FileParser) ParseExprTypeSwitch() (*ast.ExprTypeSwitch, []SyntaxError)
 			errs = append(errs, fp.SyntaxErrorf("expected label and body"))
 			continue
 		}
-		bodyExpr, bodyErrs := fp.ChildParser(bodyNode).ParseExpression()
+		bodyExpr, bodyErrs := fp.SameScopeChildParser(bodyNode).ParseExpression()
 		if len(bodyErrs) > 0 {
 			errs = append(errs, bodyErrs...)
 		}

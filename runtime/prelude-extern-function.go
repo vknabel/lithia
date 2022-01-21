@@ -29,8 +29,13 @@ func MakeExternFunction(
 	}
 }
 
-func (PreludeExternFunction) Lookup(member string) (Evaluatable, *RuntimeError) {
-	panic("TODO: not implemented PreludeExternFunction")
+func (f PreludeExternFunction) Lookup(member string) (Evaluatable, *RuntimeError) {
+	switch member {
+	case "arity":
+		return NewConstantRuntimeValue(PreludeInt(f.Arity())), nil
+	default:
+		return nil, NewRuntimeErrorf("no such member: %s", member)
+	}
 }
 
 func (PreludeExternFunction) RuntimeType() RuntimeTypeRef {

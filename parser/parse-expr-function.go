@@ -4,7 +4,7 @@ import (
 	"github.com/vknabel/go-lithia/ast"
 )
 
-func (fp *FileParser) ParseFunctionExpr() (*ast.ExprFunc, []SyntaxError) {
+func (fp *FileParser) ParseFunctionExpr(name string) (*ast.ExprFunc, []SyntaxError) {
 	parametersNode := fp.Node.ChildByFieldName("parameters")
 	bodyNode := fp.Node.ChildByFieldName("body")
 
@@ -12,7 +12,7 @@ func (fp *FileParser) ParseFunctionExpr() (*ast.ExprFunc, []SyntaxError) {
 	var params []ast.DeclParameter
 	var paramsErrors []SyntaxError
 	if parametersNode != nil {
-		params, paramsErrors = fp.ChildParser(parametersNode).ParseParameterDeclarationList()
+		params, paramsErrors = fp.SameScopeChildParser(parametersNode).ParseParameterDeclarationList()
 	} else {
 		params = []ast.DeclParameter{}
 		paramsErrors = []SyntaxError{}
@@ -23,11 +23,11 @@ func (fp *FileParser) ParseFunctionExpr() (*ast.ExprFunc, []SyntaxError) {
 	if params == nil {
 		return nil, errors
 	}
-	function := ast.MakeExprFunc(params, fp.AstSource())
+	function := ast.MakeExprFunc(name, params, fp.AstSource())
 	if bodyNode == nil {
 		return function, nil
 	}
-	bodyParser := fp.ChildParser(bodyNode)
+	bodyParser := fp.NewScopeChildParser(bodyNode)
 	for i := 0; i < int(bodyNode.NamedChildCount()); i++ {
 		child := bodyNode.NamedChild(i)
 		if bodyParser.ParseChildCommentIfNeeded(child) {

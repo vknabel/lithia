@@ -12,7 +12,7 @@ func (fp *FileParser) ParseEnumDeclaration() (*ast.DeclEnum, []ast.Decl, []Synta
 	if caseList == nil {
 		return decl, nil, nil
 	}
-	casep := fp.ChildParser(caseList)
+	casep := fp.NewScopeChildParser(caseList)
 	decl.Docs = fp.ConsumeDocs()
 
 	allChildDecls := []ast.Decl{}

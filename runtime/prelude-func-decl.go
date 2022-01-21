@@ -15,16 +15,25 @@ type PreludeFuncDecl struct {
 func MakePreludeFuncDecl(context *InterpreterContext, decl ast.DeclFunc) PreludeFuncDecl {
 	fx := context.NestedInterpreterContext(string(decl.DeclName()))
 	for _, decl := range decl.Impl.Declarations {
+		if _, ok := decl.(ast.DeclConstant); ok {
+			continue
+		}
 		fx.environment.DeclareExported(string(decl.DeclName()), MakeRuntimeValueDecl(fx, decl))
 	}
+
 	return PreludeFuncDecl{
 		fx,
 		decl,
 	}
 }
 
-func (PreludeFuncDecl) Lookup(member string) (Evaluatable, *RuntimeError) {
-	panic("TODO: not implemented PreludeFuncDecl")
+func (f PreludeFuncDecl) Lookup(member string) (Evaluatable, *RuntimeError) {
+	switch member {
+	case "arity":
+		return NewConstantRuntimeValue(PreludeInt(f.Arity())), nil
+	default:
+		return nil, NewRuntimeErrorf("no such member: %s", member)
+	}
 }
 
 func (PreludeFuncDecl) RuntimeType() RuntimeTypeRef {
@@ -46,6 +55,12 @@ func (f PreludeFuncDecl) Call(args []Evaluatable) (RuntimeValue, *RuntimeError) 
 	}
 
 	ex := f.context.NestedInterpreterContext("()")
+	for _, decl := range f.Decl.Impl.Declarations {
+		if _, ok := decl.(ast.DeclConstant); ok {
+			ex.environment.DeclareExported(string(decl.DeclName()), MakeRuntimeValueDecl(ex, decl))
+		}
+	}
+
 	for i, param := range f.Decl.Impl.Parameters {
 		ex.environment.DeclareUnexported(string(param.Name), args[i])
 	}

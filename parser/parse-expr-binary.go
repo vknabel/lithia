@@ -10,12 +10,12 @@ func (fp *FileParser) ParseBinaryExpr() (*ast.ExprOperatorBinary, []SyntaxError)
 	}
 	operator := fp.Node.ChildByFieldName("operator").Content(fp.Source)
 
-	leftP := fp.ChildParser(fp.Node.NamedChild(0))
+	leftP := fp.SameScopeChildParser(fp.Node.NamedChild(0))
 	left, lerrs := leftP.ParseExpression()
 	if len(lerrs) > 0 {
 		return nil, lerrs
 	}
-	rightP := fp.ChildParser(fp.Node.NamedChild(1))
+	rightP := fp.SameScopeChildParser(fp.Node.NamedChild(1))
 	right, rerrs := rightP.ParseExpression()
 	if len(rerrs) > 0 {
 		return nil, rerrs

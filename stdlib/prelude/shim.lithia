@@ -15,6 +15,8 @@ extern String {
     append str
 }
 extern Char
-extern Function
+extern Function {
+    arity
+}
 extern Module
 extern Any

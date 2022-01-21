@@ -15,8 +15,9 @@ func (e ExprFunc) Meta() *MetaExpr {
 	return e.MetaInfo
 }
 
-func MakeExprFunc(parameters []DeclParameter, source *Source) *ExprFunc {
+func MakeExprFunc(name string, parameters []DeclParameter, source *Source) *ExprFunc {
 	return &ExprFunc{
+		Name:         name,
 		Parameters:   parameters,
 		Declarations: []Decl{},
 		Expressions:  []Expr{},

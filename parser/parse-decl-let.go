@@ -6,7 +6,7 @@ func (fp *FileParser) ParseLetDeclaration() (*ast.DeclConstant, []SyntaxError) {
 	nameIdentifier := ast.Identifier(fp.Node.ChildByFieldName("name").Content(fp.Source))
 
 	valueNode := fp.Node.ChildByFieldName("value")
-	value, errs := fp.ChildParser(valueNode).ParseExpression()
+	value, errs := fp.SameScopeChildParser(valueNode).ParseExpression()
 	if len(errs) != 0 {
 		return nil, errs
 	}

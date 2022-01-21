@@ -14,5 +14,21 @@ func (s PreludeString) String() string {
 }
 
 func (i PreludeString) Lookup(member string) (Evaluatable, *RuntimeError) {
-	panic("TODO: length, append, chars")
+	switch member {
+	case "length":
+		return NewConstantRuntimeValue(PreludeInt(len(i))), nil
+	case "append":
+		return NewConstantRuntimeValue(MakeAnonymousFunction(
+			"append",
+			[]string{"str"},
+			func(args []Evaluatable) (RuntimeValue, *RuntimeError) {
+				value, err := args[0].Evaluate()
+				if err != nil {
+					return nil, err
+				}
+				return PreludeString(i) + PreludeString(value.String()), nil
+			})), nil
+	default:
+		return nil, NewRuntimeErrorf("no such member: %s", member)
+	}
 }

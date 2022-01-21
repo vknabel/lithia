@@ -8,7 +8,7 @@ func (fp *FileParser) ParseExternDeclaration() (*ast.Decl, []SyntaxError) {
 	name := ast.Identifier(fp.Node.ChildByFieldName("name").Content(fp.Source))
 	parameters := fp.Node.ChildByFieldName("parameters")
 	if parameters != nil {
-		paramsParser := fp.ChildParser(parameters)
+		paramsParser := fp.NewScopeChildParser(parameters)
 		var decl ast.Decl
 		params, errs := paramsParser.ParseParameterDeclarationList()
 		if params == nil {
@@ -28,7 +28,7 @@ func (fp *FileParser) ParseExternDeclaration() (*ast.Decl, []SyntaxError) {
 		decl = *typeDecl
 		return &decl, nil
 	}
-	propsp := fp.ChildParser(propertiesNode)
+	propsp := fp.NewScopeChildParser(propertiesNode)
 
 	var numberOfFields int
 	if propertiesNode != nil {

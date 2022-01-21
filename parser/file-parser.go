@@ -8,7 +8,7 @@ import (
 type FileParser struct {
 	ModuleName    ast.ModuleName
 	File          string
-	FunctionCount int
+	functionCount *int
 
 	Node   *sitter.Node
 	Tree   *sitter.Tree
@@ -22,11 +22,12 @@ func NewFileParser(moduleName ast.ModuleName, file string, node *sitter.Node, tr
 		panic("node is nil")
 	}
 	return &FileParser{
-		ModuleName: moduleName,
-		File:       file,
-		Node:       node,
-		Tree:       tree,
-		Source:     source,
+		ModuleName:    moduleName,
+		File:          file,
+		functionCount: new(int),
+		Node:          node,
+		Tree:          tree,
+		Source:        source,
 	}
 }
 
@@ -36,14 +37,28 @@ func (fp *FileParser) ConsumeDocs() *ast.Docs {
 	return docs
 }
 
-func (fp *FileParser) ChildParser(node *sitter.Node) *FileParser {
+func (fp *FileParser) NewScopeChildParser(node *sitter.Node) *FileParser {
 	if node == nil {
 		panic("node is nil")
 	}
 	return &FileParser{
 		ModuleName:    fp.ModuleName,
 		File:          fp.File,
-		FunctionCount: 0,
+		functionCount: new(int),
+		Node:          node,
+		Source:        fp.Source,
+		Comments:      []string{},
+	}
+}
+
+func (fp *FileParser) SameScopeChildParser(node *sitter.Node) *FileParser {
+	if node == nil {
+		panic("node is nil")
+	}
+	return &FileParser{
+		ModuleName:    fp.ModuleName,
+		File:          fp.File,
+		functionCount: fp.functionCount,
 		Node:          node,
 		Source:        fp.Source,
 		Comments:      []string{},
@@ -59,7 +74,7 @@ func (fp *FileParser) ChildParserConsumingComments(node *sitter.Node) *FileParse
 	return &FileParser{
 		ModuleName:    fp.ModuleName,
 		File:          fp.File,
-		FunctionCount: 0,
+		functionCount: fp.functionCount,
 		Node:          node,
 		Source:        fp.Source,
 		Comments:      comments,
@@ -80,4 +95,10 @@ func (fp *FileParser) AssertNodeType(nodeType string) []SyntaxError {
 		return []SyntaxError{fp.SyntaxErrorf("unexpected %q, expected %q", fp.Node.Type(), nodeType)}
 	}
 	return nil
+}
+
+func (fp *FileParser) CountFunction() int {
+	count := fp.functionCount
+	*fp.functionCount = *fp.functionCount + 1
+	return *count
 }

@@ -1,6 +1,8 @@
 package parser
 
 import (
+	"fmt"
+
 	"github.com/vknabel/go-lithia/ast"
 )
 
@@ -83,7 +85,7 @@ func (fp *FileParser) ParseExpressionIfGiven() (ast.Expr, []SyntaxError) {
 			return expr, errs
 		}
 	case TYPE_NODE_FUNCTION_LITERAL:
-		expr, errs := fp.ParseFunctionExpr()
+		expr, errs := fp.ParseFunctionExpr(fmt.Sprintf("func#%d", fp.CountFunction()))
 		if expr == nil {
 			return nil, errs
 		} else {

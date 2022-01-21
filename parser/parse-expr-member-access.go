@@ -8,7 +8,7 @@ func (fp *FileParser) ParseExprMemberAccess() (*ast.ExprMemberAccess, []SyntaxEr
 	if fp.Node.NamedChildCount() < 2 {
 		return nil, []SyntaxError{fp.SyntaxErrorf("expected at least 2 children, got %d", fp.Node.NamedChildCount())}
 	}
-	targetExpr, errs := fp.ChildParser(fp.Node.NamedChild(0)).ParseExpression()
+	targetExpr, errs := fp.SameScopeChildParser(fp.Node.NamedChild(0)).ParseExpression()
 	if len(errs) > 0 {
 		return nil, errs
 	}

@@ -6,7 +6,7 @@ import (
 
 func (fp *FileParser) ParseInvocationExpr() (*ast.ExprInvocation, []SyntaxError) {
 	errors := []SyntaxError{}
-	functionParser := fp.ChildParser(fp.Node.ChildByFieldName("function"))
+	functionParser := fp.SameScopeChildParser(fp.Node.ChildByFieldName("function"))
 	functionExpr, functionErrors := functionParser.ParseExpression()
 
 	if functionErrors != nil {
@@ -22,7 +22,7 @@ func (fp *FileParser) ParseInvocationExpr() (*ast.ExprInvocation, []SyntaxError)
 		if fp.ParseChildCommentIfNeeded(child) {
 			continue
 		}
-		childParser := fp.ChildParser(child)
+		childParser := fp.SameScopeChildParser(child)
 		expr, childErrs := childParser.ParseExpression()
 		if len(childErrs) > 0 {
 			errors = append(errors, childErrs...)

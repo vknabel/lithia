@@ -2,6 +2,7 @@ package runtime
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/vknabel/go-lithia/ast"
 )
@@ -95,7 +96,7 @@ func (e EvaluatableExpr) EvaluateExprIdentifier(expr ast.ExprIdentifier) (Runtim
 		}
 		return value, nil
 	} else {
-		return nil, NewRuntimeError(fmt.Errorf("undeclared %s", expr.Name))
+		return nil, NewRuntimeErrorf("undeclared %s in %s", expr.Name, strings.Join(e.Context.path, "."))
 	}
 }
 
