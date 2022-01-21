@@ -8,7 +8,7 @@ import cmp
 import controls
 // TODO: external import docs
 import eq
-// TODO: external import fs
+import fs
 import lists.lists_t
 import optionals
 import os.os_t

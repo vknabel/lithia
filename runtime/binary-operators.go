@@ -305,6 +305,7 @@ func (ex *InterpreterContext) boolToRuntimeValue(value bool) (RuntimeValue, *Run
 }
 
 func (ex *InterpreterContext) DeepEqual(left, right RuntimeValue) (bool, *RuntimeError) {
+	// TODO: should be moved to RuntimeValue
 	switch left := left.(type) {
 	case DataRuntimeValue:
 		right, ok := right.(DataRuntimeValue)
