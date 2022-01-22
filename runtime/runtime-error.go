@@ -2,22 +2,34 @@ package runtime
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 
 	"github.com/vknabel/go-lithia/ast"
 )
 
 type RuntimeError struct {
-	Cause      error
-	StackTrace []ast.Source
+	topic      string
+	cause      error
+	stackTrace []stackEntry
+}
+
+type stackEntry struct {
+	// contextPath []string
+	source ast.Source
+
+	// optional
+	decl ast.Decl
+	// optional
+	expr ast.Expr
 }
 
 func (e RuntimeError) Error() string {
-	// TODO: Stacktrace
 	stackTrace := ""
-	for _, source := range e.StackTrace {
+	for _, source := range e.stackTrace {
 		stackTrace += stackTraceEntryString(source)
 	}
-	return fmt.Sprintf("runtime error: %s\n%s", e.Cause, stackTrace)
+	return fmt.Sprintf("%s: %s\n%s", e.topic, e.cause, stackTrace)
 }
 
 func NewRuntimeError(err error) *RuntimeError {
@@ -25,8 +37,9 @@ func NewRuntimeError(err error) *RuntimeError {
 		return runtimeErr
 	}
 	return &RuntimeError{
-		Cause:      err,
-		StackTrace: []ast.Source{},
+		topic:      "runtime error",
+		cause:      err,
+		stackTrace: []stackEntry{},
 	}
 }
 
@@ -34,23 +47,25 @@ func NewRuntimeErrorf(format string, args ...interface{}) *RuntimeError {
 	return NewRuntimeError(fmt.Errorf(format, args...))
 }
 
-func (r *RuntimeError) Cascade(source ast.Source) *RuntimeError {
+func (r *RuntimeError) cascadeEntry(entry stackEntry) *RuntimeError {
 	if r == nil {
 		return nil
 	}
-	if len(r.StackTrace) == 0 {
+	if len(r.stackTrace) == 0 {
 		return &RuntimeError{
-			Cause:      r.Cause,
-			StackTrace: append(r.StackTrace, source),
+			topic:      r.topic,
+			cause:      r.cause,
+			stackTrace: append(r.stackTrace, entry),
 		}
 	}
-	last := r.StackTrace[len(r.StackTrace)-1]
-	if stackTraceEntryString(last) == stackTraceEntryString(source) {
+	last := r.stackTrace[len(r.stackTrace)-1]
+	if stackTraceEntryString(last) == stackTraceEntryString(entry) {
 		return r
 	} else {
 		return &RuntimeError{
-			Cause:      r.Cause,
-			StackTrace: append(r.StackTrace, source),
+			topic:      r.topic,
+			cause:      r.cause,
+			stackTrace: append(r.stackTrace, entry),
 		}
 	}
 }
@@ -59,7 +74,10 @@ func (r *RuntimeError) CascadeDecl(decl ast.Decl) *RuntimeError {
 	if decl.Meta().Source == nil {
 		return r
 	} else {
-		return r.Cascade(*decl.Meta().Source)
+		return r.cascadeEntry(stackEntry{
+			source: *decl.Meta().Source,
+			decl:   decl,
+		})
 	}
 }
 
@@ -67,16 +85,32 @@ func (r *RuntimeError) CascadeExpr(expr ast.Expr) *RuntimeError {
 	if expr.Meta().Source == nil {
 		return r
 	} else {
-		return r.Cascade(*expr.Meta().Source)
+		return r.cascadeEntry(stackEntry{
+			source: *expr.Meta().Source,
+			expr:   expr,
+		})
 	}
 }
 
-func stackTraceEntryString(source ast.Source) string {
+func stackTraceEntryString(entry stackEntry) string {
+	var name string
+	if entry.decl != nil {
+		name = string(entry.decl.DeclName())
+	}
+
+	fileName := entry.source.FileName
+	if dir, err := os.Getwd(); err == nil {
+		rel, err := filepath.Rel(dir, entry.source.FileName)
+		if err == nil {
+			fileName = "." + string(os.PathSeparator) + rel
+		}
+	}
+	source := entry.source
 	return fmt.Sprintf(
 		"\t%s:%d:%d %s\n",
-		source.FileName,
+		fileName,
 		source.Start.Line+1,
 		source.Start.Column+1,
-		source.ModuleName,
+		name,
 	)
 }

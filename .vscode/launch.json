@@ -1,49 +1,45 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
-        {
-            "name": "Write docs",
-            "type": "go",
-            "request": "launch",
-            "mode": "auto",
-            "program": "${workspaceFolder}/cmd/lithia/main.go",
-            "args": [
-                "${workspaceFolder}/stdlib/stdlib-write-docs.lithia"
-            ],
-            "cwd": "${workspaceFolder}",
-            "env": {
-                "LITHIA_STDLIB": "${workspaceFolder}/stdlib"
-            }
-        },
-        {
-            "name": "Test example stdlib",
-            "type": "go",
-            "request": "launch",
-            "mode": "auto",
-            "program": "${workspaceFolder}/cmd/lithia/main.go",
-            "args": [
-                "${workspaceFolder}/stdlib/stdlib-tests.lithia"
-            ],
-            "env": {
-                "LITHIA_TESTS": "1",
-                "LITHIA_STDLIB": "${workspaceFolder}/stdlib"
-            }
-        },
-        {
-            "name": "Launch lithia",
-            "type": "go",
-            "request": "launch",
-            "mode": "auto",
-            "program": "${workspaceFolder}/cmd/lithia/main.go",
-            "args": [
-                "${workspaceFolder}/examples/fib-type.lithia"
-            ],
-            "env": {
-                "LITHIA_STDLIB": "${workspaceFolder}/stdlib"
-            }
-        },
-    ]
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Write docs",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/cmd/lithia/main.go",
+      "args": ["${workspaceFolder}/stdlib/stdlib-write-docs.lithia"],
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "LITHIA_STDLIB": "${workspaceFolder}/stdlib"
+      }
+    },
+    {
+      "name": "Test example stdlib",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/cmd/lithia/main.go",
+      "args": ["${workspaceFolder}/stdlib/stdlib-tests.lithia"],
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "LITHIA_TESTS": "1",
+        "LITHIA_STDLIB": "${workspaceFolder}/stdlib"
+      }
+    },
+    {
+      "name": "Launch lithia",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/cmd/lithia/main.go",
+      "args": ["${workspaceFolder}/examples/fib-type.lithia"],
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "LITHIA_STDLIB": "${workspaceFolder}/stdlib"
+      }
+    }
+  ]
 }

@@ -38,8 +38,13 @@ func MakePreludeFuncExpr(context *InterpreterContext, expr ast.ExprFunc) (Prelud
 	}, nil
 }
 
-func (PreludeFuncExpr) Lookup(member string) (Evaluatable, *RuntimeError) {
-	panic("TODO: not implemented PreludeFuncExpr")
+func (f PreludeFuncExpr) Lookup(member string) (Evaluatable, *RuntimeError) {
+	switch member {
+	case "arity":
+		return NewConstantRuntimeValue(PreludeInt(f.Arity())), nil
+	default:
+		return nil, NewRuntimeErrorf("no such member: %s", member)
+	}
 }
 
 func (PreludeFuncExpr) RuntimeType() RuntimeTypeRef {
@@ -51,7 +56,7 @@ func (f PreludeFuncExpr) String() string {
 	for i, param := range f.Decl.Parameters {
 		paramList[i] = string(param.Name)
 	}
-	return fmt.Sprintf("func %s %s", f.Decl.Name, strings.Join(paramList, ", "))
+	return fmt.Sprintf("<func %s %s>", f.Decl.Name, strings.Join(paramList, ", "))
 }
 
 func (f PreludeFuncExpr) Arity() int {

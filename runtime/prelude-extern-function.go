@@ -47,7 +47,7 @@ func (f PreludeExternFunction) String() string {
 	for i, param := range f.Decl.Parameters {
 		argNames[i] = string(param.Name)
 	}
-	return fmt.Sprintf("(extern %s %s)", f.Decl.Name, strings.Join(argNames, ", "))
+	return fmt.Sprintf("<extern %s %s>", f.Decl.Name, strings.Join(argNames, ", "))
 }
 
 func (f PreludeExternFunction) Arity() int {

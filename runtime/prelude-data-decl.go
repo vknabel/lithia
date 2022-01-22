@@ -16,8 +16,8 @@ type PreludeDataDecl struct {
 	Decl ast.DeclData
 }
 
-func (PreludeDataDecl) Lookup(member string) (Evaluatable, *RuntimeError) {
-	panic("TODO: data not implemented")
+func (d PreludeDataDecl) Lookup(member string) (Evaluatable, *RuntimeError) {
+	panic(fmt.Sprintf("cannot access member %s of data type %s, see https://github.com/vknabel/lithia/discussions/25", member, d.Decl.Name))
 }
 
 func (PreludeDataDecl) RuntimeType() RuntimeTypeRef {
@@ -44,7 +44,7 @@ func (d PreludeDataDecl) Call(args []Evaluatable) (RuntimeValue, *RuntimeError) 
 	arity := d.Arity()
 	if arity == 0 && len(args) == 0 {
 		dataVal, err := MakeDataRuntimeValueMemberwise(&d, make(map[string]Evaluatable))
-		return dataVal, err.Cascade(*d.Decl.Meta().Source)
+		return dataVal, err.CascadeDecl(d.Decl)
 	}
 	if arity > len(args) {
 		return MakeCurriedCallable(d, args), nil
@@ -55,7 +55,7 @@ func (d PreludeDataDecl) Call(args []Evaluatable) (RuntimeValue, *RuntimeError) 
 	}
 	dataVal, err := MakeDataRuntimeValueMemberwise(&d, members)
 	if err != nil {
-		return dataVal, err.Cascade(*d.Decl.Meta().Source)
+		return dataVal, err.CascadeDecl(d.Decl)
 	}
 	if len(args) > arity {
 		stringifiedArgs := make([]string, len(args[arity:]))
@@ -67,7 +67,7 @@ func (d PreludeDataDecl) Call(args []Evaluatable) (RuntimeValue, *RuntimeError) 
 			d.Decl.Name,
 			dataVal,
 			strings.Join(stringifiedArgs, ", "),
-		).Cascade(*d.Decl.Meta().Source)
+		).CascadeDecl(d.Decl)
 	}
 	return dataVal, nil
 }

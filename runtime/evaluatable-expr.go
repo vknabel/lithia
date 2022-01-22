@@ -77,7 +77,7 @@ func (e EvaluatableExpr) EvaluateExprArray(expr ast.ExprArray) (RuntimeValue, *R
 		evaluatables[i] = MakeEvaluatableExpr(e.Context, element)
 	}
 	list, err := e.Context.environment.MakeList(evaluatables)
-	return list, err.Cascade(*expr.Meta().Source)
+	return list, err.CascadeExpr(expr)
 }
 
 func (e EvaluatableExpr) EvaluateExprFloat(expr ast.ExprFloat) (RuntimeValue, *RuntimeError) {

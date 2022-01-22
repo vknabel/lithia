@@ -40,7 +40,7 @@ func (PreludeAnonymousFunction) RuntimeType() RuntimeTypeRef {
 }
 
 func (f PreludeAnonymousFunction) String() string {
-	return fmt.Sprintf("(extern %s %s)", f.Name, strings.Join(f.Params, ", "))
+	return fmt.Sprintf("<extern %s %s>", f.Name, strings.Join(f.Params, ", "))
 }
 
 func (f PreludeAnonymousFunction) Arity() int {

@@ -1,6 +1,9 @@
 package runtime
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/vknabel/go-lithia/ast"
 )
 
@@ -49,8 +52,13 @@ func (PreludeFuncDecl) RuntimeType() RuntimeTypeRef {
 	return PreludeFunctionTypeRef
 }
 
-func (PreludeFuncDecl) String() string {
-	panic("TODO: not implemented PreludeFuncDecl")
+func (f PreludeFuncDecl) String() string {
+	paramList := make([]string, len(f.Decl.Impl.Declarations))
+	for i, param := range f.Decl.Impl.Parameters {
+		paramList[i] = string(param.Name)
+	}
+
+	return fmt.Sprintf("<func %s %s>", f.Decl.Name, strings.Join(paramList, ", "))
 }
 
 func (f PreludeFuncDecl) Arity() int {

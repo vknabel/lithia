@@ -8,7 +8,7 @@ import (
 type InterpreterContext struct {
 	interpreter *Interpreter
 	fileDef     *ast.SourceFile
-	module      *Module
+	module      *RuntimeModule
 
 	path        []string
 	environment *Environment
@@ -16,7 +16,7 @@ type InterpreterContext struct {
 	evalCache *LazyEvaluationCache
 }
 
-func (inter *Interpreter) NewInterpreterContext(fileDef *ast.SourceFile, module *Module, node *sitter.Node, source []byte, environment *Environment) *InterpreterContext {
+func (inter *Interpreter) NewInterpreterContext(fileDef *ast.SourceFile, module *RuntimeModule, node *sitter.Node, source []byte, environment *Environment) *InterpreterContext {
 	if environment == nil {
 		environment = NewEnvironment(module.Environment.Private())
 	}

@@ -1,5 +1,7 @@
 package runtime
 
+import "fmt"
+
 var _ RuntimeValue = PreludeCurriedCallable{}
 var _ CallableRuntimeValue = PreludeExternFunction{}
 
@@ -17,16 +19,21 @@ func MakeCurriedCallable(actual CallableRuntimeValue, arguments []Evaluatable) P
 	}
 }
 
-func (PreludeCurriedCallable) Lookup(member string) (Evaluatable, *RuntimeError) {
-	panic("TODO: not implemented PreludeCurriedCallable")
+func (f PreludeCurriedCallable) Lookup(member string) (Evaluatable, *RuntimeError) {
+	switch member {
+	case "arity":
+		return NewConstantRuntimeValue(PreludeInt(f.Arity())), nil
+	default:
+		return nil, NewRuntimeErrorf("no such member: %s", member)
+	}
 }
 
 func (PreludeCurriedCallable) RuntimeType() RuntimeTypeRef {
 	return PreludeFunctionTypeRef
 }
 
-func (PreludeCurriedCallable) String() string {
-	panic("TODO: not implemented PreludeCurriedCallable")
+func (f PreludeCurriedCallable) String() string {
+	return fmt.Sprintf("%s curried by %d", f.actual.String(), f.remainingArity)
 }
 
 func (f PreludeCurriedCallable) Arity() int {

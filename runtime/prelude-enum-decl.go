@@ -41,7 +41,7 @@ func MakeEnumDecl(context *InterpreterContext, decl ast.DeclEnum) PreludeEnumDec
 func (e PreludeEnumDecl) Lookup(member string) (Evaluatable, *RuntimeError) {
 	value, ok := e.caseLookups[ast.Identifier(member)]
 	if !ok {
-		return nil, NewRuntimeErrorf("enum %s has no member %s", e, member).Cascade(*e.Decl.MetaInfo.Source)
+		return nil, NewRuntimeErrorf("enum %s has no member %s", e, member).CascadeDecl(e.Decl)
 	}
 	return value, nil
 }
@@ -58,15 +58,15 @@ func (e PreludeEnumDecl) HasInstance(interpreter *Interpreter, value RuntimeValu
 	for identifier, evalCase := range e.caseLookups {
 		caseValue, err := evalCase.Evaluate()
 		if err != nil {
-			return false, err.Cascade(*e.Decl.MetaInfo.Source)
+			return false, err.CascadeDecl(e.Decl)
 		}
 		caseDeclValue, ok := caseValue.(DeclRuntimeValue)
 		if !ok {
-			return false, NewRuntimeErrorf("enum case not a declaration %s, got: %s", identifier, caseDeclValue).Cascade(*e.Decl.MetaInfo.Source)
+			return false, NewRuntimeErrorf("enum case not a declaration %s, got: %s", identifier, caseDeclValue).CascadeDecl(e.Decl)
 		}
 		ok, err = caseDeclValue.HasInstance(interpreter, value)
 		if err != nil {
-			return false, err.Cascade(*e.Decl.MetaInfo.Source)
+			return false, err.CascadeDecl(e.Decl)
 		}
 		if ok {
 			return true, nil

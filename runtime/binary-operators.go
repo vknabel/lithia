@@ -312,7 +312,7 @@ func (ex *InterpreterContext) DeepEqual(left, right RuntimeValue) (bool, *Runtim
 		if !ok {
 			return false, nil
 		}
-		if len(left.Members) != len(left.Members) {
+		if len(left.Members) != len(right.Members) {
 			return false, nil
 		}
 		ok, err := ex.DeepEqual(left.TypeDecl, right.TypeDecl)

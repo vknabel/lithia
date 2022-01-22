@@ -48,7 +48,7 @@ func (t RxVariableType) Call(arguments []Evaluatable) (RuntimeValue, *RuntimeErr
 	}
 	value, err := arguments[0].Evaluate()
 	if err != nil {
-		return nil, err.Cascade(*t.MetaInfo.Source)
+		return nil, err.CascadeDecl(t.DeclExternType)
 	}
 	return MakeRxVariable(&t, value), nil
 }

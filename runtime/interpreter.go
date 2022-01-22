@@ -13,7 +13,7 @@ import (
 type Interpreter struct {
 	ImportRoots         []string
 	Parser              *parser.Parser
-	Modules             map[ast.ModuleName]*Module
+	Modules             map[ast.ModuleName]*RuntimeModule
 	ExternalDefinitions map[ast.ModuleName]ExternalDefinition
 	Prelude             *Environment
 }
@@ -48,7 +48,7 @@ func NewInterpreter(importRoots ...string) *Interpreter {
 	inter := &Interpreter{
 		ImportRoots:         absoluteImportRoots,
 		Parser:              parser.NewParser(),
-		Modules:             make(map[ast.ModuleName]*Module),
+		Modules:             make(map[ast.ModuleName]*RuntimeModule),
 		ExternalDefinitions: make(map[ast.ModuleName]ExternalDefinition),
 	}
 	// TODO: External definitions
@@ -97,7 +97,7 @@ func (inter *Interpreter) InterpretEmbed(fileName string, script string) (Runtim
 	}
 }
 
-func (inter *Interpreter) LoadFileIntoModule(module *Module, fileName string, script string) (*InterpreterContext, error) {
+func (inter *Interpreter) LoadFileIntoModule(module *RuntimeModule, fileName string, script string) (*InterpreterContext, error) {
 	fileParser, err := inter.Parser.Parse(module.Name, fileName, script)
 	if err != nil {
 		return nil, fileParser.SyntaxErrorOrConvert(err)
@@ -109,10 +109,7 @@ func (inter *Interpreter) LoadFileIntoModule(module *Module, fileName string, sc
 	module.Decl.AddSourceFile(sourceFile)
 	ix := inter.NewInterpreterContext(sourceFile, module, fileParser.Tree.RootNode(), []byte(script), module.Environment.Private())
 	module.Files[FileName(fileName)] = ix
-	// TODO: Modules?
-	// for _, moduleImport := range sourceFile.Imports {
-	// 	ix.environment.DeclareUnexported(string(moduleImport), moduleImport)
-	// }
+
 	for _, decl := range sourceFile.Declarations {
 		declValue, err := MakeRuntimeValueDecl(ix, decl)
 		if err != nil {
@@ -127,7 +124,7 @@ func (inter *Interpreter) LoadFileIntoModule(module *Module, fileName string, sc
 	return ix, nil
 }
 
-func (inter *Interpreter) EmbedFileIntoModule(module *Module, fileName string, script string) (*InterpreterContext, error) {
+func (inter *Interpreter) EmbedFileIntoModule(module *RuntimeModule, fileName string, script string) (*InterpreterContext, error) {
 	fileParser, err := inter.Parser.Parse(module.Name, fileName, script)
 	if err != nil {
 		return nil, fileParser.SyntaxErrorOrConvert(err)
@@ -141,7 +138,7 @@ func (inter *Interpreter) EmbedFileIntoModule(module *Module, fileName string, s
 	return ex, nil
 }
 
-func (inter *Interpreter) LoadModuleIfNeeded(moduleName ast.ModuleName) (*Module, error) {
+func (inter *Interpreter) LoadModuleIfNeeded(moduleName ast.ModuleName) (*RuntimeModule, error) {
 	if module, ok := inter.Modules[moduleName]; ok {
 		return module, nil
 	}
@@ -174,7 +171,7 @@ func (inter *Interpreter) LoadModuleIfNeeded(moduleName ast.ModuleName) (*Module
 	return nil, fmt.Errorf("module %s not found", moduleName)
 }
 
-func (inter *Interpreter) LoadFilesIntoModule(module *Module, files []string) ([]InterpreterContext, error) {
+func (inter *Interpreter) LoadFilesIntoModule(module *RuntimeModule, files []string) ([]InterpreterContext, error) {
 	var contexts []InterpreterContext
 	for _, file := range files {
 		scriptData, err := os.ReadFile(file)
