@@ -39,7 +39,7 @@ func (d PreludeDataDecl) Arity() int {
 	return len(d.Decl.Fields)
 }
 
-func (d PreludeDataDecl) Call(args []Evaluatable) (RuntimeValue, *RuntimeError) {
+func (d PreludeDataDecl) Call(args []Evaluatable, fromExpr ast.Expr) (RuntimeValue, *RuntimeError) {
 	if len(args) != d.Arity() {
 		panic("use Call to call functions!")
 	}
@@ -56,4 +56,8 @@ func (d PreludeDataDecl) Call(args []Evaluatable) (RuntimeValue, *RuntimeError) 
 		return dataVal, err.CascadeDecl(d.Decl)
 	}
 	return dataVal, nil
+}
+
+func (f PreludeDataDecl) Source() *ast.Source {
+	return f.Decl.Meta().Source
 }

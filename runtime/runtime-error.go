@@ -22,11 +22,17 @@ type stackEntry struct {
 	decl ast.Decl
 	// optional
 	expr ast.Expr
+	//optional
+	function CallableRuntimeValue
 }
 
 func (e RuntimeError) Error() string {
 	stackTrace := ""
-	for _, source := range e.stackTrace {
+	for i, source := range e.stackTrace {
+		if i > 19 {
+			stackTrace += fmt.Sprintf("\tand %d more...\n", len(e.stackTrace)-i)
+			break
+		}
 		stackTrace += stackTraceEntryString(source)
 	}
 	return fmt.Sprintf("%s: %s\n%s", e.topic, e.cause, stackTrace)
@@ -71,23 +77,37 @@ func (r *RuntimeError) cascadeEntry(entry stackEntry) *RuntimeError {
 }
 
 func (r *RuntimeError) CascadeDecl(decl ast.Decl) *RuntimeError {
-	if decl.Meta().Source == nil {
-		return r
-	} else {
-		return r.cascadeEntry(stackEntry{
-			source: *decl.Meta().Source,
-			decl:   decl,
-		})
-	}
+	return r
+	// if decl.Meta().Source == nil {
+	// 	return r
+	// } else {
+	// 	return r.cascadeEntry(stackEntry{
+	// 		source: *decl.Meta().Source,
+	// 		decl:   decl,
+	// 	})
+	// }
 }
 
 func (r *RuntimeError) CascadeExpr(expr ast.Expr) *RuntimeError {
-	if expr.Meta().Source == nil {
+	return r
+	// if expr.Meta().Source == nil {
+	// 	return r
+	// } else {
+	// 	return r.cascadeEntry(stackEntry{
+	// 		source: *expr.Meta().Source,
+	// 		expr:   expr,
+	// 	})
+	// }
+}
+
+func (r *RuntimeError) CascadeCall(callable CallableRuntimeValue, fromExpr ast.Expr) *RuntimeError {
+	if fromExpr.Meta().Source == nil {
 		return r
 	} else {
 		return r.cascadeEntry(stackEntry{
-			source: *expr.Meta().Source,
-			expr:   expr,
+			source:   *fromExpr.Meta().Source,
+			function: callable,
+			expr:     fromExpr,
 		})
 	}
 }
@@ -96,6 +116,8 @@ func stackTraceEntryString(entry stackEntry) string {
 	var name string
 	if entry.decl != nil {
 		name = string(entry.decl.DeclName())
+	} else if entry.function != nil {
+		name = string(entry.function.String())
 	}
 
 	fileName := entry.source.FileName
@@ -107,7 +129,7 @@ func stackTraceEntryString(entry stackEntry) string {
 	}
 	source := entry.source
 	return fmt.Sprintf(
-		"\t%s:%d:%d %s\n",
+		"\t%s:%d:%d\t%s\n",
 		fileName,
 		source.Start.Line+1,
 		source.Start.Column+1,

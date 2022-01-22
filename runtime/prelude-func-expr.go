@@ -56,14 +56,14 @@ func (f PreludeFuncExpr) String() string {
 	for i, param := range f.Decl.Parameters {
 		paramList[i] = string(param.Name)
 	}
-	return fmt.Sprintf("<func %s %s>", f.Decl.Name, strings.Join(paramList, ", "))
+	return fmt.Sprintf("<func %s.%s %s>", f.context.module.Name, strings.Join(f.context.path, "."), strings.Join(paramList, ", "))
 }
 
 func (f PreludeFuncExpr) Arity() int {
 	return len(f.Decl.Parameters)
 }
 
-func (f PreludeFuncExpr) Call(args []Evaluatable) (RuntimeValue, *RuntimeError) {
+func (f PreludeFuncExpr) Call(args []Evaluatable, fromExpr ast.Expr) (RuntimeValue, *RuntimeError) {
 	if len(args) != f.Arity() {
 		panic("use Call to call functions!")
 	}
@@ -92,4 +92,8 @@ func (f PreludeFuncExpr) Call(args []Evaluatable) (RuntimeValue, *RuntimeError) 
 		}
 	}
 	return value, nil
+}
+
+func (f PreludeFuncExpr) Source() *ast.Source {
+	return f.Decl.Meta().Source
 }

@@ -22,7 +22,10 @@ type RuntimeType interface {
 type CallableRuntimeValue interface {
 	RuntimeValue
 	Arity() int
-	Call(args []Evaluatable) (RuntimeValue, *RuntimeError)
+	Call(args []Evaluatable, fromExpr ast.Expr) (RuntimeValue, *RuntimeError)
+	// An optional source for stack traces
+	// If nil, no stack trace will be printed
+	Source() *ast.Source
 }
 
 type DeclRuntimeValue interface {

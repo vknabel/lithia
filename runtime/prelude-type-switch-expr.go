@@ -45,18 +45,14 @@ func (t PreludeTypeSwitchExpr) String() string {
 	if err != nil {
 		panic(fmt.Sprintf("error: %s", err))
 	}
-	cases := make([]string, 0, len(t.Decl.CaseOrder))
-	for i, identifier := range t.Decl.CaseOrder {
-		cases[i] = string(identifier)
-	}
-	return fmt.Sprintf("type %s { %s })", value, strings.Join(cases, ", "))
+	return fmt.Sprintf("<type %s.type %s>", strings.Join(t.context.path, "."), value.RuntimeType().Name)
 }
 
 func (t PreludeTypeSwitchExpr) Arity() int {
 	return 1
 }
 
-func (t PreludeTypeSwitchExpr) Call(args []Evaluatable) (RuntimeValue, *RuntimeError) {
+func (t PreludeTypeSwitchExpr) Call(args []Evaluatable, fromExpr ast.Expr) (RuntimeValue, *RuntimeError) {
 	if len(args) != t.Arity() {
 		panic("use Call to call functions!")
 	}
@@ -90,7 +86,7 @@ func (t PreludeTypeSwitchExpr) Call(args []Evaluatable) (RuntimeValue, *RuntimeE
 			if !ok {
 				return nil, NewRuntimeErrorf("cannot call non function %T", intermediate).CascadeExpr(t.Decl)
 			}
-			return Call(fun, args)
+			return Call(fun, args, t.Decl.Cases[caseIdentifier])
 		}
 		lazyCaseValue, err := enumDef.Lookup(string(caseIdentifier))
 		if err != nil {
@@ -120,7 +116,11 @@ func (t PreludeTypeSwitchExpr) Call(args []Evaluatable) (RuntimeValue, *RuntimeE
 		if err != nil {
 			return nil, err.CascadeExpr(t.Decl)
 		}
-		return Call(fun, args)
+		return Call(fun, args, t.Decl.Cases[caseIdentifier])
 	}
 	return nil, NewRuntimeErrorf("no matching case %s", primaryArg).CascadeExpr(t.Decl)
+}
+
+func (f PreludeTypeSwitchExpr) Source() *ast.Source {
+	return f.Decl.Meta().Source
 }

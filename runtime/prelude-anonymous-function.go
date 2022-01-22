@@ -3,6 +3,8 @@ package runtime
 import (
 	"fmt"
 	"strings"
+
+	"github.com/vknabel/go-lithia/ast"
 )
 
 var _ RuntimeValue = PreludeAnonymousFunction{}
@@ -47,9 +49,13 @@ func (f PreludeAnonymousFunction) Arity() int {
 	return len(f.Params)
 }
 
-func (f PreludeAnonymousFunction) Call(args []Evaluatable) (RuntimeValue, *RuntimeError) {
+func (f PreludeAnonymousFunction) Call(args []Evaluatable, fromExpr ast.Expr) (RuntimeValue, *RuntimeError) {
 	if len(args) != f.Arity() {
 		panic("use Call to call functions!")
 	}
 	return f.Impl(args)
+}
+
+func (f PreludeAnonymousFunction) Source() *ast.Source {
+	return nil
 }

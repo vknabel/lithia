@@ -53,19 +53,19 @@ func (PreludeFuncDecl) RuntimeType() RuntimeTypeRef {
 }
 
 func (f PreludeFuncDecl) String() string {
-	paramList := make([]string, len(f.Decl.Impl.Declarations))
+	paramList := make([]string, len(f.Decl.Impl.Parameters))
 	for i, param := range f.Decl.Impl.Parameters {
 		paramList[i] = string(param.Name)
 	}
 
-	return fmt.Sprintf("<func %s %s>", f.Decl.Name, strings.Join(paramList, ", "))
+	return fmt.Sprintf("<func %s.%s %s>", f.context.module.Name, strings.Join(f.context.path, "."), strings.Join(paramList, ", "))
 }
 
 func (f PreludeFuncDecl) Arity() int {
 	return len(f.Decl.Impl.Parameters)
 }
 
-func (f PreludeFuncDecl) Call(args []Evaluatable) (RuntimeValue, *RuntimeError) {
+func (f PreludeFuncDecl) Call(args []Evaluatable, fromExpr ast.Expr) (RuntimeValue, *RuntimeError) {
 	if len(args) != f.Arity() {
 		panic("use Call to call functions!")
 	}
@@ -94,4 +94,8 @@ func (f PreludeFuncDecl) Call(args []Evaluatable) (RuntimeValue, *RuntimeError) 
 		}
 	}
 	return value, nil
+}
+
+func (f PreludeFuncDecl) Source() *ast.Source {
+	return f.Decl.Meta().Source
 }

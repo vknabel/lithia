@@ -104,7 +104,7 @@ func (e EvaluatableExpr) EvaluateExprIdentifier(expr ast.ExprIdentifier) (Runtim
 		}
 		if fun, ok := value.(CallableRuntimeValue); ok {
 			if fun.Arity() == 0 {
-				return Call(fun, nil)
+				return Call(fun, nil, expr)
 			}
 		}
 		return value, nil
@@ -126,7 +126,7 @@ func (e EvaluatableExpr) EvaluateExprInvocation(expr ast.ExprInvocation) (Runtim
 	for i, argExpr := range expr.Arguments {
 		args[i] = MakeEvaluatableExpr(e.Context, *argExpr)
 	}
-	return Call(function, args)
+	return Call(function, args, expr)
 }
 
 func (e EvaluatableExpr) EvaluateExprMemberAccess(expr ast.ExprMemberAccess) (RuntimeValue, *RuntimeError) {
@@ -153,12 +153,16 @@ func (e EvaluatableExpr) EvaluateExprMemberAccess(expr ast.ExprMemberAccess) (Ru
 func (e EvaluatableExpr) EvaluateExprOperatorBinary(expr ast.ExprOperatorBinary) (RuntimeValue, *RuntimeError) {
 	impl, err := e.Context.BinaryOperatorFunction(string(expr.Operator))
 	if err != nil {
-		return nil, err
+		return nil, err.CascadeCall(nil, expr)
 	}
 	leftEvalExpr := MakeEvaluatableExpr(e.Context, expr.Left)
 	rightEvalExpr := MakeEvaluatableExpr(e.Context, expr.Right)
 
-	return impl(leftEvalExpr, rightEvalExpr)
+	result, err := impl(leftEvalExpr, rightEvalExpr)
+	if err != nil {
+		return nil, err.CascadeCall(nil, expr)
+	}
+	return result, nil
 }
 
 func (e EvaluatableExpr) EvaluateExprOperatorUnary(expr ast.ExprOperatorUnary) (RuntimeValue, *RuntimeError) {

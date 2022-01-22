@@ -42,7 +42,7 @@ func (RxVariableType) Arity() int {
 	return 1
 }
 
-func (t RxVariableType) Call(arguments []Evaluatable) (RuntimeValue, *RuntimeError) {
+func (t RxVariableType) Call(arguments []Evaluatable, fromExpr ast.Expr) (RuntimeValue, *RuntimeError) {
 	if len(arguments) != 1 {
 		return nil, NewRuntimeErrorf("too many arguments for variable type %s", t)
 	}
@@ -51,4 +51,8 @@ func (t RxVariableType) Call(arguments []Evaluatable) (RuntimeValue, *RuntimeErr
 		return nil, err.CascadeDecl(t.DeclExternType)
 	}
 	return MakeRxVariable(&t, value), nil
+}
+
+func (t RxVariableType) Source() *ast.Source {
+	return t.Meta().Source
 }

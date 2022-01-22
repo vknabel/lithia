@@ -57,9 +57,13 @@ func (f PreludeExternTypeMethod) Arity() int {
 	return len(f.Decl.Parameters)
 }
 
-func (f PreludeExternTypeMethod) Call(args []Evaluatable) (RuntimeValue, *RuntimeError) {
+func (f PreludeExternTypeMethod) Call(args []Evaluatable, fromExpr ast.Expr) (RuntimeValue, *RuntimeError) {
 	if len(args) != f.Arity() {
 		panic("use Call to call functions!")
 	}
 	return f.Impl(args)
+}
+
+func (f PreludeExternTypeMethod) Source() *ast.Source {
+	return f.Decl.Meta().Source
 }
