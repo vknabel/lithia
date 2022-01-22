@@ -64,11 +64,9 @@ func (f PreludeFuncExpr) Arity() int {
 }
 
 func (f PreludeFuncExpr) Call(args []Evaluatable) (RuntimeValue, *RuntimeError) {
-	arity := f.Arity()
-	if arity > len(args) {
-		return MakeCurriedCallable(f, args), nil
+	if len(args) != f.Arity() {
+		panic("use Call to call functions!")
 	}
-
 	ex := f.context.NestedInterpreterContext("()")
 	for _, decl := range f.Decl.Declarations {
 		switch decl := decl.(type) {
@@ -93,14 +91,5 @@ func (f PreludeFuncExpr) Call(args []Evaluatable) (RuntimeValue, *RuntimeError) 
 			return nil, err
 		}
 	}
-
-	if arity == len(args) {
-		return value, nil
-	}
-	intermediate, ok := value.(CallableRuntimeValue)
-	if !ok {
-		return nil, NewRuntimeErrorf("cannot call %T %s", intermediate, intermediate)
-	}
-	remainingArgs := args[arity:]
-	return intermediate.Call(remainingArgs)
+	return value, nil
 }

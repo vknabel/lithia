@@ -104,7 +104,7 @@ func (e EvaluatableExpr) EvaluateExprIdentifier(expr ast.ExprIdentifier) (Runtim
 		}
 		if fun, ok := value.(CallableRuntimeValue); ok {
 			if fun.Arity() == 0 {
-				return fun.Call(nil)
+				return Call(fun, nil)
 			}
 		}
 		return value, nil
@@ -122,15 +122,11 @@ func (e EvaluatableExpr) EvaluateExprInvocation(expr ast.ExprInvocation) (Runtim
 	if err != nil {
 		return nil, err
 	}
-	callable, ok := function.(CallableRuntimeValue)
-	if !ok {
-		return nil, NewRuntimeErrorf("cannot call %T %s", function, function)
-	}
 	args := make([]Evaluatable, len(expr.Arguments))
 	for i, argExpr := range expr.Arguments {
 		args[i] = MakeEvaluatableExpr(e.Context, *argExpr)
 	}
-	return callable.Call(args)
+	return Call(function, args)
 }
 
 func (e EvaluatableExpr) EvaluateExprMemberAccess(expr ast.ExprMemberAccess) (RuntimeValue, *RuntimeError) {

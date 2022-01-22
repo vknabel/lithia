@@ -48,19 +48,8 @@ func (f PreludeAnonymousFunction) Arity() int {
 }
 
 func (f PreludeAnonymousFunction) Call(args []Evaluatable) (RuntimeValue, *RuntimeError) {
-	if len(args) < len(f.Params) {
-		return MakeCurriedCallable(f, args), nil
+	if len(args) != f.Arity() {
+		panic("use Call to call functions!")
 	}
-	intermediate, err := f.Impl(args[:len(f.Params)])
-	if err != nil {
-		return nil, err
-	}
-	if len(args) == len(f.Params) {
-		return intermediate, nil
-	}
-	if g, ok := intermediate.(CallableRuntimeValue); ok {
-		return g.Call(args[len(f.Params):])
-	} else {
-		return nil, NewRuntimeErrorf("%s is not callable", g)
-	}
+	return f.Impl(args)
 }

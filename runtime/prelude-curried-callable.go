@@ -41,10 +41,9 @@ func (f PreludeCurriedCallable) Arity() int {
 }
 
 func (f PreludeCurriedCallable) Call(args []Evaluatable) (RuntimeValue, *RuntimeError) {
-	allArgs := append(f.arguments, args...)
-	if len(args) < f.remainingArity {
-		return MakeCurriedCallable(f.actual, allArgs), nil
-	} else {
-		return f.actual.Call(allArgs)
+	if len(args) != f.Arity() {
+		panic("use Call to call functions!")
 	}
+	allArgs := append(f.arguments, args...)
+	return Call(f.actual, allArgs)
 }

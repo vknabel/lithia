@@ -3,7 +3,6 @@ package runtime
 import (
 	"fmt"
 	"reflect"
-	"strings"
 
 	"github.com/vknabel/go-lithia/ast"
 )
@@ -41,13 +40,12 @@ func (d PreludeDataDecl) Arity() int {
 }
 
 func (d PreludeDataDecl) Call(args []Evaluatable) (RuntimeValue, *RuntimeError) {
-	arity := d.Arity()
-	if arity == 0 && len(args) == 0 {
+	if len(args) != d.Arity() {
+		panic("use Call to call functions!")
+	}
+	if d.Arity() == 0 {
 		dataVal, err := MakeDataRuntimeValueMemberwise(&d, make(map[string]Evaluatable))
 		return dataVal, err.CascadeDecl(d.Decl)
-	}
-	if arity > len(args) {
-		return MakeCurriedCallable(d, args), nil
 	}
 	members := make(map[string]Evaluatable)
 	for i, field := range d.Decl.Fields {
@@ -56,18 +54,6 @@ func (d PreludeDataDecl) Call(args []Evaluatable) (RuntimeValue, *RuntimeError) 
 	dataVal, err := MakeDataRuntimeValueMemberwise(&d, members)
 	if err != nil {
 		return dataVal, err.CascadeDecl(d.Decl)
-	}
-	if len(args) > arity {
-		stringifiedArgs := make([]string, len(args[arity:]))
-		for i, arg := range args {
-			stringifiedArgs[i] = fmt.Sprintf("%s", arg)
-		}
-		return nil, NewRuntimeErrorf(
-			"cannot call non-function value of type %s: %q with args %s",
-			d.Decl.Name,
-			dataVal,
-			strings.Join(stringifiedArgs, ", "),
-		).CascadeDecl(d.Decl)
 	}
 	return dataVal, nil
 }

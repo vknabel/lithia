@@ -35,7 +35,7 @@ func MakeRuntimeValueDecl(context *InterpreterContext, decl ast.Decl) (Evaluatab
 	case ast.DeclImport:
 		module, err := context.interpreter.LoadModuleIfNeeded(decl.ModuleName)
 		if err != nil {
-			panic(NewRuntimeError(err).CascadeDecl(decl))
+			return nil, NewRuntimeError(err).CascadeDecl(decl)
 		}
 		return NewConstantRuntimeValue(PreludeModule{Module: module}), nil
 	case ast.DeclImportMember:

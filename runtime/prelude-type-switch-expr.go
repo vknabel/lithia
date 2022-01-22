@@ -57,8 +57,8 @@ func (t PreludeTypeSwitchExpr) Arity() int {
 }
 
 func (t PreludeTypeSwitchExpr) Call(args []Evaluatable) (RuntimeValue, *RuntimeError) {
-	if len(args) < t.Arity() {
-		return MakeCurriedCallable(t, args), nil
+	if len(args) != t.Arity() {
+		panic("use Call to call functions!")
 	}
 	primaryArg, err := args[0].Evaluate()
 	if err != nil {
@@ -90,7 +90,7 @@ func (t PreludeTypeSwitchExpr) Call(args []Evaluatable) (RuntimeValue, *RuntimeE
 			if !ok {
 				return nil, NewRuntimeErrorf("cannot call non function %T", intermediate).CascadeExpr(t.Decl)
 			}
-			return fun.Call(args)
+			return Call(fun, args)
 		}
 		lazyCaseValue, err := enumDef.Lookup(string(caseIdentifier))
 		if err != nil {
@@ -116,15 +116,11 @@ func (t PreludeTypeSwitchExpr) Call(args []Evaluatable) (RuntimeValue, *RuntimeE
 		if !ok {
 			continue
 		}
-		intermediate, err := t.caseValue[caseIdentifier].Evaluate()
+		fun, err := t.caseValue[caseIdentifier].Evaluate()
 		if err != nil {
 			return nil, err.CascadeExpr(t.Decl)
 		}
-		fun, ok := intermediate.(CallableRuntimeValue)
-		if !ok {
-			return nil, NewRuntimeErrorf("cannot call non function %T", intermediate).CascadeExpr(t.Decl)
-		}
-		return fun.Call(args)
+		return Call(fun, args)
 	}
 	return nil, NewRuntimeErrorf("no matching case %s", primaryArg).CascadeExpr(t.Decl)
 }
