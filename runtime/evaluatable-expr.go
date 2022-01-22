@@ -64,11 +64,11 @@ func (e EvaluatableExpr) Evaluate() (RuntimeValue, *RuntimeError) {
 		case *ast.ExprTypeSwitch:
 			return e.EvaluateExprTypeSwitch(*expr)
 		default:
-			panic(fmt.Sprintf("unknown expr: %T %s", expr, expr))
+			panic(fmt.Errorf("unknown expr: %T %s", expr, expr))
 		}
 	})
 
-	return value, err.Cascade(*e.Expr.Meta().Source)
+	return value, err.CascadeExpr(e.Expr)
 }
 
 func (e EvaluatableExpr) EvaluateExprArray(expr ast.ExprArray) (RuntimeValue, *RuntimeError) {
@@ -88,7 +88,7 @@ func (e EvaluatableExpr) EvaluateExprFunc(expr ast.ExprFunc) (RuntimeValue, *Run
 	if e.Context.fileDef.Path != expr.Meta().Source.FileName {
 		panic("Mixing files in function expressions!")
 	}
-	return MakePreludeFuncExpr(e.Context, expr), nil
+	return MakePreludeFuncExpr(e.Context, expr)
 }
 
 func (e EvaluatableExpr) EvaluateExprGroup(expr ast.ExprGroup) (RuntimeValue, *RuntimeError) {
@@ -166,7 +166,7 @@ func (e EvaluatableExpr) EvaluateExprOperatorBinary(expr ast.ExprOperatorBinary)
 }
 
 func (e EvaluatableExpr) EvaluateExprOperatorUnary(expr ast.ExprOperatorUnary) (RuntimeValue, *RuntimeError) {
-	panic("TODO: not implemented EvaluateExprOperatorUnary")
+	panic("unary expressions https://github.com/vknabel/lithia/issues/22")
 }
 
 func (e EvaluatableExpr) EvaluateExprString(expr ast.ExprString) (RuntimeValue, *RuntimeError) {

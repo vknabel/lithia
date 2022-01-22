@@ -17,7 +17,9 @@ func (fp *FileParser) ParseFieldDeclaration() (*ast.DeclField, []SyntaxError) {
 
 func (fp *FileParser) parseDataPropertyValue() (*ast.DeclField, []SyntaxError) {
 	name := ast.Identifier(fp.Node.ChildByFieldName("name").Content(fp.Source))
-	return ast.MakeDeclField(name, nil, fp.AstSource()), nil
+	field := ast.MakeDeclField(name, nil, fp.AstSource())
+	field.Docs = fp.ConsumeDocs()
+	return field, nil
 }
 
 func (fp *FileParser) parseDataPropertyFunction() (*ast.DeclField, []SyntaxError) {
@@ -37,5 +39,7 @@ func (fp *FileParser) parseDataPropertyFunction() (*ast.DeclField, []SyntaxError
 		}
 	}
 
-	return ast.MakeDeclField(name, params, fp.AstSource()), errors
+	field := ast.MakeDeclField(name, params, fp.AstSource())
+	field.Docs = fp.ConsumeDocs()
+	return field, errors
 }

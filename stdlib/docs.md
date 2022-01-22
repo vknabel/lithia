@@ -7,7 +7,9 @@ _module_
 - _data_ [DataFieldDocs](#DataFieldDocs)
 - _data_ [EnumCaseDocs](#EnumCaseDocs)
 - _data_ [EnumDocs](#EnumDocs)
-- _data_ [ExternDocs](#ExternDocs)
+- _data_ [ExternFieldDocs](#ExternFieldDocs)
+- _data_ [ExternFunctionDocs](#ExternFunctionDocs)
+- _data_ [ExternTypeDocs](#ExternTypeDocs)
 - _data_ [FunctionDocs](#FunctionDocs)
 - _data_ [ModuleDocs](#ModuleDocs)
 - _enum_ [TypeDocs](#TypeDocs)
@@ -67,7 +69,17 @@ _data_ Contains all documentation information for a given enum.
 - `docs`
 - `cases`
 
-## ExternDocs
+## ExternFieldDocs
+
+_data_ Describes a field of a data type
+
+### Properties
+
+- `name` - name of the data property
+- `docs`
+- `params`
+
+## ExternFunctionDocs
 
 _data_ 
 
@@ -75,6 +87,17 @@ _data_
 
 - `name`
 - `docs`
+- `fields` - a list of ExternFieldDocs
+
+## ExternTypeDocs
+
+_data_ 
+
+### Properties
+
+- `name`
+- `docs`
+- `fields`
 
 ## FunctionDocs
 
@@ -102,12 +125,13 @@ _enum_ All possible docs inspection values.
 
 ### Cases
 
-- [ConstantDocs](#ConstantDocs)
-- [DataDocs](#DataDocs)
 - [EnumDocs](#EnumDocs)
-- [ExternDocs](#ExternDocs)
-- [FunctionDocs](#FunctionDocs)
+- [DataDocs](#DataDocs)
 - [ModuleDocs](#ModuleDocs)
+- [FunctionDocs](#FunctionDocs)
+- [ConstantDocs](#ConstantDocs)
+- [ExternTypeDocs](#ExternTypeDocs)
+- [ExternFunctionDocs](#ExternFunctionDocs)
 - [None](#None)
 
 ## dataFieldDocsToMarkdown

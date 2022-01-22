@@ -6,34 +6,38 @@ import (
 	"github.com/vknabel/go-lithia/ast"
 )
 
-func MakeRuntimeValueDecl(context *InterpreterContext, decl ast.Decl) Evaluatable {
+func MakeRuntimeValueDecl(context *InterpreterContext, decl ast.Decl) (Evaluatable, *RuntimeError) {
 	switch decl := decl.(type) {
 	case ast.DeclConstant:
-		return MakeEvaluatableExpr(context, decl.Value)
+		return MakeEvaluatableExpr(context, decl.Value), nil
 	case ast.DeclData:
-		return NewConstantRuntimeValue(PreludeDataDecl{Decl: decl})
+		return NewConstantRuntimeValue(PreludeDataDecl{Decl: decl}), nil
 	case ast.DeclEnum:
-		return NewConstantRuntimeValue(MakeEnumDecl(context, decl))
+		return NewConstantRuntimeValue(MakeEnumDecl(context, decl)), nil
 	case ast.DeclFunc:
-		return NewConstantRuntimeValue(MakePreludeFuncDecl(context, decl))
+		value, err := MakePreludeFuncDecl(context, decl)
+		if err != nil {
+			return nil, err
+		}
+		return NewConstantRuntimeValue(value), nil
 	case ast.DeclExternFunc, ast.DeclExternType:
 		definition, ok := context.interpreter.ExternalDefinitions[context.module.Name]
 		if !ok {
-			panic(fmt.Sprintf("extern definitions not found for module %s. assumed by extern %s", context.module.Name, decl.DeclName()))
+			return nil, NewRuntimeErrorf("extern definitions not found for module %s. assumed by extern %s", context.module.Name, decl.DeclName())
 		}
 		value, ok := definition.Lookup(string(decl.DeclName()), context.environment, decl)
 		if !ok {
-			panic(fmt.Sprintf("extern definition not found in module %s: extern %s", context.module.Name, decl.DeclName()))
+			return nil, NewRuntimeErrorf("extern definition not found in module %s: extern %s", context.module.Name, decl.DeclName())
 		}
-		return NewConstantRuntimeValue(value)
+		return NewConstantRuntimeValue(value), nil
 	case ast.DeclModule:
-		return NewConstantRuntimeValue(PreludeModule{Module: context.module})
+		return NewConstantRuntimeValue(PreludeModule{Module: context.module}), nil
 	case ast.DeclImport:
 		module, err := context.interpreter.LoadModuleIfNeeded(decl.ModuleName)
 		if err != nil {
 			panic(NewRuntimeError(err).Cascade(*decl.Meta().Source))
 		}
-		return NewConstantRuntimeValue(PreludeModule{Module: module})
+		return NewConstantRuntimeValue(PreludeModule{Module: module}), nil
 	case ast.DeclImportMember:
 		return NewLazyRuntimeValue(func() (RuntimeValue, *RuntimeError) {
 			module, err := context.interpreter.LoadModuleIfNeeded(decl.ModuleName)
@@ -42,8 +46,8 @@ func MakeRuntimeValueDecl(context *InterpreterContext, decl ast.Decl) Evaluatabl
 			}
 			value, err := module.Environment.GetEvaluatedRuntimeValue(string(decl.DeclName()))
 			return value, NewRuntimeError(err).Cascade(*decl.Meta().Source)
-		})
+		}), nil
 	default:
-		panic(fmt.Sprintf("unknown decl: %T %s", decl, decl.DeclName()))
+		panic(fmt.Errorf("unknown decl: %T %s", decl, decl.DeclName()))
 	}
 }

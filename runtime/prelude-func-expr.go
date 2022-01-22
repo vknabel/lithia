@@ -2,6 +2,7 @@ package runtime
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/vknabel/go-lithia/ast"
 )
@@ -14,7 +15,7 @@ type PreludeFuncExpr struct {
 	Decl    ast.ExprFunc
 }
 
-func MakePreludeFuncExpr(context *InterpreterContext, expr ast.ExprFunc) PreludeFuncExpr {
+func MakePreludeFuncExpr(context *InterpreterContext, expr ast.ExprFunc) (PreludeFuncExpr, *RuntimeError) {
 	if context.fileDef.Path != expr.Meta().Source.FileName {
 		panic("Mixing files in function expressions!")
 	}
@@ -24,13 +25,17 @@ func MakePreludeFuncExpr(context *InterpreterContext, expr ast.ExprFunc) Prelude
 		case ast.DeclConstant, ast.DeclFunc:
 			continue
 		default:
-			fx.environment.DeclareExported(string(decl.DeclName()), MakeRuntimeValueDecl(fx, decl))
+			eval, err := MakeRuntimeValueDecl(fx, decl)
+			if err != nil {
+				return PreludeFuncExpr{}, err
+			}
+			fx.environment.DeclareExported(string(decl.DeclName()), eval)
 		}
 	}
 	return PreludeFuncExpr{
 		fx,
 		expr,
-	}
+	}, nil
 }
 
 func (PreludeFuncExpr) Lookup(member string) (Evaluatable, *RuntimeError) {
@@ -42,8 +47,11 @@ func (PreludeFuncExpr) RuntimeType() RuntimeTypeRef {
 }
 
 func (f PreludeFuncExpr) String() string {
-	return fmt.Sprintf("%s", f.Decl)
-	// panic("TODO: not implemented PreludeFuncExpr")
+	paramList := make([]string, len(f.Decl.Parameters))
+	for i, param := range f.Decl.Parameters {
+		paramList[i] = string(param.Name)
+	}
+	return fmt.Sprintf("func %s %s", f.Decl.Name, strings.Join(paramList, ", "))
 }
 
 func (f PreludeFuncExpr) Arity() int {
@@ -60,7 +68,11 @@ func (f PreludeFuncExpr) Call(args []Evaluatable) (RuntimeValue, *RuntimeError) 
 	for _, decl := range f.Decl.Declarations {
 		switch decl := decl.(type) {
 		case ast.DeclConstant, ast.DeclFunc:
-			ex.environment.DeclareExported(string(decl.DeclName()), MakeRuntimeValueDecl(ex, decl))
+			eval, err := MakeRuntimeValueDecl(ex, decl)
+			if err != nil {
+				return nil, err
+			}
+			ex.environment.DeclareExported(string(decl.DeclName()), eval)
 		default:
 			continue
 		}

@@ -22,13 +22,16 @@ func (r RuntimeTypeRef) String() string {
 	return fmt.Sprintf("%s.%s", r.Module, r.Name)
 }
 
-// func (r RuntimeTypeRef) Declaration(interpreter *Interpreter) (ast.Decl, *RuntimeError) {
-// 	valueType, err := r.ResolveType(interpreter)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	return valueType.Declaration(interpreter)
-// }
+func (r RuntimeTypeRef) Declaration(interpreter *Interpreter) (ast.Decl, *RuntimeError) {
+	valueType, err := r.ResolveType(interpreter)
+	if err != nil {
+		return nil, err
+	}
+	if runtimeType, ok := valueType.(RuntimeType); ok {
+		return runtimeType.Declaration(interpreter)
+	}
+	panic(fmt.Errorf("TODO: decl runtime value %s has no declaration", valueType))
+}
 
 func (r RuntimeTypeRef) ResolveType(interpreter *Interpreter) (DeclRuntimeValue, *RuntimeError) {
 	module, ok := interpreter.Modules[r.Module]

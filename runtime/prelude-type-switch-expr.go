@@ -2,6 +2,7 @@ package runtime
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/vknabel/go-lithia/ast"
 )
@@ -39,7 +40,11 @@ func (t PreludeTypeSwitchExpr) String() string {
 	if err != nil {
 		panic(fmt.Sprintf("error: %s", err))
 	}
-	return fmt.Sprintf("(type %s {})", value)
+	cases := make([]string, 0, len(t.Decl.CaseOrder))
+	for i, identifier := range t.Decl.CaseOrder {
+		cases[i] = string(identifier)
+	}
+	return fmt.Sprintf("type %s { %s })", value, strings.Join(cases, ", "))
 }
 
 func (t PreludeTypeSwitchExpr) Arity() int {

@@ -50,10 +50,6 @@ func (fp *FileParser) ParseExpressionIfGiven() (ast.Expr, []SyntaxError) {
 		} else {
 			return expr, errs
 		}
-	case TYPE_NODE_TYPE_BODY:
-		panic("not implemented")
-	case TYPE_NODE_TYPE_CASE:
-		panic("not implemented")
 	case TYPE_NODE_STRING_LITERAL:
 		expr, errs := fp.ParseExprString()
 		if expr == nil {
@@ -61,8 +57,6 @@ func (fp *FileParser) ParseExpressionIfGiven() (ast.Expr, []SyntaxError) {
 		} else {
 			return expr, errs
 		}
-	// case TYPE_NODE_ESCAPE_SEQUENCE:
-	// 	panic("not implemented")
 	case TYPE_NODE_GROUP_LITERAL:
 		expr, errs := fp.ParseGroupExpr()
 		if expr == nil {
@@ -91,8 +85,6 @@ func (fp *FileParser) ParseExpressionIfGiven() (ast.Expr, []SyntaxError) {
 		} else {
 			return expr, errs
 		}
-	case TYPE_NODE_PARAMETER_LIST:
-		panic("not implemented")
 	case TYPE_NODE_IDENTIFIER:
 		expr, errs := fp.parseExprIdentifier()
 		if expr == nil {
@@ -101,6 +93,11 @@ func (fp *FileParser) ParseExpressionIfGiven() (ast.Expr, []SyntaxError) {
 			return expr, errs
 		}
 
+	case TYPE_NODE_TYPE_BODY,
+		TYPE_NODE_TYPE_CASE,
+		TYPE_NODE_ESCAPE_SEQUENCE,
+		TYPE_NODE_PARAMETER_LIST:
+		panic(fmt.Errorf("unexpected node type %s", fp.Node.Type()))
 	default:
 		return nil, nil
 	}

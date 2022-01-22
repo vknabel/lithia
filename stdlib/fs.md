@@ -6,7 +6,7 @@ _module_
 - _func_ [deleteAll](#deleteAll) atPath
 - _func_ [exists](#exists) atPath
 - _func_ [readString](#readString) fromPath
-- _func_ [writeString](#writeString) toPath, contents
+- _func_ [writeString](#writeString) toPath, newContents
 
 ## delete
 
@@ -30,5 +30,5 @@ _func_ `readString fromPath`
 
 ## writeString
 
-_func_ `writeString toPath, contents`
+_func_ `writeString toPath, newContents`
 

@@ -12,7 +12,8 @@ func (fp *FileParser) ParseDataDeclaration() (*ast.DeclData, []SyntaxError) {
 	if propertiesNode == nil {
 		return dataDecl, nil
 	}
-	propsp := fp.NewScopeChildParser(propertiesNode)
+	fp.addAllChildComments()
+	propsp := fp.ChildParserConsumingComments(propertiesNode)
 
 	var numberOfFields int
 	if propertiesNode != nil {

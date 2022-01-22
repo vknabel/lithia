@@ -12,7 +12,7 @@ type PreludeFuncDecl struct {
 	Decl    ast.DeclFunc
 }
 
-func MakePreludeFuncDecl(context *InterpreterContext, decl ast.DeclFunc) PreludeFuncDecl {
+func MakePreludeFuncDecl(context *InterpreterContext, decl ast.DeclFunc) (PreludeFuncDecl, *RuntimeError) {
 	if context.fileDef.Path != decl.Meta().FileName {
 		panic("Mixing files in declared functions!")
 	}
@@ -22,14 +22,18 @@ func MakePreludeFuncDecl(context *InterpreterContext, decl ast.DeclFunc) Prelude
 		case ast.DeclConstant, ast.DeclFunc:
 			continue
 		default:
-			fx.environment.DeclareExported(string(decl.DeclName()), MakeRuntimeValueDecl(fx, decl))
+			declValue, err := MakeRuntimeValueDecl(fx, decl)
+			if err != nil {
+				return PreludeFuncDecl{}, err
+			}
+			fx.environment.DeclareExported(string(decl.DeclName()), declValue)
 		}
 	}
 
 	return PreludeFuncDecl{
 		fx,
 		decl,
-	}
+	}, nil
 }
 
 func (f PreludeFuncDecl) Lookup(member string) (Evaluatable, *RuntimeError) {
@@ -63,7 +67,11 @@ func (f PreludeFuncDecl) Call(args []Evaluatable) (RuntimeValue, *RuntimeError) 
 	for _, decl := range f.Decl.Impl.Declarations {
 		switch decl := decl.(type) {
 		case ast.DeclConstant, ast.DeclFunc:
-			ex.environment.DeclareExported(string(decl.DeclName()), MakeRuntimeValueDecl(ex, decl))
+			declValue, err := MakeRuntimeValueDecl(ex, decl)
+			if err != nil {
+				return nil, err
+			}
+			ex.environment.DeclareExported(string(decl.DeclName()), declValue)
 		default:
 			continue
 		}

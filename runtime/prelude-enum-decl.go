@@ -23,7 +23,7 @@ func MakeEnumDecl(context *InterpreterContext, decl ast.DeclEnum) PreludeEnumDec
 	for _, caseDecl := range decl.Cases {
 		lookedUp, ok := context.environment.GetPrivate(string(caseDecl.Name))
 		if !ok {
-			panic(fmt.Sprintf(
+			panic(fmt.Errorf(
 				"undeclared enum case %s in %s",
 				caseDecl.Name,
 				strings.Join(enumContext.path, "."),

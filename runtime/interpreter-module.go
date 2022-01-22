@@ -20,7 +20,7 @@ func (inter *Interpreter) NewModule(name ast.ModuleName) *Module {
 		Name:        name,
 		Environment: NewEnvironment(inter.NewPreludeEnvironment()),
 		Files:       make(map[FileName]*InterpreterContext),
-		// TODO: Decl
+		Decl:        ast.MakeContextModule(name),
 	}
 	inter.Modules[name] = module
 	return module

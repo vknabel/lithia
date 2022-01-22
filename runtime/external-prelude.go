@@ -42,7 +42,7 @@ func (e ExternalPrelude) Lookup(name string, env *Environment, decl ast.Decl) (R
 	case "Char":
 		if externDecl, ok := decl.(ast.DeclExternType); ok {
 			return PreludePrimitiveExternType{&externDecl, func(value RuntimeValue) (bool, *RuntimeError) {
-				panic("char not implemented")
+				panic("char https://github.com/vknabel/lithia/issues/23")
 			}}, true
 		} else {
 			return nil, false

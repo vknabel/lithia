@@ -106,6 +106,7 @@ func (inter *Interpreter) LoadFileIntoModule(module *Module, fileName string, sc
 	if sourceFile == nil {
 		return nil, errs[0] // TODO: Multiple Errors!
 	}
+	module.Decl.AddSourceFile(sourceFile)
 	ix := inter.NewInterpreterContext(sourceFile, module, fileParser.Tree.RootNode(), []byte(script), module.Environment.Private())
 	module.Files[FileName(fileName)] = ix
 	// TODO: Modules?
@@ -113,7 +114,10 @@ func (inter *Interpreter) LoadFileIntoModule(module *Module, fileName string, sc
 	// 	ix.environment.DeclareUnexported(string(moduleImport), moduleImport)
 	// }
 	for _, decl := range sourceFile.Declarations {
-		declValue := MakeRuntimeValueDecl(ix, decl)
+		declValue, err := MakeRuntimeValueDecl(ix, decl)
+		if err != nil {
+			return nil, err
+		}
 		if decl.IsExportedDecl() {
 			ix.environment.DeclareExported(string(decl.DeclName()), declValue)
 		} else {
@@ -132,6 +136,7 @@ func (inter *Interpreter) EmbedFileIntoModule(module *Module, fileName string, s
 	if sourceFile == nil {
 		return nil, errs[0] // TODO: Multiple Errors!
 	}
+	module.Decl.AddSourceFile(sourceFile)
 	ex := inter.NewInterpreterContext(sourceFile, module, fileParser.Tree.RootNode(), []byte(script), module.Environment)
 	return ex, nil
 }

@@ -2,6 +2,7 @@ package runtime
 
 import (
 	"sort"
+	"strings"
 
 	"github.com/vknabel/go-lithia/ast"
 )
@@ -62,21 +63,21 @@ func docsInspectValue(value RuntimeValue, env *Environment) (RuntimeValue, *Runt
 		if err != nil {
 			return nil, err
 		}
-		moduleDocs := ""
-		if value.Module.Decl != nil {
-			for _, file := range value.Module.Decl.Files {
-				for _, decl := range file.Declarations {
-					if moduleDecl, ok := decl.(*ast.DeclModule); ok {
-						moduleDocs += moduleDecl.Docs.Content
-						moduleDocs += "\n"
+		moduleDocs := []string{}
+		for _, file := range value.Module.Decl.Files {
+			for _, decl := range file.Declarations {
+				if moduleDecl, ok := decl.(ast.DeclModule); ok {
+					if len(moduleDecl.Docs.Content) == 0 {
+						continue
 					}
+					moduleDocs = append(moduleDocs, moduleDecl.Docs.Content)
 				}
 			}
 		}
 		return env.MakeDataRuntimeValue("ModuleDocs", map[string]Evaluatable{
 			"name":  NewConstantRuntimeValue(PreludeString(value.Module.Name)),
 			"types": NewConstantRuntimeValue(childrenList),
-			"docs":  NewConstantRuntimeValue(PreludeString(moduleDocs)),
+			"docs":  NewConstantRuntimeValue(PreludeString(strings.Join(moduleDocs, "\n"))),
 		})
 	case PreludeDataDecl:
 		fieldDocs := make([]RuntimeValue, 0)
@@ -198,6 +199,36 @@ func docsInspectValue(value RuntimeValue, env *Environment) (RuntimeValue, *Runt
 			"name":   NewConstantRuntimeValue(PreludeString(value.Decl.Name)),
 			"docs":   NewConstantRuntimeValue(PreludeString("")),
 			"params": NewConstantRuntimeValue(paramsList),
+		})
+	case RxVariableType:
+		fieldDocs := make([]RuntimeValue, 0)
+		for _, field := range value.Fields {
+			params := make([]RuntimeValue, 0)
+			for _, param := range field.Parameters {
+				params = append(params, PreludeString(param.Name))
+			}
+			paramsList, err := env.MakeEagerList(params)
+			if err != nil {
+				return nil, err
+			}
+			doc, err := env.MakeDataRuntimeValue("ExternFieldDocs", map[string]Evaluatable{
+				"name":   NewConstantRuntimeValue(PreludeString(field.Name)),
+				"docs":   NewConstantRuntimeValue(PreludeString(field.Docs.Content)),
+				"params": NewConstantRuntimeValue(paramsList),
+			})
+			if err != nil {
+				return nil, err
+			}
+			fieldDocs = append(fieldDocs, doc)
+		}
+		fieldDocsList, err := env.MakeEagerList(fieldDocs)
+		if err != nil {
+			return nil, err
+		}
+		return env.MakeDataRuntimeValue("ExternTypeDocs", map[string]Evaluatable{
+			"name":   NewConstantRuntimeValue(PreludeString(value.Name)),
+			"docs":   NewConstantRuntimeValue(PreludeString(value.Docs.Content)),
+			"fields": NewConstantRuntimeValue(fieldDocsList),
 		})
 	// case DocumentedRuntimeValue:
 	// 	docs := value.GetDocs()
