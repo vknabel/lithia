@@ -74,8 +74,13 @@ func (t PreludeTypeSwitchExpr) Call(args []Evaluatable, fromExpr ast.Expr) (Runt
 			enumDefValue,
 		).CascadeExpr(t.Decl)
 	}
+
+	err = validateTypeSwitchAgainstEnumDecl(enumDef, t.Decl)
+	if err != nil {
+		return nil, err.CascadeExpr(t.Decl)
+	}
+
 	// TODO: optimization can be cached
-	// TODO: more validation
 	for _, caseIdentifier := range t.Decl.CaseOrder {
 		if caseIdentifier == "Any" {
 			intermediate, err := t.caseValue[caseIdentifier].Evaluate()
@@ -88,7 +93,7 @@ func (t PreludeTypeSwitchExpr) Call(args []Evaluatable, fromExpr ast.Expr) (Runt
 			}
 			return Call(fun, args, t.Decl.Cases[caseIdentifier])
 		}
-		lazyCaseValue, err := enumDef.Lookup(string(caseIdentifier))
+		lazyCaseValue, err := enumDef.LookupCase(string(caseIdentifier))
 		if err != nil {
 			return nil, err.CascadeExpr(t.Decl)
 		}
@@ -123,4 +128,41 @@ func (t PreludeTypeSwitchExpr) Call(args []Evaluatable, fromExpr ast.Expr) (Runt
 
 func (f PreludeTypeSwitchExpr) Source() *ast.Source {
 	return f.Decl.Meta().Source
+}
+
+func validateTypeSwitchAgainstEnumDecl(enumDecl PreludeEnumDecl, typeSwitch ast.ExprTypeSwitch) *RuntimeError {
+	err := validateTypeSwitchAgainstEnumDeclForCount(enumDecl, typeSwitch)
+	if err != nil {
+		return err
+	}
+	err = validateTypeSwitchAgainstEnumDeclForUnknownCases(enumDecl, typeSwitch)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func validateTypeSwitchAgainstEnumDeclForCount(enumDecl PreludeEnumDecl, typeSwitch ast.ExprTypeSwitch) *RuntimeError {
+	if len(typeSwitch.Cases) != len(enumDecl.Decl.Cases) {
+		for caseIdentifier := range typeSwitch.Cases {
+			if caseIdentifier == "Any" {
+				return nil
+			}
+		}
+		return ReportNonExhaustiveTypeSwitch(enumDecl, typeSwitch)
+	}
+	return nil
+}
+
+func validateTypeSwitchAgainstEnumDeclForUnknownCases(enumDecl PreludeEnumDecl, typeSwitch ast.ExprTypeSwitch) *RuntimeError {
+	for _, caseIdentifier := range typeSwitch.CaseOrder {
+		if caseIdentifier == "Any" {
+			continue
+		}
+		_, err := enumDecl.LookupCase(string(caseIdentifier))
+		if err != nil {
+			return err.CascadeExpr(typeSwitch.Cases[caseIdentifier])
+		}
+	}
+	return nil
 }

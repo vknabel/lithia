@@ -16,7 +16,7 @@ type PreludeDataDecl struct {
 }
 
 func (d PreludeDataDecl) Lookup(member string) (Evaluatable, *RuntimeError) {
-	panic(fmt.Sprintf("cannot access member %s of data type %s, see https://github.com/vknabel/lithia/discussions/25", member, d.Decl.Name))
+	return nil, NewRuntimeErrorf("cannot access member %s of data type %s, see https://github.com/vknabel/lithia/discussions/25", member, d.Decl.Name)
 }
 
 func (PreludeDataDecl) RuntimeType() RuntimeTypeRef {

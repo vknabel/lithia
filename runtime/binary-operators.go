@@ -150,7 +150,7 @@ func (ex *InterpreterContext) numericGreedyComparision(
 		case PreludeFloat:
 			return ex.boolToRuntimeValue(compareFloat(PreludeFloat(left), right))
 		default:
-			return nil, RuntimeBinaryOperatorOnlySupportsType(
+			return nil, ReportBinaryOperatorOnlySupportsType(
 				operator,
 				[]RuntimeTypeRef{PreludeInt(0).RuntimeType(), PreludeFloat(0).RuntimeType()},
 				left,
@@ -167,14 +167,14 @@ func (ex *InterpreterContext) numericGreedyComparision(
 		case PreludeFloat:
 			return ex.boolToRuntimeValue(compareFloat(left, right))
 		default:
-			return nil, RuntimeBinaryOperatorOnlySupportsType(
+			return nil, ReportBinaryOperatorOnlySupportsType(
 				operator,
 				[]RuntimeTypeRef{PreludeInt(0).RuntimeType(), PreludeFloat(0).RuntimeType()},
 				left,
 			)
 		}
 	default:
-		return nil, RuntimeBinaryOperatorOnlySupportsType(
+		return nil, ReportBinaryOperatorOnlySupportsType(
 			operator,
 			[]RuntimeTypeRef{PreludeInt(0).RuntimeType(), PreludeFloat(0).RuntimeType()},
 			left,
@@ -204,7 +204,7 @@ func (ex *InterpreterContext) numericGreedyOperation(
 		case PreludeFloat:
 			return combineFloat(PreludeFloat(left), right), nil
 		default:
-			return nil, RuntimeBinaryOperatorOnlySupportsType(
+			return nil, ReportBinaryOperatorOnlySupportsType(
 				operator,
 				[]RuntimeTypeRef{PreludeInt(0).RuntimeType(), PreludeFloat(0).RuntimeType()},
 				left,
@@ -221,14 +221,14 @@ func (ex *InterpreterContext) numericGreedyOperation(
 		case PreludeFloat:
 			return combineFloat(left, right), nil
 		default:
-			return nil, RuntimeBinaryOperatorOnlySupportsType(
+			return nil, ReportBinaryOperatorOnlySupportsType(
 				operator,
 				[]RuntimeTypeRef{PreludeInt(0).RuntimeType(), PreludeFloat(0).RuntimeType()},
 				left,
 			)
 		}
 	default:
-		return nil, RuntimeBinaryOperatorOnlySupportsType(
+		return nil, ReportBinaryOperatorOnlySupportsType(
 			operator,
 			[]RuntimeTypeRef{PreludeInt(0).RuntimeType(), PreludeFloat(0).RuntimeType()},
 			left,
@@ -260,7 +260,7 @@ func (ex *InterpreterContext) lazyLogicComparision(
 		if err != nil {
 			return nil, err
 		}
-		return nil, RuntimeBinaryOperatorOnlySupportsType(
+		return nil, ReportBinaryOperatorOnlySupportsType(
 			operator,
 			[]RuntimeTypeRef{boolRef},
 			left,

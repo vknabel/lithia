@@ -53,6 +53,21 @@ func NewRuntimeErrorf(format string, args ...interface{}) *RuntimeError {
 	return NewRuntimeError(fmt.Errorf(format, args...))
 }
 
+func NewTypeError(err error) *RuntimeError {
+	if runtimeErr, ok := err.(*RuntimeError); ok {
+		return runtimeErr
+	}
+	return &RuntimeError{
+		topic:      "type error",
+		cause:      err,
+		stackTrace: []stackEntry{},
+	}
+}
+
+func NewTypeErrorf(format string, args ...interface{}) *RuntimeError {
+	return NewTypeError(fmt.Errorf(format, args...))
+}
+
 func (r *RuntimeError) cascadeEntry(entry stackEntry) *RuntimeError {
 	if r == nil {
 		return nil

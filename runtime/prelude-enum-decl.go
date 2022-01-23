@@ -39,6 +39,10 @@ func MakeEnumDecl(context *InterpreterContext, decl ast.DeclEnum) PreludeEnumDec
 }
 
 func (e PreludeEnumDecl) Lookup(member string) (Evaluatable, *RuntimeError) {
+	return nil, NewRuntimeErrorf("cannot access member %s of enum type %s, see https://github.com/vknabel/lithia/discussions/25", member, e.Decl.Name)
+}
+
+func (e PreludeEnumDecl) LookupCase(member string) (Evaluatable, *RuntimeError) {
 	value, ok := e.caseLookups[ast.Identifier(member)]
 	if !ok {
 		return nil, NewRuntimeErrorf("enum %s has no member %s", e, member).CascadeDecl(e.Decl)
