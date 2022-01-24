@@ -1,6 +1,6 @@
 # Changelog
 
-## unreleased
+## v0.0.10
 
 - stdlib: added `arity` to `prelude.Function`
 - compiler: massive performance improvements
