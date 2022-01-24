@@ -6,11 +6,7 @@ import (
 )
 
 func ReportErrorOrPanic(err error) {
-	if locatable, ok := err.(LocatableError); ok {
-		fmt.Fprintln(os.Stderr, locatable)
-	} else {
-		report(0, "", err.Error())
-	}
+	fmt.Fprintln(os.Stderr, err)
 }
 
 func ReportError(line int, message string) {

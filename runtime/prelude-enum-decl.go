@@ -17,17 +17,17 @@ type PreludeEnumDecl struct {
 	caseLookups map[ast.Identifier]Evaluatable
 }
 
-func MakeEnumDecl(context *InterpreterContext, decl ast.DeclEnum) PreludeEnumDecl {
+func MakeEnumDecl(context *InterpreterContext, decl ast.DeclEnum) (PreludeEnumDecl, *RuntimeError) {
 	enumContext := context.NestedInterpreterContext(string(decl.Name))
 	caseLookups := make(map[ast.Identifier]Evaluatable)
 	for _, caseDecl := range decl.Cases {
 		lookedUp, ok := context.environment.GetPrivate(string(caseDecl.Name))
 		if !ok {
-			panic(fmt.Errorf(
+			return PreludeEnumDecl{}, NewTypeErrorf(
 				"undeclared enum case %s in %s",
 				caseDecl.Name,
 				strings.Join(enumContext.path, "."),
-			))
+			).CascadeDecl(decl)
 		}
 		caseLookups[caseDecl.Name] = lookedUp
 	}
@@ -35,7 +35,7 @@ func MakeEnumDecl(context *InterpreterContext, decl ast.DeclEnum) PreludeEnumDec
 		context:     context,
 		Decl:        decl,
 		caseLookups: caseLookups,
-	}
+	}, nil
 }
 
 func (e PreludeEnumDecl) Lookup(member string) (Evaluatable, *RuntimeError) {

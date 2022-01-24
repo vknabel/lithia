@@ -13,15 +13,15 @@ type SyntaxParsingError struct {
 	tree     *sitter.Tree
 }
 
-func MakeSyntaxParsingError(fileName string, source string, tree *sitter.Tree) SyntaxParsingError {
-	return SyntaxParsingError{
+func MakeSyntaxParsingError(fileName string, source string, tree *sitter.Tree) *SyntaxParsingError {
+	return &SyntaxParsingError{
 		fileName: fileName,
 		source:   source,
 		tree:     tree,
 	}
 }
 
-func (err SyntaxParsingError) LocatableErrors() []SyntaxError {
+func (err SyntaxParsingError) SyntaxErrors() []SyntaxError {
 	partialErrors := []SyntaxError{}
 
 	for _, errorNode := range err.ErrorNodes(err.tree.RootNode()) {
@@ -39,7 +39,7 @@ func (err SyntaxParsingError) LocatableErrors() []SyntaxError {
 
 func (err SyntaxParsingError) Error() string {
 	partials := []string{}
-	for _, partialError := range err.LocatableErrors() {
+	for _, partialError := range err.SyntaxErrors() {
 		partials = append(partials, partialError.Error())
 	}
 	if len(partials) > 0 {

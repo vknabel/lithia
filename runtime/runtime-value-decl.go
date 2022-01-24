@@ -13,7 +13,11 @@ func MakeRuntimeValueDecl(context *InterpreterContext, decl ast.Decl) (Evaluatab
 	case ast.DeclData:
 		return NewConstantRuntimeValue(PreludeDataDecl{Decl: decl}), nil
 	case ast.DeclEnum:
-		return NewConstantRuntimeValue(MakeEnumDecl(context, decl)), nil
+		enumDecl, err := MakeEnumDecl(context, decl)
+		if err != nil {
+			return nil, err
+		}
+		return NewConstantRuntimeValue(enumDecl), nil
 	case ast.DeclFunc:
 		value, err := MakePreludeFuncDecl(context, decl)
 		if err != nil {

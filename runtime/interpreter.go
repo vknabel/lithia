@@ -98,13 +98,13 @@ func (inter *Interpreter) InterpretEmbed(fileName string, script string) (Runtim
 }
 
 func (inter *Interpreter) LoadFileIntoModule(module *RuntimeModule, fileName string, script string) (*InterpreterContext, error) {
-	fileParser, err := inter.Parser.Parse(module.Name, fileName, script)
-	if err != nil {
-		return nil, fileParser.SyntaxErrorOrConvert(err)
+	fileParser, errs := inter.Parser.Parse(module.Name, fileName, script)
+	if len(errs) > 0 {
+		return nil, parser.NewGroupedSyntaxError(errs)
 	}
 	sourceFile, errs := fileParser.ParseSourceFile()
-	if sourceFile == nil {
-		return nil, errs[0] // TODO: Multiple Errors!
+	if len(errs) > 0 {
+		return nil, parser.NewGroupedSyntaxError(errs)
 	}
 	module.Decl.AddSourceFile(sourceFile)
 	ix := inter.NewInterpreterContext(sourceFile, module, fileParser.Tree.RootNode(), []byte(script), module.Environment.Private())
@@ -125,13 +125,13 @@ func (inter *Interpreter) LoadFileIntoModule(module *RuntimeModule, fileName str
 }
 
 func (inter *Interpreter) EmbedFileIntoModule(module *RuntimeModule, fileName string, script string) (*InterpreterContext, error) {
-	fileParser, err := inter.Parser.Parse(module.Name, fileName, script)
-	if err != nil {
-		return nil, fileParser.SyntaxErrorOrConvert(err)
+	fileParser, errs := inter.Parser.Parse(module.Name, fileName, script)
+	if len(errs) > 0 {
+		return nil, parser.NewGroupedSyntaxError(errs)
 	}
 	sourceFile, errs := fileParser.ParseSourceFile()
 	if sourceFile == nil {
-		return nil, errs[0] // TODO: Multiple Errors!
+		return nil, parser.NewGroupedSyntaxError(errs)
 	}
 	module.Decl.AddSourceFile(sourceFile)
 	ex := inter.NewInterpreterContext(sourceFile, module, fileParser.Tree.RootNode(), []byte(script), module.Environment)
