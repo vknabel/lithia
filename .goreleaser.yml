@@ -56,11 +56,11 @@ dockers:
     # actually goreleaser should be used to copy the binaries
     # -> only the second stage
     extra_files:
+      - ast
+      - cmd
+      - parser
+      - reporting
+      - runtime
       - stdlib
       - go.mod
       - go.sum
-      - go.sum
-      - cmd
-      - interpreter
-      - parser
-      - reporting
