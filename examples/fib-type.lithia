@@ -1,0 +1,8 @@
+func fib { n =>
+    type Bool {
+        True: { _ => 1 },
+        False: { _ => (fib n - 1) + (fib n - 2) }
+    } (n <= 1)
+}
+
+print fib 30

@@ -58,7 +58,14 @@ func docsToMarkdown { docs =>
                 d.docs, "\n"
             ]
         },
-        ExternDocs: { d =>
+        ExternTypeDocs: { d =>
+            strings.concat [
+                "## ", d.name,"\n\n"
+                "_extern_ ",
+                d.docs, "\n"
+            ]
+        },
+        ExternFunctionDocs: { d =>
             strings.concat [
                 "## ", d.name,"\n\n"
                 "_extern_ ",
@@ -98,7 +105,12 @@ func moduleMemberDocsToMarkdown { member =>
                 "- _let_ [", d.name, "](#", d.name, ")"
             ]
         },
-        ExternDocs: { d =>
+        ExternTypeDocs: { d =>
+            strings.concat [
+                "- _extern_ [", d.name, "](#", d.name, ")"
+            ]
+        },
+        ExternFunctionDocs: { d =>
             strings.concat [
                 "- _extern_ [", d.name, "](#", d.name, ")"
             ]

@@ -1,5 +1,12 @@
 # Changelog
 
+## unreleased
+
+- stdlib: added `arity` to `prelude.Function`
+- compiler: massive performance improvements
+- compiler: large refactoring
+- fix: rare equality bugs
+
 ## v0.0.9
 
 - fix: `==` didn't work for independent values

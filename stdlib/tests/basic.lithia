@@ -107,6 +107,9 @@ func runTests { =>
 }
 
 func runTestCase { summary, testCase =>
+    let eagerlyRunPreviousTests = summary.failedTests
+    eagerlyRunPreviousTests
+
     let testNumber = summary.ok + summary.notOk + 1
     let failure = rx.Variable None
     testCase.impl { message =>

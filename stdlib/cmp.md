@@ -36,8 +36,8 @@ _enum_
 ### Cases
 
 - [Ascending](#Ascending)
-- [Descending](#Descending)
 - [Equal](#Equal)
+- [Descending](#Descending)
 
 
 ## equatableFrom

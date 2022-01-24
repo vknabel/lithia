@@ -34,8 +34,8 @@ _enum_
 
 ### Cases
 
-- [Failure](#Failure)
 - [Success](#Success)
+- [Failure](#Failure)
 
 ## Success
 

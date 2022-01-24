@@ -166,9 +166,9 @@ func greet { person =>
 
 in Lithia are different than you might know them from other languages.
 Other languages define enums as a list of constant values. A few allow associated values for each named case.
-A Lithia *enum* is an enumeration of types.
+A Lithia _enum_ is an enumeration of types.
 
-There is syntactic sugar for value enumerations, to directly declare a case and the associated *enum* or *data* type.
+There is syntactic sugar for value enumerations, to directly declare a case and the associated _enum_ or _data_ type.
 
 ```
 enum JuristicPerson {
@@ -407,7 +407,7 @@ Most languages allow type casts and checks. Lithia does only support the type sw
 
 These checks are unstructured and therefore tempt to be used in the wrong places. Though type checks should be used sparingly. Lithia prefers to move required decisions to the edge of the code. Witnesses should implement decisions for the provided data and desired behavior.
 
-If there is one type to focus on, the tooling and the developer can understand all cases much easier and faster.
+If there is one type to focus on, the developer and the tooling can understand all cases much easier and faster.
 
 ## License
 

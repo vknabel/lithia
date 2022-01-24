@@ -16,8 +16,8 @@ _enum_
 
 ### Cases
 
-- [None](#None)
 - [Some](#Some)
+- [None](#None)
 
 ## equalFor
 

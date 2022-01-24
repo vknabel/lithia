@@ -53,8 +53,8 @@ pullback { person => person.name }, cmp.contravariant
 ### Cases
 
 - [Contravariant](#Contravariant)
-- [Function](#Function)
 - [Module](#Module)
+- [Function](#Function)
 
 ## Functor
 
@@ -96,9 +96,9 @@ map incr, lists.functor
 
 ### Cases
 
-- [Function](#Function)
 - [Functor](#Functor)
 - [Module](#Module)
+- [Function](#Function)
 - [Monad](#Monad)
 
 ## Monad
@@ -128,8 +128,8 @@ flatMap repeat 2, lists.monad
 
 ### Cases
 
-- [Module](#Module)
 - [Monad](#Monad)
+- [Module](#Module)
 
 ## contravariantFrom
 

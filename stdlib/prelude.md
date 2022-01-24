@@ -44,8 +44,8 @@ Typically used for conditionals and flags.
 
 ### Cases
 
-- [False](#False)
 - [True](#True)
+- [False](#False)
 
 ## Char
 
@@ -112,8 +112,8 @@ _enum_
 
 ### Cases
 
-- [None](#None)
 - [Some](#Some)
+- [None](#None)
 
 ## Some
 

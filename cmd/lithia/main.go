@@ -7,8 +7,8 @@ import (
 	"os"
 	"path"
 
-	"github.com/vknabel/go-lithia/interpreter"
 	"github.com/vknabel/go-lithia/reporting"
+	"github.com/vknabel/go-lithia/runtime"
 )
 
 func main() {
@@ -35,10 +35,10 @@ func runFile(fileName string) error {
 	if err != nil {
 		return err
 	}
-	inter := interpreter.NewInterpreter(path.Dir(fileName))
+	inter := runtime.NewInterpreter(path.Dir(fileName))
 	script := string(scriptData) + "\n"
-	_, err = inter.Interpret(fileName, script)
-	return err
+	_, ierr := inter.Interpret(fileName, script)
+	return ierr
 }
 
 func runPrompt() error {
@@ -47,7 +47,7 @@ func runPrompt() error {
 		return err
 	}
 	reader := bufio.NewReader(os.Stdin)
-	inter := interpreter.NewInterpreter(importRoot)
+	inter := runtime.NewInterpreter(importRoot)
 	for {
 		fmt.Print("> ")
 		line, err := reader.ReadString('\n')
@@ -58,8 +58,8 @@ func runPrompt() error {
 			reporting.ReportErrorOrPanic(err)
 			continue
 		}
-		value, err := inter.InterpretEmbed("prompt", line)
-		if err != nil {
+		value, ierr := inter.InterpretEmbed("prompt", line)
+		if ierr != nil {
 			reporting.ReportErrorOrPanic(err)
 			continue
 		}

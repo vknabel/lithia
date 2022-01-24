@@ -1,9 +1,8 @@
 package parser
 
 import (
-	"fmt"
-
 	sitter "github.com/smacker/go-tree-sitter"
+	"github.com/vknabel/go-lithia/ast"
 	syntax "github.com/vknabel/tree-sitter-lithia"
 )
 
@@ -14,15 +13,16 @@ func NewParser() *Parser {
 	return &Parser{}
 }
 
-func (*Parser) Parse(contents string) (*sitter.Tree, error) {
+func (*Parser) Parse(moduleName ast.ModuleName, file string, contents string) (*FileParser, []SyntaxError) {
 	parser := sitter.NewParser()
 	parser.SetLanguage(syntax.GetLanguage())
 
 	input := []byte(contents)
 	tree := parser.Parse(nil, input)
 
+	fileParser := NewFileParser(moduleName, file, tree.RootNode(), tree, input)
 	if tree.RootNode().HasError() {
-		return tree, fmt.Errorf("error parsing tree: %s", tree.RootNode())
+		return fileParser, MakeSyntaxParsingError(file, contents, tree).SyntaxErrors()
 	}
-	return tree, nil
+	return fileParser, nil
 }
