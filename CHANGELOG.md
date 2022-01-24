@@ -3,8 +3,9 @@
 ## unreleased
 
 - stdlib: added `arity` to `prelude.Function`
-- compiler: large refactor
 - compiler: massive performance improvements
+- compiler: large refactoring
+- fix: rare equality bugs
 
 ## v0.0.9
 

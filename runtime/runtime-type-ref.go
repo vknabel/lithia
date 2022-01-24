@@ -9,8 +9,7 @@ import (
 var _ RuntimeType = RuntimeTypeRef{}
 
 type RuntimeTypeRef struct {
-	Name ast.Identifier
-	// TODO: rename to ModuleName
+	Name   ast.Identifier
 	Module ast.ModuleName
 }
 

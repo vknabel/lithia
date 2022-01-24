@@ -55,9 +55,8 @@ test "int comparisions", { fail =>
 
 test "lists.replicate", { fail =>
     when (lists.replicate 0, 42) != [], fail "zero elements"
-    // TODO: Bug in equal function
-    // when (lists.replicate 1, 42) != [42], fail "one element"
-    // when (lists.replicate 2, 42) != [42, 42], fail "two elements"
+    when (lists.replicate 1, 42) != [42], fail "one element"
+    when (lists.replicate 2, 42) != [42, 42], fail "two elements"
 }
 
 func main { =>
