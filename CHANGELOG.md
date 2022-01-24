@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.0.11
+
+- compiler: binaries for macOS, linux, windows
+
 ## v0.0.10
 
 - stdlib: added `arity` to `prelude.Function`

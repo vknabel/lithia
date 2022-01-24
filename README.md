@@ -19,7 +19,7 @@ Currently Lithia is an early proof of concept. Basic language features exist, bu
 - [x] Testing library
 - [x] Easy installation
 - [x] Prebuilt docker image
-- [ ] Prebuilt linux binaries
+- [x] Prebuilt linux binaries
 - [x] Generated docs for stdlib
 - [x] Improved performance [#20](https://github.com/vknabel/lithia/pull/20)
 - [x] Stack traces [#20](https://github.com/vknabel/lithia/pull/20)

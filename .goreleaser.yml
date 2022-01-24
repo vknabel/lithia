@@ -7,13 +7,44 @@ before:
     # you may remove this if you don't need go generate
     - go generate ./...
 builds:
-  - main: ./cmd/lithia
+  - id: lithia-macos
+    main: ./cmd/lithia
     env:
       - CGO_ENABLED=1
     goos:
       # - linux
       # - windows
       - darwin
+  # requires cross-compiler
+  # brew install FiloSottile/musl-cross/musl-cross --with-aarch64
+  # brew install mingw-w64
+  - id: lithia-x-linux-amd64
+    main: ./cmd/lithia
+    env:
+      - CGO_ENABLED=1
+      - CC=x86_64-linux-musl-gcc
+    goos:
+      - linux
+    goarch:
+      - amd64
+  - id: lithia-x-linux-arm64
+    main: ./cmd/lithia
+    env:
+      - CGO_ENABLED=1
+      - CC=aarch64-linux-musl-gcc
+    goos:
+      - linux
+    goarch:
+      - arm64
+  - id: lithia-x-windows-amd64
+    main: ./cmd/lithia
+    env:
+      - CGO_ENABLED=1
+      - CC=x86_64-w64-mingw32-gcc
+    goos:
+      - windows
+    goarch:
+      - amd64
 archives:
   - replacements:
       darwin: Darwin
