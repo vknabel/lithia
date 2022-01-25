@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.0.12-next
+
+- cli: new CLI interface, including, help and version
+
 ## v0.0.11
 
 - compiler: binaries for macOS, linux, windows

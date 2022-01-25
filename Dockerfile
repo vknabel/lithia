@@ -13,7 +13,7 @@ RUN go mod download
 
 COPY ./ ./
 
-RUN go build ./cmd/lithia
+RUN go build ./app/lithia
 
 ##
 ## Deploy
