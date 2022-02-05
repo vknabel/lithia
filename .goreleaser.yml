@@ -87,8 +87,10 @@ dockers:
     # actually goreleaser should be used to copy the binaries
     # -> only the second stage
     extra_files:
-      - ast
       - app
+      - ast
+      - info
+      - langsrv
       - parser
       - reporting
       - runtime
