@@ -1,15 +1,17 @@
 package cmd
 
 import (
-	"fmt"
+	cobra "github.com/muesli/coral"
 
-	"github.com/spf13/cobra"
+	"github.com/vknabel/lithia/langsrv"
 )
 
 func init() {
-	// rootCmd.AddCommand(lspCmd)
+	rootCmd.AddCommand(lspCmd)
 	lspCmd.AddCommand(lspStdioCmd)
 	lspCmd.AddCommand(lspSocketCmd)
+	lspCmd.AddCommand(lspIPCCmd)
+	lspCmd.AddCommand(lspTCPCmd)
 
 	lspSocketCmd.Flags().StringVarP(
 		&lspSocketAddress,
@@ -35,7 +37,22 @@ var lspStdioCmd = &cobra.Command{
 	Aliases: []string{"stdin", "-"},
 	Short:   "stdio mode. Supported by most editors.",
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("stdio")
+		err := langsrv.RunStdio()
+		if err != nil {
+			panic(err)
+		}
+	},
+}
+
+var lspIPCCmd = &cobra.Command{
+	Use:   "ipc",
+	Short: `opens a nodejs ipc connection.`,
+	Args:  cobra.RangeArgs(0, 1),
+	Run: func(cmd *cobra.Command, args []string) {
+		err := langsrv.RunIPC()
+		if err != nil {
+			panic(err)
+		}
 	},
 }
 
@@ -45,6 +62,22 @@ var lspSocketCmd = &cobra.Command{
 	Short: `opens a socket on the specified address. Make sure the port is free.`,
 	Args:  cobra.RangeArgs(0, 1),
 	Run: func(cmd *cobra.Command, args []string) {
-		fmt.Println("socket", lspSocketAddress)
+		err := langsrv.RunSocket(lspSocketAddress)
+		if err != nil {
+			panic(err)
+		}
+	},
+}
+
+var lspTCPAddress string = "127.0.0.1:7998"
+var lspTCPCmd = &cobra.Command{
+	Use:   "tcp",
+	Short: `opens a tcp connection on the specified address. Make sure the port is free.`,
+	Args:  cobra.RangeArgs(0, 1),
+	Run: func(cmd *cobra.Command, args []string) {
+		err := langsrv.RunSocket(lspSocketAddress)
+		if err != nil {
+			panic(err)
+		}
 	},
 }

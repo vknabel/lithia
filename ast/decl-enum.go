@@ -50,3 +50,7 @@ func (e DeclEnum) String() string {
 	}
 	return declarationClause + "}"
 }
+
+func (decl DeclEnum) ProvidedDocs() *Docs {
+	return decl.Docs
+}

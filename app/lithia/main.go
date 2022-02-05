@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/vknabel/go-lithia/app/lithia/cmd"
+	"github.com/vknabel/lithia/app/lithia/cmd"
 )
 
 func main() {

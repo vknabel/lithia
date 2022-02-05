@@ -3,7 +3,7 @@ package runtime
 import (
 	"fmt"
 
-	"github.com/vknabel/go-lithia/ast"
+	"github.com/vknabel/lithia/ast"
 )
 
 func MakeRuntimeValueDecl(context *InterpreterContext, decl ast.Decl) (Evaluatable, *RuntimeError) {

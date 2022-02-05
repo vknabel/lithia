@@ -27,3 +27,7 @@ func MakeDeclEnumCase(name Identifier) *DeclEnumCase {
 		MetaInfo: &MetaDecl{},
 	}
 }
+
+func (decl DeclEnumCase) ProvidedDocs() *Docs {
+	return decl.Docs
+}

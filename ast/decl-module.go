@@ -24,3 +24,7 @@ func (e DeclModule) IsExportedDecl() bool {
 func MakeDeclModule(internalName Identifier, source *Source) *DeclModule {
 	return &DeclModule{Name: internalName, MetaInfo: &MetaDecl{source}}
 }
+
+func (decl DeclModule) ProvidedDocs() *Docs {
+	return decl.Docs
+}

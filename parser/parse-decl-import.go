@@ -3,7 +3,7 @@ package parser
 import (
 	"strings"
 
-	"github.com/vknabel/go-lithia/ast"
+	"github.com/vknabel/lithia/ast"
 )
 
 func (fp *FileParser) ParseImportDeclaration() (*ast.DeclImport, []SyntaxError) {

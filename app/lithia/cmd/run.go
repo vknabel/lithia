@@ -5,8 +5,8 @@ import (
 	"os"
 	"path"
 
-	"github.com/spf13/cobra"
-	"github.com/vknabel/go-lithia/runtime"
+	cobra "github.com/muesli/coral"
+	"github.com/vknabel/lithia/runtime"
 )
 
 func init() {

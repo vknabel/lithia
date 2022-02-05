@@ -34,3 +34,7 @@ func MakeDeclExternType(name Identifier, source *Source) *DeclExternType {
 func (e *DeclExternType) AddField(decl DeclField) {
 	e.Fields[decl.Name] = decl
 }
+
+func (decl DeclExternType) ProvidedDocs() *Docs {
+	return decl.Docs
+}

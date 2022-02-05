@@ -36,3 +36,7 @@ func MakeDeclData(name Identifier, source *Source) *DeclData {
 func (e *DeclData) AddField(field DeclField) {
 	e.Fields = append(e.Fields, field)
 }
+
+func (decl DeclData) ProvidedDocs() *Docs {
+	return decl.Docs
+}

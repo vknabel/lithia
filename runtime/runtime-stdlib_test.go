@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/vknabel/go-lithia/ast"
-	r "github.com/vknabel/go-lithia/runtime"
+	"github.com/vknabel/lithia/ast"
+	r "github.com/vknabel/lithia/runtime"
 )
 
 func TestStdlib(t *testing.T) {

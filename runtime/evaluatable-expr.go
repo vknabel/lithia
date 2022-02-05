@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/vknabel/go-lithia/ast"
+	"github.com/vknabel/lithia/ast"
 )
 
 type EvaluatableExpr struct {

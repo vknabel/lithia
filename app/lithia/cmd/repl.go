@@ -6,9 +6,9 @@ import (
 	"io"
 	"os"
 
-	"github.com/spf13/cobra"
-	"github.com/vknabel/go-lithia/reporting"
-	"github.com/vknabel/go-lithia/runtime"
+	cobra "github.com/muesli/coral"
+	"github.com/vknabel/lithia/reporting"
+	"github.com/vknabel/lithia/runtime"
 )
 
 func init() {

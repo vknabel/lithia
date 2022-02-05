@@ -1,6 +1,6 @@
 package runtime
 
-import "github.com/vknabel/go-lithia/ast"
+import "github.com/vknabel/lithia/ast"
 
 var PreludeFunctionTypeRef = MakeRuntimeTypeRef("Function", "prelude")
 

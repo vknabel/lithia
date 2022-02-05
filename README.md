@@ -23,7 +23,7 @@ Currently Lithia is an early proof of concept. Basic language features exist, bu
 - [x] Generated docs for stdlib
 - [x] Improved performance [#20](https://github.com/vknabel/lithia/pull/20)
 - [x] Stack traces [#20](https://github.com/vknabel/lithia/pull/20)
-- [ ] Creating a custom language server
+- [x] Creating a custom language server
 - [ ] ... with diagnostics
 - [ ] ... with syntax highlighting
 - [ ] ... with auto completion
@@ -64,7 +64,9 @@ If you want to give Lithia a try, the easiest way to get started is using Homebr
 $ brew install vknabel/lithia/lithia
 ```
 
-To get syntax highlighting, download and install the latest version of [Syntax Highlighter with Lithia](https://github.com/vknabel/syntax-highlighter/releases) for VS Code.
+To get syntax highlighting, use the [Lithia for VS Code extension](https://marketplace.visualstudio.com/items?itemName=vknabel.vscode-lithia).
+
+> Not using Visual Studio Code? Get started with `lithia lsp --help`.
 
 ### Docker
 

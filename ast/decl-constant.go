@@ -29,3 +29,7 @@ func MakeDeclConstant(name Identifier, value Expr, source *Source) *DeclConstant
 		MetaInfo: &MetaDecl{source},
 	}
 }
+
+func (e DeclConstant) ProvidedDocs() *Docs {
+	return e.Docs
+}
