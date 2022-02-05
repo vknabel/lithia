@@ -4,6 +4,7 @@
 
 - cli: new CLI interface, including, help and version
 - fix: imports and declarations in repl were broken
+- lsp: basic, proof of concept language server #19
 
 ## v0.0.11
 

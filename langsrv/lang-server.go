@@ -1,7 +1,6 @@
 package langsrv
 
 import (
-	"github.com/tliron/glsp"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 	"github.com/tliron/glsp/server"
 	"github.com/tliron/kutil/logging"
@@ -22,16 +21,13 @@ func init() {
 		Shutdown:    shutdown,
 		SetTrace:    setTrace,
 
+		TextDocumentHover:          textDocumentHover,
+		TextDocumentCompletion:     textDocumentCompletion,
+		TextDocumentDefinition:     textDocumentDefinition,
+		TextDocumentTypeDefinition: textDocumentTypeDefinition,
+		TextDocumentDeclaration:    textDocumentDeclaration,
+
 		TextDocumentSemanticTokensFull: textDocumentSemanticTokensFull,
-		TextDocumentSemanticTokensFullDelta: func(context *glsp.Context, params *protocol.SemanticTokensDeltaParams) (interface{}, error) {
-			return nil, nil
-		},
-		TextDocumentSemanticTokensRange: func(context *glsp.Context, params *protocol.SemanticTokensRangeParams) (interface{}, error) {
-			return nil, nil
-		},
-		TextDocumentSemanticTokensRefresh: func(context *glsp.Context) error {
-			return nil
-		},
 	}
 }
 
