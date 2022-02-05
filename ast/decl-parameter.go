@@ -29,3 +29,7 @@ func MakeDeclParameter(name Identifier, source *Source) *DeclParameter {
 		},
 	}
 }
+
+func (decl DeclParameter) ProvidedDocs() *Docs {
+	return decl.Docs
+}

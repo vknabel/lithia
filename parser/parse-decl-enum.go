@@ -1,7 +1,7 @@
 package parser
 
 import (
-	"github.com/vknabel/go-lithia/ast"
+	"github.com/vknabel/lithia/ast"
 )
 
 func (fp *FileParser) ParseEnumDeclaration() (*ast.DeclEnum, []ast.Decl, []SyntaxError) {

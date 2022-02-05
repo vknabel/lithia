@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"reflect"
 
-	"github.com/vknabel/go-lithia/ast"
+	"github.com/vknabel/lithia/ast"
 )
 
 var _ RuntimeValue = PreludeDataDecl{}

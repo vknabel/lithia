@@ -6,8 +6,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/vknabel/go-lithia/ast"
-	"github.com/vknabel/go-lithia/parser"
+	"github.com/vknabel/lithia/ast"
+	"github.com/vknabel/lithia/parser"
 )
 
 type Interpreter struct {

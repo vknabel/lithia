@@ -4,7 +4,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/vknabel/go-lithia/ast"
+	"github.com/vknabel/lithia/ast"
 )
 
 var _ ExternalDefinition = ExternalDocs{}

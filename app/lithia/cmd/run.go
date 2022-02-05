@@ -6,7 +6,7 @@ import (
 	"path"
 
 	"github.com/spf13/cobra"
-	"github.com/vknabel/go-lithia/runtime"
+	"github.com/vknabel/lithia/runtime"
 )
 
 func init() {

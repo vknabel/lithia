@@ -1,6 +1,6 @@
 package parser
 
-import "github.com/vknabel/go-lithia/ast"
+import "github.com/vknabel/lithia/ast"
 
 func (fp *FileParser) ParseFunctionDeclaration() (*ast.DeclFunc, []SyntaxError) {
 	functionNode := fp.Node.ChildByFieldName("function")

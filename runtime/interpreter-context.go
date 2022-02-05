@@ -2,7 +2,7 @@ package runtime
 
 import (
 	sitter "github.com/smacker/go-tree-sitter"
-	"github.com/vknabel/go-lithia/ast"
+	"github.com/vknabel/lithia/ast"
 )
 
 type InterpreterContext struct {

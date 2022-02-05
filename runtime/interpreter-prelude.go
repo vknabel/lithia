@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/vknabel/go-lithia/ast"
+	"github.com/vknabel/lithia/ast"
 )
 
 func (inter *Interpreter) NewPreludeEnvironment() *Environment {

@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
+	"github.com/vknabel/lithia/info"
 )
 
 func Execute() error {
@@ -17,7 +18,7 @@ var rootCmd = &cobra.Command{
 		"all language features contribute to.\n" +
 		"\n" +
 		"Lean more at https://github.com/vknabel/lithia",
-	Version: "0.0.12-next",
+	Version: info.Version,
 	Args:    cobra.RangeArgs(0, 1),
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) == 1 {

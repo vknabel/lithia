@@ -7,8 +7,8 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/vknabel/go-lithia/reporting"
-	"github.com/vknabel/go-lithia/runtime"
+	"github.com/vknabel/lithia/reporting"
+	"github.com/vknabel/lithia/runtime"
 )
 
 func init() {

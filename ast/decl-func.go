@@ -31,3 +31,7 @@ func MakeDeclFunc(name Identifier, impl *ExprFunc, source *Source) *DeclFunc {
 		},
 	}
 }
+
+func (decl DeclFunc) ProvidedDocs() *Docs {
+	return decl.Docs
+}

@@ -1,6 +1,6 @@
 package parser
 
-import "github.com/vknabel/go-lithia/ast"
+import "github.com/vknabel/lithia/ast"
 
 func (fp *FileParser) ParseLetDeclaration() (*ast.DeclConstant, []SyntaxError) {
 	nameIdentifier := ast.Identifier(fp.Node.ChildByFieldName("name").Content(fp.Source))
