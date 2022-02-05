@@ -23,7 +23,7 @@ Currently Lithia is an early proof of concept. Basic language features exist, bu
 - [x] Generated docs for stdlib
 - [x] Improved performance [#20](https://github.com/vknabel/lithia/pull/20)
 - [x] Stack traces [#20](https://github.com/vknabel/lithia/pull/20)
-- [ ] Creating a custom language server
+- [x] Creating a custom language server
 - [ ] ... with diagnostics
 - [ ] ... with syntax highlighting
 - [ ] ... with auto completion

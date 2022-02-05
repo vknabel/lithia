@@ -8,6 +8,9 @@ import (
 
 func initialize(context *glsp.Context, params *protocol.InitializeParams) (interface{}, error) {
 	capabilities := handler.CreateServerCapabilities()
+	capabilities.CompletionProvider = &protocol.CompletionOptions{
+		TriggerCharacters: []string{"."},
+	}
 	capabilities.SemanticTokensProvider = protocol.SemanticTokensRegistrationOptions{
 		SemanticTokensOptions: protocol.SemanticTokensOptions{
 			Legend: protocol.SemanticTokensLegend{
