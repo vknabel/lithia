@@ -8,7 +8,7 @@ before:
     - go generate ./...
 builds:
   - id: lithia-macos
-    main: ./cmd/lithia
+    main: ./app/lithia
     env:
       - CGO_ENABLED=1
     goos:
@@ -19,7 +19,7 @@ builds:
   # brew install FiloSottile/musl-cross/musl-cross --with-aarch64
   # brew install mingw-w64
   - id: lithia-x-linux-amd64
-    main: ./cmd/lithia
+    main: ./app/lithia
     env:
       - CGO_ENABLED=1
       - CC=x86_64-linux-musl-gcc
@@ -28,7 +28,7 @@ builds:
     goarch:
       - amd64
   - id: lithia-x-linux-arm64
-    main: ./cmd/lithia
+    main: ./app/lithia
     env:
       - CGO_ENABLED=1
       - CC=aarch64-linux-musl-gcc
@@ -37,7 +37,7 @@ builds:
     goarch:
       - arm64
   - id: lithia-x-windows-amd64
-    main: ./cmd/lithia
+    main: ./app/lithia
     env:
       - CGO_ENABLED=1
       - CC=x86_64-w64-mingw32-gcc
@@ -88,7 +88,7 @@ dockers:
     # -> only the second stage
     extra_files:
       - ast
-      - cmd
+      - app
       - parser
       - reporting
       - runtime

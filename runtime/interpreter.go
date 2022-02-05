@@ -135,6 +135,18 @@ func (inter *Interpreter) EmbedFileIntoModule(module *RuntimeModule, fileName st
 	}
 	module.Decl.AddSourceFile(sourceFile)
 	ex := inter.NewInterpreterContext(sourceFile, module, fileParser.Tree.RootNode(), []byte(script), module.Environment)
+
+	for _, decl := range sourceFile.Declarations {
+		declValue, err := MakeRuntimeValueDecl(ex, decl)
+		if err != nil {
+			return nil, err
+		}
+		if decl.IsExportedDecl() {
+			ex.environment.DeclareExported(string(decl.DeclName()), declValue)
+		} else {
+			ex.environment.DeclareUnexported(string(decl.DeclName()), declValue)
+		}
+	}
 	return ex, nil
 }
 

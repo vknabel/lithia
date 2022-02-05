@@ -1,5 +1,10 @@
 # Changelog
 
+## v0.0.12-next
+
+- cli: new CLI interface, including, help and version
+- fix: imports and declarations in repl were broken
+
 ## v0.0.11
 
 - compiler: binaries for macOS, linux, windows
