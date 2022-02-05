@@ -6,7 +6,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/spf13/cobra"
+	cobra "github.com/muesli/coral"
 	"github.com/vknabel/lithia/reporting"
 	"github.com/vknabel/lithia/runtime"
 )

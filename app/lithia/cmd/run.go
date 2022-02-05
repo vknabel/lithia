@@ -5,7 +5,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/spf13/cobra"
+	cobra "github.com/muesli/coral"
 	"github.com/vknabel/lithia/runtime"
 )
 
