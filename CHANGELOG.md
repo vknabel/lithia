@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.0.12-next
+## v0.0.12
 
 - cli: new CLI interface, including, help and version
 - fix: imports and declarations in repl were broken
