@@ -68,6 +68,27 @@ To get syntax highlighting, use the [Lithia for VS Code extension](https://marke
 
 > Not using Visual Studio Code? Get started with `lithia lsp --help`.
 
+### asdf
+
+If you are using the [asdf version manager](https://asdf-vm.com), there is a [lithia plugin](https://github.com/vknabel/asdf-lithia)!
+
+```bash
+# Install the plugin
+$ asdf plugin add lithia https://github.com/vknabel/asdf-lithia.git
+
+# Show all installable versions
+asdf list-all lithia
+
+# Install specific version
+asdf install lithia latest
+
+# Set a version globally (on your ~/.tool-versions file)
+asdf global lithia latest
+
+# Now lithia commands are available
+lithia --version
+```
+
 ### Docker
 
 To give Lithia a try, you can use our docker container to start the REPL:
