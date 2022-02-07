@@ -1,8 +1,9 @@
 # Changelog
 
-## v0.0.13-next
+## v0.0.13
 
 - lsp: semantic syntax highlighting #28
+- lsp: diagnostics #29
 
 ## v0.0.12
 

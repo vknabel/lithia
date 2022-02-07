@@ -10,13 +10,13 @@ func textDocumentDidOpen(context *glsp.Context, params *protocol.DidOpenTextDocu
 	lithiaParser := parser.NewParser()
 	fileParser, errs := lithiaParser.Parse("default-module", string(params.TextDocument.URI), params.TextDocument.Text)
 	if len(errs) > 0 {
-		// TODO: syntax errors
-		return parser.NewGroupedSyntaxError(errs)
+		publishSyntaxErrorDiagnostics(context, params.TextDocument.URI, uint32(params.TextDocument.Version), errs)
+		return nil
 	}
 	sourceFile, errs := fileParser.ParseSourceFile()
 	if len(errs) > 0 {
-		// TODO: syntax errors
-		return parser.NewGroupedSyntaxError(errs)
+		publishSyntaxErrorDiagnostics(context, params.TextDocument.URI, uint32(params.TextDocument.Version), errs)
+		return nil
 	}
 	langserver.documentCache.documents[params.TextDocument.URI] = &textDocumentEntry{
 		item:       params.TextDocument,
@@ -24,5 +24,6 @@ func textDocumentDidOpen(context *glsp.Context, params *protocol.DidOpenTextDocu
 		fileParser: fileParser,
 		sourceFile: sourceFile,
 	}
+	publishSyntaxErrorDiagnostics(context, params.TextDocument.URI, uint32(params.TextDocument.Version), nil)
 	return nil
 }
