@@ -8,12 +8,11 @@ import (
 )
 
 func textDocumentSemanticTokensFull(context *glsp.Context, params *protocol.SemanticTokensParams) (*protocol.SemanticTokens, error) {
-	rc := NewReqContext(params.TextDocument)
-	fileParser, err := rc.createFileParser()
-	if err != nil && fileParser == nil {
-		return nil, err
+	entry := langserver.documentCache.documents[params.TextDocument.URI]
+	if entry == nil {
+		return nil, nil
 	}
-	rootNode := fileParser.Tree.RootNode()
+	rootNode := entry.fileParser.Tree.RootNode()
 	highlightsQuery, err := sitter.NewQuery([]byte(`
 	[
 		"func"

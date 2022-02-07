@@ -12,6 +12,15 @@ var lsName = "lithia"
 var debug = true
 var handler protocol.Handler
 
+type lithiaLangserver struct {
+	server        *server.Server
+	documentCache *documentCache
+}
+
+var langserver lithiaLangserver = lithiaLangserver{
+	documentCache: &documentCache{documents: make(map[protocol.URI]*textDocumentEntry)},
+}
+
 func init() {
 	logging.Configure(1, nil)
 
@@ -20,6 +29,9 @@ func init() {
 		Initialized: initialized,
 		Shutdown:    shutdown,
 		SetTrace:    setTrace,
+
+		TextDocumentDidOpen:   textDocumentDidOpen,
+		TextDocumentDidChange: textDocumentDidChange,
 
 		TextDocumentHover:          textDocumentHover,
 		TextDocumentCompletion:     textDocumentCompletion,
@@ -32,21 +44,21 @@ func init() {
 }
 
 func RunStdio() error {
-	server := server.NewServer(&handler, lsName, debug)
-	return server.RunStdio()
+	langserver.server = server.NewServer(&handler, lsName, debug)
+	return langserver.server.RunStdio()
 }
 
 func RunIPC() error {
-	server := server.NewServer(&handler, lsName, debug)
-	return server.RunNodeJs()
+	langserver.server = server.NewServer(&handler, lsName, debug)
+	return langserver.server.RunNodeJs()
 }
 
 func RunSocket(address string) error {
-	server := server.NewServer(&handler, lsName, debug)
-	return server.RunWebSocket(address)
+	langserver.server = server.NewServer(&handler, lsName, debug)
+	return langserver.server.RunWebSocket(address)
 }
 
 func RunTCP(address string) error {
-	server := server.NewServer(&handler, lsName, debug)
-	return server.RunTCP(address)
+	langserver.server = server.NewServer(&handler, lsName, debug)
+	return langserver.server.RunTCP(address)
 }
