@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.0.13-next
+
+- lsp: semantic syntax highlighting #28
+
 ## v0.0.12
 
 - cli: new CLI interface, including, help and version

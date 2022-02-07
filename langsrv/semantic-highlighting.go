@@ -82,11 +82,11 @@ var allTokenTypes = []tokenType{
 func (tt tokenType) bitflag() protocol.UInteger {
 	switch tt {
 	case token_namespace:
-		return 1
+		return 0
 	case token_class:
-		return 2
+		return 1
 	case token_enum:
-		return 3
+		return 2
 	case token_interface:
 		return 3
 	case token_struct:
@@ -173,25 +173,25 @@ var allTokenModifiers = []tokenModifier{
 func (tm tokenModifier) bitflag() protocol.UInteger {
 	switch tm {
 	case modifier_declaration:
-		return 1
+		return 0b0000000001
 	case modifier_definition:
-		return 2
+		return 0b0000000010
 	case modifier_readonly:
-		return 3
+		return 0b0000000100
 	case modifier_static:
-		return 4
+		return 0b0000001000
 	case modifier_deprecated:
-		return 5
+		return 0b0000010000
 	case modifier_abstract:
-		return 6
+		return 0b0000100000
 	case modifier_async:
-		return 7
+		return 0b0001000000
 	case modifier_modification:
-		return 8
+		return 0b0010000000
 	case modifier_documentation:
-		return 9
+		return 0b0100000000
 	case modifier_defaultLibrary:
-		return 10
+		return 0b1000000000
 	default:
 		return 0
 	}
