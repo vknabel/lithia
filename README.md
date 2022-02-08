@@ -24,11 +24,12 @@ Currently Lithia is an early proof of concept. Basic language features exist, bu
 - [x] Improved performance [#20](https://github.com/vknabel/lithia/pull/20)
 - [x] Stack traces [#20](https://github.com/vknabel/lithia/pull/20)
 - [x] Creating a custom language server
-- [ ] ... with diagnostics
-- [ ] ... with syntax highlighting
-- [ ] ... with auto completion
+- [x] ... with diagnostics
+- [x] ... with syntax highlighting
+- [ ] ... with auto completion _proof of concept_
+- [ ] ... with highlights
+- [ ] ... with refactorings
 - [ ] A package manager
-- [ ] Move stdlib to a package
 - [ ] Custom plugins for external declarations
 - [ ] More static type safety
 
