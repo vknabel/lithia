@@ -70,7 +70,7 @@ func textDocumentSemanticTokensFull(context *glsp.Context, params *protocol.Sema
 	(import_members (identifier) @variable.import)
 	(module_declaration name: (identifier) @variable.import)
 	(complex_invocation_expression function: (identifier) @function)
-	(simple_invocation_expression function: (identifier) @function)
+	(simple_invocation_expression function: (identifier) @function.simple)
 	(string_literal) @string
 	(escape_sequence) @string.special
 	(type_expression type: (identifier) @type.enum)
@@ -80,7 +80,7 @@ func textDocumentSemanticTokensFull(context *glsp.Context, params *protocol.Sema
 	(member_identifier) @property
 	
 	(ERROR) @error
-	(identifier) @variable
+	; (identifier) @variable ; would override every other token
 	`), syntax.GetLanguage())
 	if err != nil {
 		return nil, err
@@ -108,7 +108,6 @@ func textDocumentSemanticTokensFull(context *glsp.Context, params *protocol.Sema
 			})
 		}
 	}
-
 	return &protocol.SemanticTokens{
 		Data: serializeHighlightedTokens(tokens),
 	}, nil
@@ -125,7 +124,7 @@ func tokenTypeForCaptureName(captureName string) *tokenType {
 	case "punctuation.bracket":
 		return &token_operator
 	case "variable":
-		return nil
+		return &token_variable
 	case "variable.parameter":
 		return &token_parameter
 	case "variable.builtin":
@@ -140,6 +139,8 @@ func tokenTypeForCaptureName(captureName string) *tokenType {
 		return &token_function
 	case "function.builtin":
 		return &token_function
+	case "function.simple":
+		return &token_decorator
 	case "method":
 		return &token_method
 	case "type":

@@ -3,6 +3,7 @@ package langsrv
 import (
 	"github.com/tliron/glsp"
 	protocol "github.com/tliron/glsp/protocol_3_16"
+	"github.com/vknabel/lithia/parser"
 )
 
 func textDocumentDidChange(context *glsp.Context, params *protocol.DidChangeTextDocumentParams) error {
@@ -17,18 +18,13 @@ func textDocumentDidChange(context *glsp.Context, params *protocol.DidChangeText
 		}
 	}
 	entry.item.Text = text
+	syntaxErrs := make([]parser.SyntaxError, 0)
 	fileParser, errs := entry.parser.Parse("default-module", string(params.TextDocument.URI), text)
-	if len(errs) > 0 {
-		publishSyntaxErrorDiagnostics(context, params.TextDocument.URI, uint32(params.TextDocument.Version), errs)
-		return nil
-	}
+	syntaxErrs = append(syntaxErrs, errs...)
 	sourceFile, errs := fileParser.ParseSourceFile()
-	if len(errs) > 0 {
-		publishSyntaxErrorDiagnostics(context, params.TextDocument.URI, uint32(params.TextDocument.Version), errs)
-		return nil
-	}
+	syntaxErrs = append(syntaxErrs, errs...)
 	langserver.documentCache.documents[params.TextDocument.URI].fileParser = fileParser
 	langserver.documentCache.documents[params.TextDocument.URI].sourceFile = sourceFile
-	publishSyntaxErrorDiagnostics(context, params.TextDocument.URI, uint32(params.TextDocument.Version), nil)
+	publishSyntaxErrorDiagnostics(context, params.TextDocument.URI, uint32(params.TextDocument.Version), syntaxErrs)
 	return nil
 }

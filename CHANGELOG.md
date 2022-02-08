@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.0.14-next
+
+- lsp: fix jump to definition
+
 ## v0.0.13
 
 - lsp: semantic syntax highlighting #28

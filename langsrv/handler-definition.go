@@ -32,6 +32,16 @@ func textDocumentDefinition(context *glsp.Context, params *protocol.DefinitionPa
 						Character: uint32(decl.Meta().Source.End.Line),
 					},
 				},
+				TargetSelectionRange: protocol.Range{
+					Start: protocol.Position{
+						Line:      uint32(decl.Meta().Source.Start.Line),
+						Character: uint32(decl.Meta().Source.Start.Column),
+					},
+					End: protocol.Position{
+						Line:      uint32(decl.Meta().Source.End.Line),
+						Character: uint32(decl.Meta().Source.End.Line),
+					},
+				},
 			},
 		}, nil
 	}
