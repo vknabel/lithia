@@ -3,6 +3,7 @@
 ## v0.0.14-next
 
 - lsp: fix jump to definition
+- lsp: fix multiline block comments
 
 ## v0.0.13
 

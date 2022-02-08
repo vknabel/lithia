@@ -99,13 +99,27 @@ func textDocumentSemanticTokensFull(context *glsp.Context, params *protocol.Sema
 				continue
 			}
 			tokenModifiers := tokenModifiersForCaptureName(captureName)
-			tokens = append(tokens, highlightedToken{
-				line:           uint32(capturedNode.StartPoint().Row),
-				column:         uint32(capturedNode.StartPoint().Column),
-				length:         capturedNode.EndByte() - capturedNode.StartByte(),
-				tokenType:      *tokenType,
-				tokenModifiers: tokenModifiers,
-			})
+			column := uint32(capturedNode.StartPoint().Column)
+			for row := uint32(capturedNode.StartPoint().Row); row <= capturedNode.EndPoint().Row; row++ {
+				if row == capturedNode.EndPoint().Row {
+					tokens = append(tokens, highlightedToken{
+						line:           row,
+						column:         column,
+						length:         capturedNode.EndPoint().Column,
+						tokenType:      *tokenType,
+						tokenModifiers: tokenModifiers,
+					})
+				} else {
+					tokens = append(tokens, highlightedToken{
+						line:           row,
+						column:         column,
+						length:         capturedNode.EndByte() - capturedNode.StartByte(),
+						tokenType:      *tokenType,
+						tokenModifiers: tokenModifiers,
+					})
+					column = 0
+				}
+			}
 		}
 	}
 	return &protocol.SemanticTokens{
