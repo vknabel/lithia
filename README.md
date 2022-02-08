@@ -99,7 +99,7 @@ To give Lithia a try, you can use our docker container to start the REPL:
 $ docker run --rm -it vknabel/lithia
 > print "Hello World"
 Hello World
-Hello World
+- Hello World
 >
 ```
 
