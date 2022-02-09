@@ -2,33 +2,33 @@
 
 _module_ 
 
-- _func_ [delete](#delete) atPath
-- _func_ [deleteAll](#deleteAll) atPath
-- _func_ [exists](#exists) atPath
-- _func_ [readString](#readString) fromPath
-- _func_ [writeString](#writeString) toPath, newContents
+- _extern_ [delete](#delete)
+- _extern_ [deleteAll](#deleteAll)
+- _extern_ [exists](#exists)
+- _extern_ [readString](#readString)
+- _extern_ [writeString](#writeString)
 
 ## delete
 
-_func_ `delete atPath`
+_extern_ `delete atPath`
 
 
 ## deleteAll
 
-_func_ `deleteAll atPath`
+_extern_ `deleteAll atPath`
 
 
 ## exists
 
-_func_ `exists atPath`
+_extern_ `exists atPath`
 
 
 ## readString
 
-_func_ `readString fromPath`
+_extern_ `readString fromPath`
 
 
 ## writeString
 
-_func_ `writeString toPath, newContents`
+_extern_ `writeString toPath, newContents`
 

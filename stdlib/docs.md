@@ -16,7 +16,7 @@ _module_
 - _func_ [dataFieldDocsToMarkdown](#dataFieldDocsToMarkdown) field
 - _func_ [docsToMarkdown](#docsToMarkdown) docs
 - _func_ [enumCaseDocsToMarkdown](#enumCaseDocsToMarkdown) case
-- _func_ [inspect](#inspect) value
+- _extern_ [inspect](#inspect)
 - _func_ [markdownDocsSuffix](#markdownDocsSuffix) docsString
 - _func_ [moduleMemberDocsToMarkdown](#moduleMemberDocsToMarkdown) member
 
@@ -87,7 +87,7 @@ _data_
 
 - `name`
 - `docs`
-- `fields` - a list of ExternFieldDocs
+- `params`
 
 ## ExternTypeDocs
 
@@ -97,7 +97,7 @@ _data_
 
 - `name`
 - `docs`
-- `fields`
+- `fields` - a list of ExternFieldDocs
 
 ## FunctionDocs
 
@@ -151,7 +151,7 @@ _func_ `enumCaseDocsToMarkdown case`
 
 ## inspect
 
-_func_ `inspect value`
+_extern_ `inspect value`
 
 
 ## markdownDocsSuffix

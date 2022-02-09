@@ -1,6 +1,8 @@
 module rx
 
 extern Variable {
+    // Changes the currently hold value of the variable.
     accept value
+    // Returns the currently hold value.
     current
 }

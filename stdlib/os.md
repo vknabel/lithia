@@ -2,15 +2,15 @@
 
 _module_ 
 
-- _func_ [env](#env) name
-- _func_ [exit](#exit) code
+- _extern_ [env](#env)
+- _extern_ [exit](#exit)
 
 ## env
 
-_func_ `env name`
+_extern_ `env name`
 
 
 ## exit
 
-_func_ `exit code`
+_extern_ `exit code`
 

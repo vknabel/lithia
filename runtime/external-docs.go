@@ -195,7 +195,7 @@ func docsInspectValue(value RuntimeValue, env *Environment) (RuntimeValue, *Runt
 		if err != nil {
 			return nil, err
 		}
-		return env.MakeDataRuntimeValue("FunctionDocs", map[string]Evaluatable{
+		return env.MakeDataRuntimeValue("ExternFunctionDocs", map[string]Evaluatable{
 			"name":   NewConstantRuntimeValue(PreludeString(value.Decl.Name)),
 			"docs":   NewConstantRuntimeValue(PreludeString("")),
 			"params": NewConstantRuntimeValue(paramsList),

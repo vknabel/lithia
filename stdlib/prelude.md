@@ -24,11 +24,11 @@ Will always be imported implicitly.
 - _data_ [Void](#Void)
 - _func_ [compose](#compose) f, g, value
 - _func_ [const](#const) value, _
-- _func_ [debug](#debug) message
+- _extern_ [debug](#debug)
 - _func_ [identity](#identity) value
 - _func_ [if](#if) condition, then, else
 - _func_ [pipe](#pipe) functions, initial
-- _func_ [print](#print) message
+- _extern_ [print](#print)
 - _func_ [unless](#unless) condition, then
 - _func_ [when](#when) condition, then
 - _func_ [with](#with) value, body
@@ -36,7 +36,6 @@ Will always be imported implicitly.
 ## Any
 
 _extern_ 
-
 ## Bool
 
 _enum_ Represents boolean values like `True` and `False`.
@@ -50,7 +49,6 @@ Typically used for conditionals and flags.
 ## Char
 
 _extern_ 
-
 ## Cons
 
 _data_ Represents a non-empty List.
@@ -67,15 +65,17 @@ _data_ A constant to represent invalid conditions.
 ## Float
 
 _extern_ 
-
 ## Function
 
 _extern_ 
 
+### Properties
+
+- `arity`
+
 ## Int
 
 _extern_ 
-
 ## List
 
 _enum_ A list of arbiratry elements.
@@ -95,7 +95,6 @@ lists.reduce { l, r => l + r }, 0, myList
 ## Module
 
 _extern_ 
-
 ## Never
 
 _enum_ An enum with no valid values.
@@ -127,6 +126,11 @@ _data_
 
 _extern_ 
 
+### Properties
+
+- `length`
+- `append str`
+
 ## True
 
 _data_ A constant to represent valid conditions.
@@ -146,7 +150,7 @@ _func_ `const value, _`
 Always returns the first argument.
 ## debug
 
-_func_ `debug message`
+_extern_ `debug message`
 
 
 ## identity
@@ -172,7 +176,7 @@ Pipes a given value through a list of functions.
 The first function is applied to the value, the second to the result of the first, etc.
 ## print
 
-_func_ `print message`
+_extern_ `print message`
 
 
 ## unless

@@ -4,6 +4,7 @@
 
 - lsp: fix jump to definition
 - lsp: fix multiline block comments
+- stdlib: fix extern docs generation
 
 ## v0.0.13
 

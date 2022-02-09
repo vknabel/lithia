@@ -7,3 +7,8 @@ _module_
 ## Variable
 
 _extern_ 
+
+### Properties
+
+- `accept value`
+- `current`

@@ -62,14 +62,24 @@ func docsToMarkdown { docs =>
             strings.concat [
                 "## ", d.name,"\n\n"
                 "_extern_ ",
-                d.docs, "\n"
+                d.docs,
+                (if d.fields == Nil, "", strings.concat [
+                    "\n\n",
+                    "### Properties\n\n",
+                    (strings.join "\n" , (lists.map dataFieldDocsToMarkdown, d.fields)),
+                    "\n"
+                ])
             ]
         },
         ExternFunctionDocs: { d =>
             strings.concat [
                 "## ", d.name,"\n\n"
-                "_extern_ ",
-                d.docs, "\n"
+                "_extern_ `",
+                d.name,
+                " ",
+                (strings.join ", ", d.params),
+                "`\n\n",
+                d.docs
             ]
         },
         None: { _ => "" }
