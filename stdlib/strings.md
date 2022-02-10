@@ -1,6 +1,6 @@
 # strings
 
-_module_ 
+_module_
 
 - _func_ [concat](#concat) listOfStrings
 - _func_ [join](#join) separator, listOfStrings
@@ -15,6 +15,7 @@ Concatenates a list of given strings in order.
 strings.concat ["Hello ", "World", "!"]
 // "Hello World!"
 ```
+
 ## join
 
 _func_ `join separator, listOfStrings`
@@ -27,3 +28,4 @@ If there are none or just one element, there won't be any separator.
 strings.join " ", ["Hello", "World!"]
 // "Hello World!"
 ```
+

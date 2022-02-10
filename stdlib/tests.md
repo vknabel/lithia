@@ -1,6 +1,7 @@
 # tests
 
-_module_ A basic testing framework. Compatible to TAP13.
+_module_
+A basic testing framework. Compatible to TAP13.
 It doesn't provide any expectations or matchers.
 Instead there is only a fail function.
 
@@ -22,15 +23,13 @@ In case you really need expectations, writing a wrapper around tests should be p
 
 - _data_ [TestCase](#TestCase)
 - _data_ [TestSummary](#TestSummary)
-
 - _func_ [runTestCase](#runTestCase) summary, testCase
-- _func_ [runTests](#runTests) 
+- _func_ [runTests](#runTests)
 - _func_ [test](#test) case, function
-
 
 ## TestCase
 
-_data_ 
+_data_
 
 ### Properties
 
@@ -48,17 +47,16 @@ _data_ The prinatble summary of all tests.
 - `notOk` - How many tests have been not ok.
 - `failedTests` - List of failed test numbers.
 
-
 ## runTestCase
 
 _func_ `runTestCase summary, testCase`
 
-
 ## runTests
 
-_func_ `runTests `
+_func_ `runTests`
 
 Runs all test cases, that have been buffered by now.
+
 ## test
 
 _func_ `test case, function`
@@ -72,4 +70,5 @@ tests.test "my test case", { fail =>
 when False, fail "when should not trigger when False"
 }
 ```
+
 

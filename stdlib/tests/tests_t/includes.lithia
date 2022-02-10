@@ -10,6 +10,8 @@ import docs
 import eq
 import fs
 import lists.lists_t
+import markup
+import markdown.markdown_t
 import optionals
 import os.os_t
 import prelude.prelude_t

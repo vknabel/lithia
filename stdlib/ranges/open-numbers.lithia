@@ -1,0 +1,5 @@
+func indices { => numbersFrom 0 }
+
+func numbersFrom { n =>
+    Cons n, numbersFrom (n+1)
+}

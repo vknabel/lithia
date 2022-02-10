@@ -1,0 +1,73 @@
+module markup
+
+import lists
+
+func h1 { => Heading 1 }
+func h2 { => Heading 2 }
+func h3 { => Heading 3 }
+func h4 { => Heading 4 }
+func h5 { => Heading 5 }
+func h6 { => Heading 6 }
+
+func i { => Italic }
+func b { => Bold }
+
+let br = Paragraph ""
+func p { child =>
+    let filtered = with child, type MarkupNode {
+        List: (lists.filter { n => n != "" && n != " " && n != Nil }),
+        Any: { node => node }
+    }
+    Paragraph filtered
+}
+
+func pre { => Code }
+func code { => CodeBlock }
+
+func img { => Image }
+func link { => Link }
+func ref { child, name => Link child, "#".append name }
+
+func ul { child =>
+    let filtered = with child, type MarkupNode {
+        List: (lists.filter { n => n != "" && n != " " && n != Nil }),
+        Any: { node => node }
+    }
+    UnorderedList filtered
+}
+func ol { child =>
+    let filtered = with child, type MarkupNode {
+        List: (lists.filter { n => n != "" && n != " " && n != Nil }),
+        Any: { node => node }
+    }
+    OrderedList filtered
+}
+
+func li { item => item }
+
+func text { str => str }
+func group { list => list }
+func inline { list =>
+    type List {
+        Cons: pipe [
+            (lists.filter { n => n != "" && n != " " && n != Nil }),
+            (lists.flatMap { el => [el, " "] }),
+            lists.dropLast
+        ],
+        Any: { _ => list }
+    } list
+}
+
+import tests { test }
+
+test "markup.inline", { fail =>
+    unless (inline []) == [], fail "must stay empty"
+    unless (inline [""]) == [], fail "empty text list stays empty"
+    unless (inline "") == "", fail "empty text stays"
+    unless (inline ["hello"]) == ["hello"], fail "single element has no suffix"
+    unless (inline ["hello", "world"]) == ["hello", " ", "world"], fail "mixes space in between"
+    unless (inline ["hello", "", "world"]) == ["hello", " ", "world"], fail "mixes space in between, filters empty in between"
+    unless (inline ["hello", "world", ""]) == ["hello", " ", "world"], fail "mixes space in between, filters empty at end"
+    let actual = inline ["abc", "", [], "def"]
+    unless actual == ["abc", " ", "def"], fail actual
+}

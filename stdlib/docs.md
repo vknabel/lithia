@@ -1,6 +1,6 @@
 # docs
 
-_module_ 
+_module_
 
 - _data_ [ConstantDocs](#ConstantDocs)
 - _data_ [DataDocs](#DataDocs)
@@ -13,16 +13,16 @@ _module_
 - _data_ [FunctionDocs](#FunctionDocs)
 - _data_ [ModuleDocs](#ModuleDocs)
 - _enum_ [TypeDocs](#TypeDocs)
-- _func_ [dataFieldDocsToMarkdown](#dataFieldDocsToMarkdown) field
+- _func_ [dataFieldDocsToMarkup](#dataFieldDocsToMarkup) field
 - _func_ [docsToMarkdown](#docsToMarkdown) docs
-- _func_ [enumCaseDocsToMarkdown](#enumCaseDocsToMarkdown) case
-- _extern_ [inspect](#inspect)
-- _func_ [markdownDocsSuffix](#markdownDocsSuffix) docsString
-- _func_ [moduleMemberDocsToMarkdown](#moduleMemberDocsToMarkdown) member
+- _func_ [docsToMarkup](#docsToMarkup)
+- _func_ [enumCaseDocsToMarkup](#enumCaseDocsToMarkup) case
+- _extern_ [inspect](#inspect) value
+- _func_ [moduleMemberDocsToMarkup](#moduleMemberDocsToMarkup)
 
 ## ConstantDocs
 
-_data_ 
+_data_
 
 ### Properties
 
@@ -31,7 +31,7 @@ _data_
 
 ## DataDocs
 
-_data_ 
+_data_
 
 ### Properties
 
@@ -81,7 +81,7 @@ _data_ Describes a field of a data type
 
 ## ExternFunctionDocs
 
-_data_ 
+_data_
 
 ### Properties
 
@@ -91,7 +91,7 @@ _data_
 
 ## ExternTypeDocs
 
-_data_ 
+_data_
 
 ### Properties
 
@@ -101,7 +101,7 @@ _data_
 
 ## FunctionDocs
 
-_data_ 
+_data_
 
 ### Properties
 
@@ -111,7 +111,7 @@ _data_
 
 ## ModuleDocs
 
-_data_ 
+_data_
 
 ### Properties
 
@@ -121,7 +121,8 @@ _data_
 
 ## TypeDocs
 
-_enum_ All possible docs inspection values.
+_enum_
+All possible docs inspection values.
 
 ### Cases
 
@@ -134,32 +135,26 @@ _enum_ All possible docs inspection values.
 - [ExternFunctionDocs](#ExternFunctionDocs)
 - [None](#None)
 
-## dataFieldDocsToMarkdown
+## dataFieldDocsToMarkup
 
-_func_ `dataFieldDocsToMarkdown field`
-
+_func_ `dataFieldDocsToMarkup field`
 
 ## docsToMarkdown
 
 _func_ `docsToMarkdown docs`
 
+## docsToMarkup
 
-## enumCaseDocsToMarkdown
+_func_ `docsToMarkup`
 
-_func_ `enumCaseDocsToMarkdown case`
+## enumCaseDocsToMarkup
 
+_func_ `enumCaseDocsToMarkup case`
 
 ## inspect
 
 _extern_ `inspect value`
 
+## moduleMemberDocsToMarkup
 
-## markdownDocsSuffix
-
-_func_ `markdownDocsSuffix docsString`
-
-
-## moduleMemberDocsToMarkdown
-
-_func_ `moduleMemberDocsToMarkdown member`
-
+_func_ `moduleMemberDocsToMarkup`

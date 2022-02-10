@@ -1,0 +1,21 @@
+data Serializer {
+    serialize markup
+}
+
+enum SerializerWitness {
+    Serializer
+    Module
+    Function
+}
+
+func from { witness =>
+    with witness, type SerializerWitness {
+        Serializer: { s => s },
+        Module: { m => SerializerWitness m.serialize },
+        Function: { f => SerializerWitness f },
+    }
+}
+
+func serialize { markup, witness =>
+    (from witness).serialize markup
+}

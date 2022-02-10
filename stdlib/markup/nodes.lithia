@@ -1,0 +1,39 @@
+enum MarkupNode {
+    String
+    List
+
+    data Heading {
+        level
+        child
+    }
+    data Paragraph {
+        child
+    }
+    data Italic {
+        child
+    }
+    data Bold {
+        child
+    }
+    data Link {
+        child
+        url
+    }
+    data Image {
+        url
+        alt
+    }
+    data Code {
+        text
+    }
+    data CodeBlock {
+        language
+        text
+    }
+    data UnorderedList {
+        children
+    }
+    data OrderedList {
+        children
+    }
+}

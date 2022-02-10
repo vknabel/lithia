@@ -1,0 +1,10 @@
+import lists
+import strings
+import tests { test }
+
+test "lists.dropLast", { fail =>
+    unless (lists.dropLast []) == [], fail "empty lists stay empty"
+    unless (lists.dropLast [0]) == [], fail "single elements will be empty"
+    unless (lists.dropLast [1, 2]) == [1], fail "last element will be removed, when having 2"
+    unless (lists.dropLast [1, 2, 3]) == [1, 2], fail "last element will be removed, when having 3"
+}

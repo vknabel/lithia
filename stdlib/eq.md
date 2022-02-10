@@ -1,12 +1,10 @@
 # eq
 
-_module_ 
+_module_
 
 - _data_ [Equatable](#Equatable)
-
 - _func_ [negated](#negated) witness
 - _func_ [pullback](#pullback) transform, witness
-
 
 ## Equatable
 
@@ -20,12 +18,12 @@ If you explicitly want the strict behavior, pick the `strict` witness.
 
 - `equal lhs, rhs`
 
-
 ## negated
 
 _func_ `negated witness`
 
 Negates the result of the given `Equatable`.
+
 ## pullback
 
 _func_ `pullback transform, witness`
@@ -35,3 +33,4 @@ Transforms the inputs of an `Equatable`-witness.
 ```
 cmp.pullback { person => person.name }, insensitiveEquatable, Person "Somebody"
 ```
+

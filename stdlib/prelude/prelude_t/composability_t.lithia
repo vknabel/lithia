@@ -6,6 +6,7 @@ test "pipe", { fail =>
 
     unless (pipe [incr, double], 0) == 2, fail "2 * (1 + 0)"
     unless (pipe [double, incr], 0) == 1, fail "1 + (2 * 0)"
+    unless (pipe [incr, double, incr], 0) == 3, fail "((1 + 0) * 2) + 1"
 }
 
 test "with", { fail =>

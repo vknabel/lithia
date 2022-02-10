@@ -1,0 +1,120 @@
+import markup
+import strings
+import lists
+import ranges
+
+let serializer = markup.Serializer asMarkdown
+let serialize = asMarkdown
+
+func asMarkdown { =>
+    type markup.MarkupNode {
+        String: { str => str },
+        List: pipe [
+            lists.map asMarkdown,
+            strings.concat
+        ],
+        Heading: { hx =>
+            let prefix = strings.concat (
+                lists.replicate hx.level, "#"
+            )
+            strings.concat [
+                prefix,
+                " ",
+                asMarkdown hx.child,
+                "\n\n"
+            ]
+        },
+        Paragraph: { b =>
+            let paragraph = with b.child, type markup.MarkupNode {
+                List: pipe [
+                    lists.map asMarkdown,
+                    strings.join "\n"
+                ],
+                Any: { _ => asMarkdown b.child }
+            }
+            strings.concat [
+                paragraph,
+                "\n\n"
+            ]
+        },
+        Italic: { n =>
+            strings.concat [
+                "_",
+                asMarkdown n.child,
+                "_",
+            ]
+        },
+        Bold: { n =>
+            strings.concat [
+                "**",
+                asMarkdown n.child,
+                "**",
+            ]
+        },
+        Link: { n =>
+            strings.concat [
+                "[",
+                asMarkdown n.child,
+                "]",
+                "(",
+                n.url,
+                ")",
+            ]
+        },
+        Image: { n =>
+            strings.concat [
+                "![",
+                asMarkdown n.alt,
+                "]",
+                "(",
+                n.url,
+                ")",
+            ]
+        },
+        Code: { n =>
+            strings.concat [
+                "`",
+                asMarkdown n.text,
+                "`",
+            ]
+        },
+        CodeBlock: { n =>
+            let language = with n.language, type Optional {
+                Some: { some => some.value },
+                None: { none => "" },
+                Any: { any => any }
+            }
+            strings.concat [
+                "```",
+                language,
+                "\n",
+                n.text,
+                "\n```\n\n",
+            ]
+        },
+        UnorderedList: { n =>
+            let items = lists.map pipe [
+                asMarkdown,
+                "- ".append
+            ], n.children
+
+            strings.concat [
+                (strings.join "\n", items),
+                "\n\n"
+            ]
+        },
+        OrderedList: { n =>
+            let items = lists.zipWith { i, child =>
+                strings.concat [
+                    i, ". ",
+                    asMarkdown child,
+                ]
+            }, ranges.indices, n.children
+
+            strings.concat [
+                (strings.join "\n", items),
+                "\n\n"
+            ]
+        },
+    }
+}

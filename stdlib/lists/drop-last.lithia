@@ -1,0 +1,14 @@
+module lists
+
+/// Returns the list without the last element.
+func dropLast { list =>
+    with list, type List {
+        Cons: { cons =>
+            with cons.tail, type List {
+                Cons: { inner => Cons cons.head, dropLast inner },
+                Nil: { _ => Nil },
+            }
+        },
+        Nil: { _ => Nil }
+    }
+}

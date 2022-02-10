@@ -1,34 +1,35 @@
 # fs
 
-_module_ 
+_module_
 
-- _extern_ [delete](#delete)
-- _extern_ [deleteAll](#deleteAll)
-- _extern_ [exists](#exists)
-- _extern_ [readString](#readString)
-- _extern_ [writeString](#writeString)
+- _extern_ [delete](#delete) atPath
+- _extern_ [deleteAll](#deleteAll) atPath
+- _extern_ [exists](#exists) atPath
+- _extern_ [readString](#readString) fromPath
+- _extern_ [writeString](#writeString) toPath, newContents
 
 ## delete
 
-_extern_ `delete atPath`
 
+_extern_ `delete atPath`
 
 ## deleteAll
 
-_extern_ `deleteAll atPath`
 
+_extern_ `deleteAll atPath`
 
 ## exists
 
-_extern_ `exists atPath`
 
+_extern_ `exists atPath`
 
 ## readString
 
+
 _extern_ `readString fromPath`
 
-
 ## writeString
+
 
 _extern_ `writeString toPath, newContents`
 

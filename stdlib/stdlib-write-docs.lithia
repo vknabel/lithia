@@ -5,9 +5,12 @@ import eq
 import docs
 import fs
 import lists
+import markdown
+import markup
 import optionals
 import os
 import prelude
+import ranges
 import rx
 import results
 import strings
@@ -68,15 +71,18 @@ main (GroupedModuleDocs "Lithia Standard Library",
     booleans,
     cmp,
     controls,
-    docs,
     eq,
+    docs,
     fs,
     lists,
+    markdown,
+    markup,
     optionals,
     os,
     prelude,
-    results,
+    ranges,
     rx,
+    results,
     strings,
-    tests
+    tests,
 ])

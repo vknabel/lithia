@@ -1,6 +1,6 @@
 # controls
 
-_module_ 
+_module_
 
 - _data_ [Contravariant](#Contravariant)
 - _enum_ [ContravariantWitness](#ContravariantWitness)
@@ -40,7 +40,8 @@ Invariants:
 
 ## ContravariantWitness
 
-_enum_ Defines all valid witnesses for a contravariant.
+_enum_
+Defines all valid witnesses for a contravariant.
 
 ```
 import cmp
@@ -84,7 +85,8 @@ Invariants:
 
 ## FunctorWitness
 
-_enum_ Defines all valid witnesses for a functor.
+_enum_
+Defines all valid witnesses for a functor.
 
 ```
 import lists
@@ -117,7 +119,8 @@ Invariants:
 
 ## MonadWitness
 
-_enum_ Valid witnesses for a monad.
+_enum_
+Valid witnesses for a monad.
 
 ```
 import lists
@@ -135,16 +138,13 @@ flatMap repeat 2, lists.monad
 
 _func_ `contravariantFrom moduleWitness`
 
-
 ## flatMap
 
 _func_ `flatMap f, witness, instance`
 
-
 ## functorFrom
 
 _func_ `functorFrom moduleWitness`
-
 
 ## map
 
@@ -160,15 +160,14 @@ import lists
 let incr = { i => i + 1 }
 map incr, lists, [1, 2, 3]
 ```
+
 ## monadFrom
 
 _func_ `monadFrom monadWitness`
 
-
 ## pullback
 
 _func_ `pullback f, witness`
-
 
 ## pure
 
