@@ -188,8 +188,6 @@ func dataFieldDocsToMarkup { field =>
         },
         Nil: { _ => field.name },
     }
-    print field.name
-    print fieldText
     markup.li [
         markup.pre fieldText,
         docsSuffix
