@@ -1,6 +1,8 @@
 package langsrv
 
 import (
+	"strings"
+
 	sitter "github.com/smacker/go-tree-sitter"
 	"github.com/tliron/glsp"
 	protocol "github.com/tliron/glsp/protocol_3_16"
@@ -99,26 +101,31 @@ func textDocumentSemanticTokensFull(context *glsp.Context, params *protocol.Sema
 				continue
 			}
 			tokenModifiers := tokenModifiersForCaptureName(captureName)
-			column := uint32(capturedNode.StartPoint().Column)
-			for row := uint32(capturedNode.StartPoint().Row); row <= capturedNode.EndPoint().Row; row++ {
-				if row == capturedNode.EndPoint().Row {
-					tokens = append(tokens, highlightedToken{
-						line:           row,
-						column:         column,
-						length:         capturedNode.EndPoint().Column,
-						tokenType:      *tokenType,
-						tokenModifiers: tokenModifiers,
-					})
+			if capturedNode.StartPoint().Row < capturedNode.EndPoint().Row {
+				tokens = append(tokens, highlightedToken{
+					line:           capturedNode.StartPoint().Row,
+					column:         capturedNode.StartPoint().Column,
+					length:         capturedNode.StartPoint().Column - capturedNode.EndPoint().Column,
+					tokenType:      *tokenType,
+					tokenModifiers: tokenModifiers,
+				})
+			}
+			content := entry.item.Text[capturedNode.StartByte():capturedNode.EndByte()]
+			lines := strings.Split(content, "\n")
+			for i, line := range lines {
+				var column uint32
+				if i == 0 {
+					column = capturedNode.StartPoint().Column
 				} else {
-					tokens = append(tokens, highlightedToken{
-						line:           row,
-						column:         column,
-						length:         capturedNode.EndByte() - capturedNode.StartByte(),
-						tokenType:      *tokenType,
-						tokenModifiers: tokenModifiers,
-					})
 					column = 0
 				}
+				tokens = append(tokens, highlightedToken{
+					line:           capturedNode.StartPoint().Row + uint32(i),
+					column:         column,
+					length:         uint32(len(line)),
+					tokenType:      *tokenType,
+					tokenModifiers: tokenModifiers,
+				})
 			}
 		}
 	}
