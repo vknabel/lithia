@@ -9,12 +9,12 @@ import (
 func textDocumentHover(context *glsp.Context, params *protocol.HoverParams) (*protocol.Hover, error) {
 	rc := NewReqContextAtPosition(&params.TextDocumentPositionParams)
 	sourceFile, err := rc.parseSourceFile()
-	if err != nil {
-		return nil, err
+	if err != nil && sourceFile == nil {
+		return nil, nil
 	}
 	name, tokenRange, err := rc.findToken()
-	if err != nil {
-		return nil, err
+	if err != nil && tokenRange == nil {
+		return nil, nil
 	}
 	for _, decl := range sourceFile.Declarations {
 		if string(decl.DeclName()) != name {

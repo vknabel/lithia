@@ -4,6 +4,7 @@
 
 - lsp: fix jump to definition
 - lsp: fix multiline block comments
+- lsp: fix logging too many errors
 - fix: extern docs generation
 - stdlib: new markup and markdown library
 

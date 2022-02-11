@@ -8,12 +8,12 @@ import (
 func textDocumentDefinition(context *glsp.Context, params *protocol.DefinitionParams) (interface{}, error) {
 	rc := NewReqContextAtPosition(&params.TextDocumentPositionParams)
 	sourceFile, err := rc.parseSourceFile()
-	if err != nil {
-		return nil, err
+	if err != nil && sourceFile == nil {
+		return nil, nil
 	}
 	token, _, err := rc.findToken()
-	if err != nil {
-		return nil, err
+	if err != nil && token == "" {
+		return nil, nil
 	}
 	for _, decl := range sourceFile.Declarations {
 		if string(decl.DeclName()) != token || decl.Meta().Source == nil {

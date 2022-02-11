@@ -7,9 +7,9 @@ import (
 
 func textDocumentTypeDefinition(context *glsp.Context, params *protocol.TypeDefinitionParams) (interface{}, error) {
 	rc := NewReqContextAtPosition(&params.TextDocumentPositionParams)
-	_, err := rc.parseSourceFile()
-	if err != nil {
-		return nil, err
+	sourceFile, err := rc.parseSourceFile()
+	if err != nil && sourceFile == nil {
+		return nil, nil
 	}
 	return nil, nil
 }

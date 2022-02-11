@@ -9,8 +9,8 @@ import (
 func textDocumentCompletion(context *glsp.Context, params *protocol.CompletionParams) (interface{}, error) {
 	rc := NewReqContextAtPosition(&params.TextDocumentPositionParams)
 	sourceFile, err := rc.parseSourceFile()
-	if err != nil {
-		return nil, err
+	if err != nil && sourceFile == nil {
+		return nil, nil
 	}
 	completionItems := []protocol.CompletionItem{}
 	for _, decl := range sourceFile.Declarations {
