@@ -8,6 +8,11 @@ import (
 
 func initialize(context *glsp.Context, params *protocol.InitializeParams) (interface{}, error) {
 	capabilities := handler.CreateServerCapabilities()
+	capabilities.Workspace.FileOperations.DidDelete.Filters = []protocol.FileOperationFilter{
+		{
+			Pattern: protocol.FileOperationPattern{Glob: "**/*.lithia"},
+		},
+	}
 	capabilities.CompletionProvider = &protocol.CompletionOptions{
 		TriggerCharacters: []string{"."},
 	}

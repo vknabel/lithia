@@ -5,6 +5,7 @@
 - lsp: fix jump to definition
 - lsp: fix multiline block comments
 - lsp: fix logging too many errors
+- lsp: deleting files, deletes its diagnostics
 - fix: extern docs generation
 - stdlib: new markup and markdown library
 - stdlib: better docs generation

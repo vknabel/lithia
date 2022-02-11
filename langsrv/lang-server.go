@@ -1,6 +1,7 @@
 package langsrv
 
 import (
+	"github.com/tliron/glsp"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 	"github.com/tliron/glsp/server"
 	"github.com/tliron/kutil/logging"
@@ -22,7 +23,7 @@ var langserver lithiaLangserver = lithiaLangserver{
 }
 
 func init() {
-	logging.Configure(1, nil)
+	logging.Configure(2, nil)
 
 	handler = protocol.Handler{
 		Initialize:  initialize,
@@ -32,6 +33,9 @@ func init() {
 
 		TextDocumentDidOpen:   textDocumentDidOpen,
 		TextDocumentDidChange: textDocumentDidChange,
+		TextDocumentDidClose:  func(context *glsp.Context, params *protocol.DidCloseTextDocumentParams) error { return nil },
+
+		WorkspaceDidDeleteFiles: workspaceDidDeleteFiles,
 
 		TextDocumentHover:          textDocumentHover,
 		TextDocumentCompletion:     textDocumentCompletion,
