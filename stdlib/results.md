@@ -16,7 +16,7 @@ _module_
 
 ## Failure
 
-_data_
+_data_ Represents a failed result due to an error.
 
 ### Properties
 
@@ -25,6 +25,20 @@ _data_
 ## Result
 
 _enum_
+A result of a failable operation.
+
+```lithia
+func positive { n =>
+if n < 0,
+Failure "negative values not supported!",
+Success n
+}
+
+with positive, type Result {
+Success: { success => print success.value },
+Failure: { failure => print strings.concat ["failed: ", failure.error] },
+}
+```
 
 ### Cases
 
@@ -33,7 +47,7 @@ _enum_
 
 ## Success
 
-_data_
+_data_ Represents a successful result with a value.
 
 ### Properties
 

@@ -121,6 +121,7 @@ _data_
 ## Optional
 
 _enum_
+An optional value. Either some value or none.
 
 ### Cases
 
@@ -150,7 +151,7 @@ _data_ A constant to represent valid conditions.
 
 ## Void
 
-_data_ Representing a single value.
+_data_ Represents a single value.
 
 ## compose
 

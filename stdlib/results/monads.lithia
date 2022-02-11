@@ -2,6 +2,8 @@ module results
 
 import controls
 
+/// A witness for controls.Monad for results.Result.
+/// In contrast to failureMonad, implemented to map Success values.
 let successMonad = controls.Monad pureSuccess, flatMapSuccess
 
 func pureSuccess { value =>
@@ -15,6 +17,9 @@ func flatMapSuccess { transform, result =>
     }
 }
 
+
+/// A witness for controls.Monad for results.Result.
+/// In contrast to successMonad, implemented to map Failure errors.
 let failureMonad = controls.Monad pureFailure, flatMapFailure
 
 func pureFailure { error =>

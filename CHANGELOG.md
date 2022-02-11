@@ -7,6 +7,7 @@
 - lsp: fix logging too many errors
 - fix: extern docs generation
 - stdlib: new markup and markdown library
+- stdlib: better docs generation
 
 ## v0.0.13
 

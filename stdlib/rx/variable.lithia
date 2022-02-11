@@ -1,8 +1,10 @@
 module rx
 
+/// Holds a value and enables replacing it.
+/// Planned to propagate value changes to observers, but not implemented, yet.
 extern Variable {
-    // Changes the currently hold value of the variable.
+    /// Changes the currently hold value of the variable.
     accept value
-    // Returns the currently hold value.
+    /// Returns the currently hold value.
     current
 }

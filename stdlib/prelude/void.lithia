@@ -1,4 +1,4 @@
 module prelude
 
-/// Representing a single value.
+/// Represents a single value.
 data Void

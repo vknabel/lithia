@@ -12,6 +12,7 @@ _module_
 ## Optional
 
 _enum_
+An optional value. Either some value or none.
 
 ### Cases
 

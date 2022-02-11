@@ -1,5 +1,6 @@
 module prelude
 
+/// An optional value. Either some value or none.
 enum Optional {
   data Some { value }
   data None

@@ -1,6 +1,22 @@
 module results
 
+/// A result of a failable operation.
+///
+/// ```lithia
+/// func positive { n =>
+///     if n < 0,
+///         Failure "negative values not supported!",
+///         Success n
+/// }
+///
+/// with positive, type Result {
+///     Success: { success => print success.value },
+///     Failure: { failure => print strings.concat ["failed: ", failure.error] },
+/// }
+/// ```
 enum Result {
+    /// Represents a successful result with a value.
     data Success { value }
+    /// Represents a failed result due to an error.
     data Failure { error }
 }

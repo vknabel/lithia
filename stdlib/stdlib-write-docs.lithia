@@ -51,15 +51,51 @@ data GroupedModuleDocs {
 func main { grouped =>
     let modules = grouped.modules
     let docsFolder = optionals.orDefault "./stdlib", os.env "LITHIA_EXPORT_DOCS"
+    let successes = rx.Variable 0
+    let failures = rx.Variable 0
+
     lists.forEach modules, pipe [
         docs.inspect,
         writeModuleMarkdownDocs docsFolder,
-        print
+        type results.Result {
+            Success: { success =>
+                successes.accept successes.current+1
+            },
+            Failure: { failure =>
+                failures.accept failures.current+1
+                print strings.concat [
+                    "failed: ",
+                    failure.error,
+                ]
+            }
+        }
     ]
-    print (writeOverview docsFolder, grouped, (pipe [
+
+    let overviewResult = writeOverview docsFolder, grouped, (pipe [
         lists.map docs.inspect,
         lists.map { mod => mod.name }
-    ], grouped.modules))
+    ], grouped.modules)
+    with overviewResult, type results.Result {
+        Success: { success =>
+            successes.accept successes.current+1
+        },
+        Failure: { failure =>
+            failures.accept failures.current+1
+            print strings.concat [
+                "failed: ",
+                failure.error,
+            ]
+        },
+    }
+
+    print strings.concat [
+        "Finished: ",
+        successes.current,
+        " successful / ",
+        failures.current,
+        " failed"
+    ]
+    when failures.current > 0, os.exit 1,
 }
 
 main (GroupedModuleDocs "Lithia Standard Library", 
