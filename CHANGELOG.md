@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.0.14-next
+## v0.0.14
 
 - lsp: fix jump to definition
 - lsp: fix multiline block comments
