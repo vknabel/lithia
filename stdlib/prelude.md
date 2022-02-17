@@ -14,6 +14,7 @@ Will always be imported implicitly.
 - _extern_ [Function](#Function)
 - _extern_ [Int](#Int)
 - _enum_ [List](#List)
+- _enum_ [Maybe](#Maybe)
 - _extern_ [Module](#Module)
 - _enum_ [Never](#Never)
 - _data_ [Nil](#Nil)
@@ -37,6 +38,7 @@ Will always be imported implicitly.
 ## Any
 
 _extern_
+Any value that exists.
 
 ## Bool
 
@@ -52,6 +54,7 @@ Typically used for conditionals and flags.
 ## Char
 
 _extern_
+A single character of a string.
 
 ## Cons
 
@@ -70,18 +73,22 @@ _data_ A constant to represent invalid conditions.
 ## Float
 
 _extern_
+A base type for floating point numbers like 13.37.
 
 ## Function
 
 _extern_
+A function that may be called.
 
 ### Properties
 
-- `arity`
+- `arity` - The minimum arity of the function.
+If it returns another function, the actual arity might be higher.
 
 ## Int
 
 _extern_
+A base type for non-fractional numbers like -1, 0, 1 and 2.
 
 ## List
 
@@ -100,9 +107,21 @@ lists.reduce { l, r => l + r }, 0, myList
 - [Cons](#Cons)
 - [Nil](#Nil)
 
+## Maybe
+
+_enum_
+An uknown value. Might be an optional, the value itself or None.
+
+### Cases
+
+- [Some](#Some)
+- [None](#None)
+- [Any](#Any)
+
 ## Module
 
 _extern_
+A module. Either from an import or by a module-declaration.
 
 ## Never
 
@@ -139,11 +158,12 @@ _data_
 ## String
 
 _extern_
+Represents text like "hello world".
 
 ### Properties
 
-- `length`
-- `append str`
+- `length` - The length of the string.
+- `append str` - Allows to append another string.
 
 ## True
 
@@ -168,8 +188,9 @@ Always returns the first argument.
 
 ## debug
 
+_func_ `debug message`
 
-_extern_ `debug message`
+Prints a debug message to stdout.
 
 ## identity
 
@@ -197,16 +218,23 @@ The first function is applied to the value, the second to the result of the firs
 
 ## print
 
+_func_ `print message`
 
-_extern_ `print message`
+Prints a message to stdout.
 
 ## unless
 
 _func_ `unless condition, then`
 
+Only if a condition is False, the right side will be executed and returned.
+Otherwise Void.
+
 ## when
 
 _func_ `when condition, then`
+
+Only if a condition is True, the right side will be executed and returned.
+Otherwise Void.
 
 ## with
 

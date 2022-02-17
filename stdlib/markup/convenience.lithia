@@ -9,44 +9,59 @@ func h4 { => Heading 4 }
 func h5 { => Heading 5 }
 func h6 { => Heading 6 }
 
+/// _italic_ text
 func i { => Italic }
+/// **bold** text
 func b { => Bold }
 
+/// A blank line.
 let br = Paragraph ""
+/// A paragraph. Ignores empty lines.
 func p { child =>
-    let filtered = with child, type MarkupNode {
+    let filtered = with child, type Markup {
         List: (lists.filter { n => n != "" && n != " " && n != Nil }),
         Any: { node => node }
     }
     Paragraph filtered
 }
 
+/// Preformatted inline code.
 func pre { => Code }
+/// A Code block.
 func code { => CodeBlock }
 
+/// An image with url and alt.
 func img { => Image }
+/// A link with title and url.
 func link { => Link }
+/// An internal ref to a heading.
 func ref { child, name => Link child, "#".append name }
 
+/// An unordered list. Ignores empty lines.
 func ul { child =>
-    let filtered = with child, type MarkupNode {
+    let filtered = with child, type Markup {
         List: (lists.filter { n => n != "" && n != " " && n != Nil }),
         Any: { node => node }
     }
     UnorderedList filtered
 }
+/// An ordered list. Ignores empty lines.
 func ol { child =>
-    let filtered = with child, type MarkupNode {
+    let filtered = with child, type Markup {
         List: (lists.filter { n => n != "" && n != " " && n != Nil }),
         Any: { node => node }
     }
     OrderedList filtered
 }
 
+/// A list item for better readability.
 func li { item => item }
 
+/// Constant text for better readbility.
 func text { str => str }
+/// A list of markup for better readbility.
 func group { list => list }
+/// Some inline text. Ignores empty elements. Adds spaces.
 func inline { list =>
     type List {
         Cons: pipe [

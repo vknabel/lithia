@@ -1,6 +1,6 @@
 module cmp
 
-/// `Comparable` for numbers using < and >.
+/// `Comparable` witness for numbers using < and >.
 /// Not safe for other types.
 let numeric = Comparable { lhs, rhs =>
     if lhs < rhs, Ascending, (

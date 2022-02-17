@@ -1,5 +1,6 @@
 module lists
 
+/// True if the given list is Nil. Otherwise False.
 func isEmpty { list =>
     with list, type List {
         Cons: { _ => False },

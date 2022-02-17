@@ -1,0 +1,31 @@
+/// A generalized data format to represent human readable contents.
+/// Though it is not meant to represent HTML nodes.
+module markup
+
+/// A specific markup format to convert to.
+data Format {
+    /// Converts given markup to this format.
+    convert markup
+}
+
+/// A more generalized form of a markup.Format.
+/// Allows to use plain functions and whole modules as format.
+enum FormatWitness {
+    Format
+    Module
+    Function
+}
+
+/// Creates a Format from a given FormatWitness.
+func from { witness =>
+    with witness, type FormatWitness {
+        Format: { s => s },
+        Module: { m => Format m.serialize },
+        Function: { f => Format f },
+    }
+}
+
+/// Converts some markup to a target format.
+func convert { markup, targetFormatWitness =>
+    (from targetFormatWitness).convert markup
+}

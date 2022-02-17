@@ -3,12 +3,17 @@ module optionals
 import booleans
 import controls { Functor }
 
+/// A Functor instance for Optional.
 let functor = Functor map
 
+/// Transforms Some value to a new one.
+/// Keeps None as-is.
+/// Any other values will still be mapped, but not wrapped.
 func map { transform =>
-  type Optional {
+  type Maybe {
     Some: { some => transform some.value },
-    None: { _ => None }
+    None: { _ => None },
+    Any: { any => transform any }
   }
 }
 

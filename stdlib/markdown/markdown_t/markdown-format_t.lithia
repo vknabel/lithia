@@ -4,86 +4,86 @@ import tests {
     test
 }
 
-test "markdown.serialize string", { fail =>
+test "markdown.convert string", { fail =>
     let m = "Hello World"
-    let actual = markdown.asMarkdown m
+    let actual = markdown.convert m
     unless actual == "Hello World", fail actual
 }
 
-test "markdown.serialize list of strings", { fail =>
+test "markdown.convert list of strings", { fail =>
     let m = ["Hello", " ", "World"]
-    let actual = markdown.asMarkdown m
+    let actual = markdown.convert m
     unless actual == "Hello World", fail actual
 }
 
-test "markdown.serialize h1", { fail =>
+test "markdown.convert h1", { fail =>
     let m = markup.Heading 1, "Hello World"
-    let actual = markdown.asMarkdown m
+    let actual = markdown.convert m
     unless actual == "# Hello World\n\n", fail actual
 }
 
-test "markdown.serialize h2", { fail =>
+test "markdown.convert h2", { fail =>
     let m = markup.Heading 2, "Hi"
-    let actual = markdown.asMarkdown m
+    let actual = markdown.convert m
     unless actual == "## Hi\n\n", fail actual
 }
 
-test "markdown.serialize paragraph", { fail =>
+test "markdown.convert paragraph", { fail =>
     let m = markup.Paragraph "Hi"
-    let actual = markdown.asMarkdown m
+    let actual = markdown.convert m
     unless actual == "Hi\n\n", fail actual
 }
 
-test "markdown.serialize italic", { fail =>
+test "markdown.convert italic", { fail =>
     let m = markup.Italic "Hi"
-    let actual = markdown.asMarkdown m
+    let actual = markdown.convert m
     unless actual == "_Hi_", fail actual
 }
 
-test "markdown.serialize bold", { fail =>
+test "markdown.convert bold", { fail =>
     let m = markup.Bold "Hi"
-    let actual = markdown.asMarkdown m
+    let actual = markdown.convert m
     unless actual == "**Hi**", fail actual
 }
 
-test "markdown.serialize link", { fail =>
+test "markdown.convert link", { fail =>
     let m = markup.Link "Lithia", "https://github.com/vknabel/lithia"
-    let actual = markdown.asMarkdown m
+    let actual = markdown.convert m
     unless actual == "[Lithia](https://github.com/vknabel/lithia)", fail actual
 }
 
-test "markdown.serialize image", { fail =>
+test "markdown.convert image", { fail =>
     let m = markup.Image "./assets/lithia.png", "lithia logo"
-    let actual = markdown.asMarkdown m
+    let actual = markdown.convert m
     unless actual == "![lithia logo](./assets/lithia.png)", fail actual
 }
 
-test "markdown.serialize code", { fail =>
+test "markdown.convert code", { fail =>
     let m = markup.Code "example"
-    let actual = markdown.asMarkdown m
+    let actual = markdown.convert m
     unless actual == "`example`", fail actual
 }
 
-test "markdown.serialize code block with no language", { fail =>
+test "markdown.convert code block with no language", { fail =>
     let m = markup.CodeBlock None, "example"
-    let actual = markdown.asMarkdown m
+    let actual = markdown.convert m
     unless actual == "```\nexample\n```\n\n", fail actual
 }
 
-test "markdown.serialize code block with empty language", { fail =>
+test "markdown.convert code block with empty language", { fail =>
     let m = markup.CodeBlock "", "example"
-    let actual = markdown.asMarkdown m
+    let actual = markdown.convert m
     unless actual == "```\nexample\n```\n\n", fail actual
 }
 
-test "markdown.serialize code block with some language", { fail =>
+test "markdown.convert code block with some language", { fail =>
     let m = markup.CodeBlock Some "lithia", "example"
-    let actual = markdown.asMarkdown m
+    let actual = markdown.convert m
     unless actual == "```lithia\nexample\n```\n\n", fail actual
 }
 
-test "markdown.serialize code block with string language", { fail =>
+test "markdown.convert code block with string language", { fail =>
     let m = markup.CodeBlock "lithia", "example"
-    let actual = markdown.asMarkdown m
+    let actual = markdown.convert m
     unless actual == "```lithia\nexample\n```\n\n", fail actual
 }

@@ -2,12 +2,16 @@ module lists
 
 import controls { Monad }
 
+/// The Monad witness of List.
 let monad = Monad pure, flatMap
 
+/// Creates a list with one single element.
 func pure { value =>
     Cons value
 }
 
+/// Transforms a list's values into a list of more values.
+/// Concats these values into one single list while keeping their order.
 func flatMap { transform, list =>
     lists.concat (lists.map transform, list)
 }

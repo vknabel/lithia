@@ -1,5 +1,22 @@
 # Changelog
 
+## v0.0.15-next
+
+- stdlib: removed `docs.moduleMemberDocsToMarkup`, `docs.dataFieldDocsToMarkup` and `docs.enumCaseDocsToMarkup` and marked them as internal
+- stdlib: renamed `markup.MarkupNode` to `markup.Markup`
+- stdlib: renamed `markup.Serializer` to `markup.Format`
+- stdlib: renamed `markup.SerializerWitness` to `markup.FormatWitness`
+- stdlib: renamed `markup.serialize` to `markup.convert`
+- stdlib: renamed `markdown.serializer` to `markup.format`
+- stdlib: renamed `markdown.serialize` to `markup.convert`
+- stdlib: removed `markdown.asMarkdown`
+- stdlib: removed `optionals.Optional`. Use `prelude.Optional` instead
+- stdlib: added `prelude.Maybe` as `prelude.Some`, `prelude.None` or `prelude.Any`
+- stdlib: improved `optionals` functions to also support `prelude.Maybe`
+- stdlib: removed `tests.testCases` and `tests.runTestCase` and marked them as internal
+- fix: `docs` of `docs.ExternFunctionDocs` has always been empty
+- docs: improved for all modules
+
 ## v0.0.14
 
 - lsp: fix jump to definition
@@ -7,7 +24,7 @@
 - lsp: fix logging too many errors
 - lsp: deleting files, deletes its diagnostics
 - fix: extern docs generation
-- stdlib: new markup and markdown library
+- stdlib: new `markup` and `markdown` library
 - stdlib: better docs generation
 
 ## v0.0.13

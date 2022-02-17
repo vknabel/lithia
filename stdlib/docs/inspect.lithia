@@ -1,50 +1,116 @@
 module docs
 
+/// Inspects a given value for documentation.
+/// @returns TypeDocs
 extern inspect value
 
 /// All possible docs inspection values.
 enum TypeDocs {
     /// Contains all documentation information for a given enum.
     data EnumDocs {
-        /// Name of the enum
+        /// Name of the enum.
         name
+        /// The docs as text.
         docs
+        /// Each enum case as EnumCaseDocs.
         cases
     }
+
+    /// The documentation of a data declaration.
+    ///
+    /// ```lithia
+    /// /// The docs string
+    /// data DataName {
+    ///    someFields with, params
+    ///    orWithout
+    /// }
+    /// ```
     data DataDocs {
         /// The name of the data declaration
         name
+        /// The docs as text.
         docs
         /// A List of fields of DataFieldDocs
         fields
     }
+
+    /// The documentation of a module declaration.
+    ///
+    /// ```lithia
+    /// /// The docs string
+    /// module internalModuleName
+    /// ```
     data ModuleDocs {
         /// name of the module
         name
         /// all types declared in the module
         types
+        /// The docs as text.
         docs
     }
+
+    /// The documentation of a function declaration.
+    ///
+    /// ```lithia
+    /// /// The docs string
+    /// func functionName { params => }
+    /// ```
     data FunctionDocs {
+        /// name of the function.
         name
+        /// The docs as text.
         docs
+        /// A list of the function's parameter names.
         params
     }
+
+    /// The documentation of a constant declaration.
+    /// If a constant resolves to a function, it can still be called.
+    ///
+    /// ```lithia
+    /// /// The docs string
+    /// let constantName = 42
+    /// ```
     data ConstantDocs {
+        /// The name of the constant declaration.
         name
+        /// The docs as text.
         docs
     }
+
+    /// The documentation of an extern type declaration.
+    ///
+    /// ```lithia
+    /// /// The docs string
+    /// extern ExternTypeName {
+    ///    someFields with, params
+    ///    orWithout
+    /// }
+    /// ```
     data ExternTypeDocs {
+        /// The name of the external type.
         name
+        /// The docs as text.
         docs
-        /// a list of ExternFieldDocs
+        /// a list of ExternFieldDocs.
         fields
     }
+
+    /// The documentation of an extern function declaration.
+    ///
+    /// ```lithia
+    /// /// The docs string
+    /// extern externFunctionName params, asList
+    /// ```
     data ExternFunctionDocs {
+        /// The name of the external function.
         name
+        /// The docs as text.
         docs
+        /// A list of its paramter names. Can be treated as constant if Nil.
         params
     }
+    /// No docs available for the currently reflected type.
     None
 }
 
@@ -52,7 +118,10 @@ enum TypeDocs {
 data DataFieldDocs {
     /// name of the data property
     name
+    /// The docs as text.
     docs
+    /// A List of the data field's parameter names.
+    /// Can be treated as function if not Nil.
     params
 }
 
@@ -60,14 +129,20 @@ data DataFieldDocs {
 data ExternFieldDocs {
     /// name of the data property
     name
+    /// The docs as text.
     docs
+    /// A List of the extern field's parameter names.
+    /// Can be treated as function if not Nil.
     params
 }
 
 /// The documentation for a specific enum case.
 data EnumCaseDocs {
+    /// The name of the enum case.
     name
+    /// The docs as text.
     docs
+    /// The underlaying type of the enum case.
     type
 }
 

@@ -1,5 +1,13 @@
+/// An early concept of ranges.
+/// Might change largely in future.
+module ranges
+
+/// An infinite list of all numbers greater than or equal 0.
+/// e.g. [0, 1, 2, 3, 4, ...]
 func indices { => numbersFrom 0 }
 
+/// An infinite list of all numbers greater than or equal a given one.
+/// e.g. [n, n+1, n+2, n+3, n+4, ...]
 func numbersFrom { n =>
     Cons n, numbersFrom (n+1)
 }

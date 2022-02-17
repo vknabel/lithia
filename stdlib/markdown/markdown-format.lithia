@@ -1,16 +1,22 @@
+/// Implements the markdown format.
+/// Currently only handles converting markup.Markup to markdown strings.
+/// Planned to be able of parsing markdown strings to markup.Markup in the future.
+module markdown
+
 import markup
 import strings
 import lists
 import ranges
 
-let serializer = markup.Serializer asMarkdown
-let serialize = asMarkdown
+/// The default markup.Format to generate markdown from markup.
+let format = markup.Format convert
 
-func asMarkdown { =>
-    type markup.MarkupNode {
+/// Converts markup.Markup to a markdown string.
+func convert { =>
+    type markup.Markup {
         String: { str => str },
         List: pipe [
-            lists.map asMarkdown,
+            lists.map markdown.convert,
             strings.concat
         ],
         Heading: { hx =>
@@ -20,17 +26,17 @@ func asMarkdown { =>
             strings.concat [
                 prefix,
                 " ",
-                asMarkdown hx.child,
+                markdown.convert hx.child,
                 "\n\n"
             ]
         },
         Paragraph: { b =>
-            let paragraph = with b.child, type markup.MarkupNode {
+            let paragraph = with b.child, type markup.Markup {
                 List: pipe [
-                    lists.map asMarkdown,
+                    lists.map markdown.convert,
                     strings.join "\n"
                 ],
-                Any: { _ => asMarkdown b.child }
+                Any: { _ => markdown.convert b.child }
             }
             strings.concat [
                 paragraph,
@@ -40,21 +46,21 @@ func asMarkdown { =>
         Italic: { n =>
             strings.concat [
                 "_",
-                asMarkdown n.child,
+                markdown.convert n.child,
                 "_",
             ]
         },
         Bold: { n =>
             strings.concat [
                 "**",
-                asMarkdown n.child,
+                markdown.convert n.child,
                 "**",
             ]
         },
         Link: { n =>
             strings.concat [
                 "[",
-                asMarkdown n.child,
+                markdown.convert n.child,
                 "]",
                 "(",
                 n.url,
@@ -64,7 +70,7 @@ func asMarkdown { =>
         Image: { n =>
             strings.concat [
                 "![",
-                asMarkdown n.alt,
+                markdown.convert n.alt,
                 "]",
                 "(",
                 n.url,
@@ -74,12 +80,12 @@ func asMarkdown { =>
         Code: { n =>
             strings.concat [
                 "`",
-                asMarkdown n.text,
+                markdown.convert n.text,
                 "`",
             ]
         },
         CodeBlock: { n =>
-            let language = with n.language, type Optional {
+            let language = with n.language, type Maybe {
                 Some: { some => some.value },
                 None: { none => "" },
                 Any: { any => any }
@@ -94,7 +100,7 @@ func asMarkdown { =>
         },
         UnorderedList: { n =>
             let items = lists.map pipe [
-                asMarkdown,
+                markdown.convert,
                 "- ".append
             ], n.children
 
@@ -107,7 +113,7 @@ func asMarkdown { =>
             let items = lists.zipWith { i, child =>
                 strings.concat [
                     i, ". ",
-                    asMarkdown child,
+                    markdown.convert child,
                 ]
             }, ranges.indices, n.children
 

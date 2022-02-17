@@ -9,7 +9,14 @@ import results {
 /// Write a given string to a path.
 /// Returns `results.Result`.
 extern writeString toPath, newContents
+/// Reads a file at a given path.
+/// Returns `result.Result`.
 extern readString fromPath
+/// Returns a Bool if a file or directory exists at a given path.
 extern exists atPath
+/// Deletes a file or empty directory at a given path.
+/// Returns a `result.Result`.
 extern delete atPath
+/// Deletes a file or any directory at a given path.
+/// Returns a `result.Result`.
 extern deleteAll atPath

@@ -32,6 +32,8 @@ Appends an element to the end of a list.
 
 _func_ `concat nestedLists`
 
+Concats a list of lists.
+
 ## count
 
 _func_ `count list`
@@ -80,6 +82,9 @@ When empty `Nil`, otherwise `Some`.
 
 _func_ `flatMap transform, list`
 
+Transforms a list's values into a list of more values.
+Concats these values into one single list while keeping their order.
+
 ## foldr
 
 _func_ `foldr accumulator, initial`
@@ -99,17 +104,25 @@ Returns last result or `prelude.Void`.
 
 _func_ `isEmpty list`
 
+True if the given list is Nil. Otherwise False.
+
 ## map
 
 _func_ `map transform, list`
+
+Transforms the list values, while keeping their order.
 
 ## prependList
 
 _func_ `prependList prefix, postfix`
 
+Prepends a given prefix with another postfix list.
+
 ## pure
 
 _func_ `pure value`
+
+Creates a list with one single element.
 
 ## reduce
 

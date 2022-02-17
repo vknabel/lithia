@@ -1,3 +1,5 @@
+/// A very early concept of implementing functional reactive programming.
+/// Currently only used to provide mutability.
 module rx
 
 /// Holds a value and enables replacing it.

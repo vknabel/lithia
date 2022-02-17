@@ -6,6 +6,7 @@ import controls
 /// In contrast to failureFunctor, implemented to map Success values.
 let successFunctor = controls.Functor mapSuccess
 
+/// Transorms only successful results.
 func mapSuccess { transform, result =>
     with result, type Result {
         Success: { success => Success transform success.value },
@@ -17,6 +18,7 @@ func mapSuccess { transform, result =>
 /// In contrast to successFunctor, implemented to map Failure errors.
 let failureFunctor = controls.Functor mapFailure
 
+/// Transorms only failed results.
 func mapFailure { transform, result =>
     with result, type Result {
         Success: { success => success },
@@ -27,4 +29,6 @@ func mapFailure { transform, result =>
 /// The default witness for controls.Functor for results.Result.
 /// Is equal to successFunctor.
 let functor = successFunctor
+/// The default map for results.Result.
+/// Is equal to successFunctor.
 let map = mapSuccess

@@ -1,8 +1,11 @@
 module optionals
 
+/// Returns a default, if None given.
+/// Otherwise unwraps Some value or keeps Any as-is.
 func orDefault { default =>
-    type Optional {
+    type Maybe {
         Some: { some => some.value },
-        None: { none => default }
+        None: { none => default },
+        Any: { any => any },
     }
 }

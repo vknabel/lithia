@@ -1,6 +1,7 @@
 # results
 
 _module_
+The results module is all about failable operations.
 
 - _data_ [Failure](#Failure)
 - _enum_ [Result](#Result)
@@ -57,31 +58,47 @@ _data_ Represents a successful result with a value.
 
 _func_ `flatMapSuccess transform, result`
 
+When successful, attempts another operation by transforming the result.
+
 ## flatMapFailure
 
 _func_ `flatMapFailure transform, result`
+
+When failed, attempts another operation by transforming the error.
 
 ## flatMapSuccess
 
 _func_ `flatMapSuccess transform, result`
 
+When successful, attempts another operation by transforming the result.
+
 ## mapSuccess
 
 _func_ `mapSuccess transform, result`
+
+Transorms only successful results.
 
 ## mapFailure
 
 _func_ `mapFailure transform, result`
 
+Transorms only failed results.
+
 ## mapSuccess
 
 _func_ `mapSuccess transform, result`
+
+Transorms only successful results.
 
 ## pureFailure
 
 _func_ `pureFailure error`
 
+Creates a pure failure value.
+
 ## pureSuccess
 
 _func_ `pureSuccess value`
+
+Creates a pure succcess value.
 

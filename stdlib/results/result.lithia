@@ -1,3 +1,4 @@
+/// The results module is all about failable operations.
 module results
 
 /// A result of a failable operation.

@@ -2,8 +2,10 @@ module lists
 
 import controls { Functor }
 
+/// The Functor for lists. Allows transforming values, while keeping their order.
 let functor = Functor map
 
+/// Transforms the list values, while keeping their order.
 func map { transform, list =>
     with list, type List {
         Cons: { part =>

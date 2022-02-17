@@ -26,6 +26,7 @@ enum MonadWitness {
     Module
 }
 
+/// Creates a Monad from a given MonadWitness.
 func monadFrom { monadWitness =>
     with monadWitness, type MonadWitness {
         Monad: { witness => witness },
@@ -35,10 +36,14 @@ func monadFrom { monadWitness =>
     }
 }
 
+/// Creates a pure monad value from a yet unknown witness.
+/// Can be used in generic contexts, where the witness will be curried.
 func pure { value, witness =>
     (monadFrom witness).pure value
 }
 
+/// Flat map for a yet unknown witness and instance.
+/// Can be used in generic contexts, where the witness will be curried.
 func flatMap { f, witness, instance =>
     (monadFrom witness).flatMap f, instance
 }

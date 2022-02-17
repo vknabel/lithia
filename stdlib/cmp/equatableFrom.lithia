@@ -2,7 +2,11 @@ module cmp
 
 import eq
 
-/// Creates an `eq.Equatable`
+/// Creates an `eq.Equatable` from a `cmp.Comparable`.
+/// `cmp.Equal` will result in `True`,
+/// `cmp.Ascending` and `cmp.Descending` will be `False`.
+///
+/// @returns eq.Equatable
 func equatableFrom { comparableWitness =>
     eq.Equatable { lhs, rhs =>
         with (comparableWitness.compare lhs, rhs), type Order {

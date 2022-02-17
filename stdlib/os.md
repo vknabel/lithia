@@ -7,11 +7,13 @@ _module_
 
 ## env
 
+_func_ `env name`
 
-_extern_ `env name`
+Returns an Optional value of the environment variable.
 
 ## exit
 
+_func_ `exit code`
 
-_extern_ `exit code`
+Exits the whole program with the given exit code.
 

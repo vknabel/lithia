@@ -6,10 +6,12 @@ import controls
 /// In contrast to failureMonad, implemented to map Success values.
 let successMonad = controls.Monad pureSuccess, flatMapSuccess
 
+/// Creates a pure succcess value.
 func pureSuccess { value =>
     Success value
 }
 
+/// When successful, attempts another operation by transforming the result.
 func flatMapSuccess { transform, result =>
     with result, type Result {
         Success: { success => transform success.value },
@@ -22,10 +24,12 @@ func flatMapSuccess { transform, result =>
 /// In contrast to successMonad, implemented to map Failure errors.
 let failureMonad = controls.Monad pureFailure, flatMapFailure
 
+/// Creates a pure failure value.
 func pureFailure { error =>
     Failure error
 }
 
+/// When failed, attempts another operation by transforming the error.
 func flatMapFailure { transform, result =>
     with result, type Result {
         Success: { success => success },
@@ -33,5 +37,9 @@ func flatMapFailure { transform, result =>
     }
 }
 
+/// The default witness for controls.Monad for results.Result.
+/// Is equal to successMonad.
 let monad = successMonad
+/// The default flatMap for results.Result.
+/// Is equal to flatMapSuccess.
 let flatMap = flatMapSuccess

@@ -5,3 +5,10 @@ enum Optional {
   data Some { value }
   data None
 }
+
+/// An uknown value. Might be an optional, the value itself or None.
+enum Maybe {
+  Some
+  None
+  Any
+}

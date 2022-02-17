@@ -1,8 +1,7 @@
 module optionals
 
+/// Implements some helpers around prelude.Optional and prelude.Maybe.
 import prelude
-
-let Optional = prelude.Optional
 
 // describe "optional", { it =>
 //   it "can have some value", { _ =>
@@ -13,3 +12,12 @@ let Optional = prelude.Optional
 //     None
 //   }
 // }
+
+/// Creates an optional from a Maybe-value.
+func from { maybe =>
+    type Maybe {
+        Some: { _ => maybe },
+        None: { _ => maybe },
+        Any: { _ => Some maybe },
+    } maybe
+}

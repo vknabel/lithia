@@ -1,0 +1,46 @@
+import tests
+
+import lists
+import strings
+import rx
+
+let testCases = rx.Variable Nil
+
+func runTestCase { summary, testCase =>
+    let eagerlyRunPreviousTests = summary.failedTests
+    eagerlyRunPreviousTests
+
+    let testNumber = summary.ok + summary.notOk + 1
+    let failure = rx.Variable None
+    testCase.impl { message =>
+        let combined = with failure.current, type Optional {
+            Some: { previous => Some strings.concat [previous.value, "; ", message] },
+            None: { _ => Some message }
+        }
+        failure.accept combined
+    }
+
+    with failure.current, type Optional {
+        Some: { some => 
+            print strings.concat [
+                "not ok ",
+                testNumber,
+                " - ",
+                testCase.title
+            ]
+            print "  ---"
+            print "  message: ".append some.value
+            print "  severity: fail"
+            tests.TestSummary summary.ok, summary.notOk+1, (lists.append testNumber, summary.failedTests)
+        },
+        None: { _ => 
+            print strings.concat [
+                "ok ",
+                testNumber,
+                " - ",
+                testCase.title
+            ]
+            tests.TestSummary (summary.ok+1), summary.notOk, summary.failedTests
+        }
+    }
+}

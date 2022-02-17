@@ -2,10 +2,11 @@ module optionals
 
 import eq
 
+/// Creates an equal function, that understands optionals and maybes for a given witness.
 func equalFor { someWitness, lhs, rhs =>
-  type Optional {
+  type Maybe {
     Some: { lsome =>
-      type Optional {
+      type Maybe {
         Some: { rsome =>
           someWitness.equal lsome, rsome
         },
@@ -13,14 +14,15 @@ func equalFor { someWitness, lhs, rhs =>
       } rhs
     },
     None: { _ =>
-      type Optional {
+      type Maybe {
         Some: { _ => False },
         None: { _ => True }
       }
-    }
-  } lhs
+    },
+  } optionals.from lhs
 }
 
+/// Creates an Equatable witness for Optionals on top of an existing witness.
 func equatableFor { someWitness =>
   Equatable equalFor someWitness
 }
@@ -40,7 +42,7 @@ func equatableFor { someWitness =>
   
 //   it "some and some delegate equality to values" { expect =>
 //     expect numbers, (Some 1), (Some 1)
-//     expect eq.negated numbers (Some 1) (Some 2)
-//     expect eq.negated numbers (Some 2) (Some 1)
+//     expect eq.negated numbers, (Some 1), (Some 2)
+//     expect eq.negated numbers, (Some 2), (Some 1)
 //   }
 // }

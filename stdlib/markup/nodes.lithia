@@ -1,39 +1,105 @@
-enum MarkupNode {
+/// A recursive enum of markup nodes.
+enum Markup {
+    /// A plain string.
     String
+    // a list of markup.Markup nodes.
     List
 
+    /// A heading of a specific nesting level.
+    ///
+    /// > ##### Heading 5, "title"
     data Heading {
+        /// The level of nesting.
+        /// An Int, typically in the range of one to six.
         level
+        /// At least one child of type Markup.
         child
     }
+    /// A paragraph with some blank lines around.
+    ///
+    /// > Paragraph [
+    /// >     "First",
+    /// >     "Second"
+    /// > ]
     data Paragraph {
+        /// At least one child of type Markup.
         child
     }
+    /// An italic portion of inline text.
+    ///
+    /// > Italic _"text"_
     data Italic {
+        /// At least one child of type Markup.
         child
     }
+    /// A bold portion of inline text.
+    ///
+    /// > Bold **"text"**
     data Bold {
+        /// At least one child of type Markup.
         child
     }
+    /// A link to a resource.
+    ///
+    /// > [Link child, url](https://github.com/vknabel/lithia)
     data Link {
+        /// At least one child of type Markup.
+        /// Used to display the link.
         child
+        /// The url to point to.
+        /// Markup not supported.
         url
     }
+    /// An embedded image.
+    ///
+    /// > Image ![url](https://github.com/vknabel/lithia/blob/main/assets/lithia.png), alt
     data Image {
+        /// The url  of the image.
+        /// Markup not supported.
         url
+        /// Alternatively displayed text in case the image can't be loaded or for accessibility.
+        /// Markup not supported.
         alt
     }
+    /// Some preformatted inline code.
+    ///
+    /// > `Code text`
     data Code {
+        /// Some text. Markup not supported.
         text
     }
+    /// A block of preformatted multiline code.
+    ///
+    /// > ```lithia
+    /// > CodeBlock "lithia", "text"
+    /// > ```
     data CodeBlock {
+        /// Maybe the language as string.
+        /// Implementations must support Some, None and String.
         language
+        /// The text itself as String.
         text
     }
+    /// An unordered list. Requires a list of children.
+    ///
+    /// > UnorderedList [
+    /// >   - item
+    /// >   - another
+    /// >
+    /// > ]
     data UnorderedList {
+        /// A list of Markup children.
         children
     }
+    /// An ordered list. Requires a list of children.
+    ///
+    /// > OrderedList [
+    /// >   1. item
+    /// >   2. another
+    /// >
+    /// > ]
     data OrderedList {
+        /// A list of Markup children.
         children
     }
 }

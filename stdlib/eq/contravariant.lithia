@@ -13,4 +13,5 @@ func pullback { transform, witness =>
   }
 }
 
+/// The Contravariant over eq.Equatable.
 let contravariant = Contravariant pullback

@@ -1,15 +1,19 @@
 module prelude
 
+/// Only if a condition is True, the right side will be executed and returned.
+/// Otherwise Void.
 func when { condition, then =>
     with condition, type Bool {
         True: { _ => then },
-        False: { _ => }
+        False: { _ => Void }
     }
 }
 
+/// Only if a condition is False, the right side will be executed and returned.
+/// Otherwise Void.
 func unless { condition, then =>
     with condition, type Bool {
-        True: { _ => },
+        True: { _ => Void },
         False: { _ => then }
     }
 }

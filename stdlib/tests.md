@@ -23,13 +23,12 @@ In case you really need expectations, writing a wrapper around tests should be p
 
 - _data_ [TestCase](#TestCase)
 - _data_ [TestSummary](#TestSummary)
-- _func_ [runTestCase](#runTestCase) summary, testCase
 - _func_ [runTests](#runTests)
 - _func_ [test](#test) case, function
 
 ## TestCase
 
-_data_
+_data_ Represents a buffered test case.
 
 ### Properties
 
@@ -46,10 +45,6 @@ _data_ The prinatble summary of all tests.
 - `ok` - How many tests have been ok.
 - `notOk` - How many tests have been not ok.
 - `failedTests` - List of failed test numbers.
-
-## runTestCase
-
-_func_ `runTestCase summary, testCase`
 
 ## runTests
 

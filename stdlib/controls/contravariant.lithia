@@ -36,6 +36,7 @@ enum ContravariantWitness {
     Function
 }
 
+/// Creates a Contravariant from a given ContravariantWitness.
 func contravariantFrom { moduleWitness =>
     with moduleWitness, type ContravariantWitness {
         Contravariant: { witness => witness },
@@ -48,6 +49,7 @@ func contravariantFrom { moduleWitness =>
     }
 }
 
+/// pullback for a yet unknown witness.
 func pullback { f, witness =>
     (contravariantFrom witness).pullback f
 }

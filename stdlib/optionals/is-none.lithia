@@ -2,10 +2,11 @@ module optionals
 
 import booleans
 
+/// True if None. Otherwise False.
 func isNone { =>
   type Optional {
-    Some: { _ => False },
-    None: { _ => True }
+    None: { _ => True },
+    Any: { _ => False }
   }
 }
 

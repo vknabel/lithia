@@ -2,12 +2,20 @@ module cmp
 
 import controls { Contravariant }
 
+/// Lifts an existing `cmp.Comparable` witness to a different type.
+/// Can be used to pick a specific property of complex data.
+///
+/// ```lithia
+/// let compareUsersById = cmp.pullback { user => user.id }, cmp.numeric
+/// ```
 func pullback { f, witness =>
     Comparable { lhs, rhs =>
         witness.compare f lhs, f rhs
     }
 }
 
+/// A `controls.Contravariant` witness for `cmp.Comparable`.
+/// Allows to lift comparision to different types.
 let contravariant = Contravariant pullback
 
 import tests { test }

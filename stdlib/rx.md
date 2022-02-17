@@ -1,6 +1,8 @@
 # rx
 
 _module_
+A very early concept of implementing functional reactive programming.
+Currently only used to provide mutability.
 
 - _extern_ [Variable](#Variable)
 

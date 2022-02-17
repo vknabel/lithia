@@ -1,13 +1,24 @@
 /// Defines comparision operations, ascending and descending of values.
 module cmp
 
+/// Instances compare values regarding the order.
+/// Witnesses are typically only defined for specific types.
 data Comparable {
+    /// Compares two values.
+    /// @returns Order
     compare lhs, rhs
 }
 
+/// Represents the order of two values.
 enum Order {
+    /// Indicates an ascending order of two values.
+    /// For example 1 and 2.
     data Ascending
+    /// Both values are ordered equally.
+    /// In context of Order, it doesn't necessarily require equality.
     data Equal
+    /// Indicates an descending order of two values.
+    /// For example 2 and 1.
     data Descending
 }
 

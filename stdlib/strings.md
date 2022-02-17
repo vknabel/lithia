@@ -1,6 +1,8 @@
 # strings
 
 _module_
+Provides convenience functions around the basic String type.
+Currently pretty limited.
 
 - _func_ [concat](#concat) listOfStrings
 - _func_ [join](#join) separator, listOfStrings

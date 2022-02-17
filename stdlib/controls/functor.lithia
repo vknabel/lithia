@@ -40,6 +40,7 @@ enum FunctorWitness {
     Monad
 }
 
+/// Creates a Functor from a given FunctorWitness.
 func functorFrom { moduleWitness =>
     with moduleWitness, type FunctorWitness {
         Functor: { witness => witness },
@@ -56,7 +57,7 @@ func functorFrom { moduleWitness =>
 }
 
 /**
- * Transforms a wrapped value using a functor witness.
+ * Transforms a wrapped value using a yet unknown functor witness and value.
  * Essentially just uses the map of the given witness,
  * but allows to defer the decision regarding the witness itself.
  *

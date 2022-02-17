@@ -138,19 +138,26 @@ flatMap repeat 2, lists.monad
 
 _func_ `contravariantFrom moduleWitness`
 
+Creates a Contravariant from a given ContravariantWitness.
+
 ## flatMap
 
 _func_ `flatMap f, witness, instance`
+
+Flat map for a yet unknown witness and instance.
+Can be used in generic contexts, where the witness will be curried.
 
 ## functorFrom
 
 _func_ `functorFrom moduleWitness`
 
+Creates a Functor from a given FunctorWitness.
+
 ## map
 
 _func_ `map f, witness, value`
 
-Transforms a wrapped value using a functor witness.
+Transforms a wrapped value using a yet unknown functor witness and value.
 Essentially just uses the map of the given witness,
 but allows to defer the decision regarding the witness itself.
 
@@ -165,11 +172,18 @@ map incr, lists, [1, 2, 3]
 
 _func_ `monadFrom monadWitness`
 
+Creates a Monad from a given MonadWitness.
+
 ## pullback
 
 _func_ `pullback f, witness`
 
+pullback for a yet unknown witness.
+
 ## pure
 
 _func_ `pure value, witness`
+
+Creates a pure monad value from a yet unknown witness.
+Can be used in generic contexts, where the witness will be curried.
 

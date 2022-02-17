@@ -1,9 +1,11 @@
+/// Prepends a given prefix with another postfix list.
 func prependList { prefix, postfix =>
     foldr { nextHead, postfix =>
         Cons nextHead, postfix
     }, postfix, prefix
 }
 
+/// Concats a list of lists.
 func concat { nestedLists =>
     foldr { nextList, appendedLists =>
         prependList nextList, appendedLists

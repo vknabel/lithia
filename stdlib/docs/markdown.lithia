@@ -3,5 +3,5 @@ module docs
 import markdown
 
 func docsToMarkdown { docs =>
-    markdown.serialize docsToMarkup docs
+    markdown.convert docsToMarkup docs
 }

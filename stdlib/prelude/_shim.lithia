@@ -1,0 +1,35 @@
+/**
+ * Implements the most basic data types.
+ * Espcially those needed for built-in functionality and for the compiler.
+ * Will always be imported implicitly.
+ */
+module prelude
+
+/// Prints a message to stdout.
+extern print message
+/// Prints a debug message to stdout.
+extern debug message
+
+/// A base type for non-fractional numbers like -1, 0, 1 and 2.
+extern Int
+/// A base type for floating point numbers like 13.37.
+extern Float
+/// Represents text like "hello world".
+extern String {
+    /// The length of the string.
+    length
+    /// Allows to append another string.
+    append str
+}
+/// A single character of a string.
+extern Char
+/// A function that may be called.
+extern Function {
+    /// The minimum arity of the function.
+    /// If it returns another function, the actual arity might be higher.
+    arity
+}
+/// A module. Either from an import or by a module-declaration.
+extern Module
+/// Any value that exists.
+extern Any

@@ -3,6 +3,7 @@ module docs
 import markup
 import lists
 import strings
+import docs.internal
 
 func docsToMarkup { =>
     type TypeDocs {
@@ -13,7 +14,7 @@ func docsToMarkup { =>
                     markup.i "module",
                     d.docs
                 ]),
-                markup.ul (lists.map moduleMemberDocsToMarkup, d.types),
+                markup.ul (lists.map internal.moduleMemberDocsToMarkup, d.types),
                 (lists.map docsToMarkup, d.types)
             ]
         },
@@ -22,7 +23,7 @@ func docsToMarkup { =>
                 Cons: { cons =>
                     markup.group [
                         markup.h3 "Cases",
-                        markup.ul (lists.map enumCaseDocsToMarkup, d.cases)
+                        markup.ul (lists.map internal.enumCaseDocsToMarkup, d.cases)
                     ]
                 },
                 Nil: { _ => "" }
@@ -41,7 +42,7 @@ func docsToMarkup { =>
                 Cons: { cons =>
                     markup.group [
                         markup.h3 "Properties",
-                        markup.ul (lists.map dataFieldDocsToMarkup, cons)
+                        markup.ul (lists.map internal.dataFieldDocsToMarkup, cons)
                     ]
                 },
                 Nil: { _ => "" }
@@ -90,7 +91,7 @@ func docsToMarkup { =>
                 Cons: { cons =>
                     markup.group [
                         markup.h3 "Properties",
-                        markup.ul (lists.map dataFieldDocsToMarkup, cons)
+                        markup.ul (lists.map internal.dataFieldDocsToMarkup, cons)
                     ]
                 },
                 Nil: { _ => "" }
@@ -110,94 +111,25 @@ func docsToMarkup { =>
                 Cons: strings.join ", ",
                 Nil: { _ => "" }
             }
-            markup.p [
+            markup.group [
                 markup.h2 d.name,
-                markup.inline [
-                    markup.i "extern",
-                    markup.pre [
-                        d.name,
-                        " ",
-                        params,
+                markup.p [
+                    markup.inline [
+                        markup.i "func",
+                        markup.pre (markup.inline [
+                            d.name,
+                            params,
+                        ]),
                     ],
-                    d.docs,
-                ]
+                ],
+                (if d.docs == "", "", markup.p d.docs),
             ]
+            let params = with d.params, type List {
+                Cons: strings.join ", ",
+                Nil: { _ => "" }
+            }
         },
         None: { _ => "" }
     }
 }
 
-func moduleMemberDocsToMarkup { =>
-    type TypeDocs {
-        ModuleDocs: { d =>
-            markup.inline [
-                markup.i "module",
-                (markup.ref d.name, d.name)
-            ]
-        },
-        EnumDocs: { d => 
-            markup.inline [
-                markup.i "enum",
-                (markup.ref d.name, d.name)
-            ]
-        },
-        DataDocs: { d => 
-            markup.inline [
-                markup.i "data",
-                (markup.ref d.name, d.name)
-            ]
-        },
-        FunctionDocs: { d =>
-            markup.inline [
-                markup.i "func",
-                (markup.ref d.name, d.name)
-                (strings.join ", ", d.params)
-            ]
-        },
-        ConstantDocs: { d =>
-            markup.inline [
-                markup.i "let",
-                (markup.ref d.name, d.name)
-            ]
-        },
-        ExternTypeDocs: { d =>
-            markup.inline [
-                markup.i "extern",
-                (markup.ref d.name, d.name)
-            ]
-        },
-        ExternFunctionDocs: { d =>
-            markup.inline [
-                markup.i "extern",
-                (markup.ref d.name, d.name)
-                (strings.join ", ", d.params)
-            ]
-        },
-        None: { _ => "" }
-    }
-}
-
-func dataFieldDocsToMarkup { field =>
-    let docsSuffix = if field.docs == "", "", strings.concat [" - ", field.docs]
-    let fieldText = with field.params, type List {
-        Cons: { params => 
-            markup.inline [
-                field.name,
-                (strings.join ", ", params)
-            ]
-        },
-        Nil: { _ => field.name },
-    }
-    markup.li [
-        markup.pre fieldText,
-        docsSuffix
-    ]
-}
-
-func enumCaseDocsToMarkup { case =>
-    let docsSuffix = if case.docs == "", "", strings.concat [" - ", case.docs]
-    markup.li [
-        (markup.ref case.name, case.type.name),
-        docsSuffix
-    ]
-}

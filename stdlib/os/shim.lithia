@@ -1,2 +1,4 @@
+/// Exits the whole program with the given exit code.
 extern exit code
+/// Returns an Optional value of the environment variable.
 extern env name
