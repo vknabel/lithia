@@ -6,6 +6,7 @@ type DeclExternFunc struct {
 	Name       Identifier
 	Parameters []DeclParameter
 
+	Docs     *Docs
 	MetaInfo *MetaDecl
 }
 
@@ -27,4 +28,8 @@ func MakeDeclExternFunc(name Identifier, params []DeclParameter, source *Source)
 		Parameters: params,
 		MetaInfo:   &MetaDecl{source},
 	}
+}
+
+func (decl DeclExternFunc) ProvidedDocs() *Docs {
+	return decl.Docs
 }

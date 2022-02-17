@@ -15,6 +15,7 @@ func (fp *FileParser) ParseExternDeclaration() (*ast.Decl, []SyntaxError) {
 			return nil, errs
 		}
 		funcDecl := ast.MakeDeclExternFunc(name, params, fp.AstSource())
+		funcDecl.Docs = fp.ConsumeDocs()
 		decl = *funcDecl
 		return &decl, nil
 	}

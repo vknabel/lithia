@@ -197,7 +197,7 @@ func docsInspectValue(value RuntimeValue, env *Environment) (RuntimeValue, *Runt
 		}
 		return env.MakeDataRuntimeValue("ExternFunctionDocs", map[string]Evaluatable{
 			"name":   NewConstantRuntimeValue(PreludeString(value.Decl.Name)),
-			"docs":   NewConstantRuntimeValue(PreludeString("")),
+			"docs":   NewConstantRuntimeValue(PreludeString(value.Decl.Docs.Content)),
 			"params": NewConstantRuntimeValue(paramsList),
 		})
 	case RxVariableType:
