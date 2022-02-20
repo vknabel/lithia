@@ -31,6 +31,7 @@ Currently Lithia is an early proof of concept. Basic language features exist, bu
 - [ ] ... with refactorings
 - [ ] ... with formatter
 - [ ] A package manager
+- [ ] A debugger
 - [ ] Custom plugins for external declarations
 - [ ] More static type safety
 
