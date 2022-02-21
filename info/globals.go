@@ -1,3 +1,3 @@
 package info
 
-var Version = "0.0.15"
+var Version = "0.0.16-next"

@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.0.16-next
+
+- fix: undeclared enum case error due to file order within a module
+
 ## v0.0.15
 
 - stdlib: removed `docs.moduleMemberDocsToMarkup`, `docs.dataFieldDocsToMarkup` and `docs.enumCaseDocsToMarkup` and marked them as internal

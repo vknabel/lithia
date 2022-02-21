@@ -14,6 +14,6 @@ Planned to propagate value changes to observers, but not implemented, yet.
 
 ### Properties
 
-- `accept value` - Changes the currently hold value of the variable.
 - `current` - Returns the currently hold value.
+- `accept value` - Changes the currently hold value of the variable.
 
