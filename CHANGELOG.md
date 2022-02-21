@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.0.15-next
+## v0.0.15
 
 - stdlib: removed `docs.moduleMemberDocsToMarkup`, `docs.dataFieldDocsToMarkup` and `docs.enumCaseDocsToMarkup` and marked them as internal
 - stdlib: renamed `markup.MarkupNode` to `markup.Markup`
