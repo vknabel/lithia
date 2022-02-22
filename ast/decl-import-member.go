@@ -1,6 +1,9 @@
 package ast
 
+import "fmt"
+
 var _ Decl = DeclImportMember{}
+var _ Overviewable = DeclImportMember{}
 
 type DeclImportMember struct {
 	Name       Identifier
@@ -11,6 +14,10 @@ type DeclImportMember struct {
 
 func (e DeclImportMember) DeclName() Identifier {
 	return e.Name
+}
+
+func (e DeclImportMember) DeclOverview() string {
+	return fmt.Sprintf("import %s { %s }", e.ModuleName, e.Name)
 }
 
 func (e DeclImportMember) Meta() *MetaDecl {

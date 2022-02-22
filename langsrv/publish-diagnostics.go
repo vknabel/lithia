@@ -20,6 +20,19 @@ func publishSyntaxErrorDiagnostics(context *glsp.Context, textDocumentURI protoc
 	})
 }
 
+func publishSyntaxErrorDiagnosticsForFile(context *glsp.Context, textDocumentURI protocol.URI, errs []parser.SyntaxError) {
+	diagnostics := make([]protocol.Diagnostic, len(errs))
+	for i, err := range errs {
+		diagnostics[i] = syntaxErrorToDiagnostic(err)
+	}
+
+	context.Notify(protocol.ServerTextDocumentPublishDiagnostics, protocol.PublishDiagnosticsParams{
+		URI:         textDocumentURI,
+		Version:     nil,
+		Diagnostics: diagnostics,
+	})
+}
+
 func syntaxErrorToDiagnostic(err parser.SyntaxError) protocol.Diagnostic {
 	return protocol.Diagnostic{
 		Source:   &lsName,

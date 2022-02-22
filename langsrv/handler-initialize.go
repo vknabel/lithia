@@ -12,6 +12,9 @@ func initialize(context *glsp.Context, params *protocol.InitializeParams) (inter
 		{
 			Pattern: protocol.FileOperationPattern{Glob: "**/*.lithia"},
 		},
+		{
+			Pattern: protocol.FileOperationPattern{Glob: "**/Potfile"},
+		},
 	}
 	capabilities.CompletionProvider = &protocol.CompletionOptions{
 		TriggerCharacters: []string{"."},
@@ -24,6 +27,18 @@ func initialize(context *glsp.Context, params *protocol.InitializeParams) (inter
 			},
 			Full: true,
 		},
+	}
+
+	if len(params.WorkspaceFolders) > 0 {
+		workspaceRoots := make([]string, len(params.WorkspaceFolders))
+		for i, workspace := range params.WorkspaceFolders {
+			workspaceRoots[i] = workspace.URI
+		}
+		langserver.setWorkspaceRoots(workspaceRoots...)
+	} else if params.RootURI != nil {
+		langserver.setWorkspaceRoots(*params.RootURI)
+	} else if params.RootPath != nil {
+		langserver.setWorkspaceRoots(*params.RootPath)
 	}
 
 	return protocol.InitializeResult{

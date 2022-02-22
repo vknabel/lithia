@@ -7,8 +7,8 @@ import (
 
 func textDocumentDeclaration(context *glsp.Context, params *protocol.DeclarationParams) (interface{}, error) {
 	rc := NewReqContextAtPosition(&params.TextDocumentPositionParams)
-	sourceFile, err := rc.parseSourceFile()
-	if err != nil && sourceFile == nil {
+	sourceFile := rc.textDocumentEntry.sourceFile
+	if sourceFile == nil {
 		return nil, nil
 	}
 	token, _, err := rc.findToken()

@@ -22,7 +22,7 @@ type ModuleResolver struct {
 func DefaultModuleResolver() ModuleResolver {
 	return ModuleResolver{
 		externalImportRoots: defaultImportRoots(),
-		defaultPackageName:  "package",
+		defaultPackageName:  "root",
 		manifestName:        "Potfile",
 		manifestSearchPaths: []string{".", "..", "../..", "../../..", "../../../.."},
 		defaultSrcDir:       "src",
@@ -32,7 +32,7 @@ func DefaultModuleResolver() ModuleResolver {
 type ResolvedPackage struct {
 	Name     string
 	Path     string
-	manifest *packageManifest
+	Manifest *PackageManifest
 }
 
 type ResolvedModule struct {
@@ -44,10 +44,10 @@ type ResolvedModule struct {
 	Files        []string
 }
 
-type packageManifest struct {
+type PackageManifest struct {
 	// a Potfile-file‚
 	// the package module path will be derived from this location
-	path string
+	Path string
 }
 
 func defaultImportRoots() []string {
@@ -76,15 +76,16 @@ func defaultImportRoots() []string {
 }
 
 func (mr *ModuleResolver) ResolvePackageForReferenceFile(referenceFile string) ResolvedPackage {
+	referenceFile = removingFilePrefix(referenceFile)
 	for _, candidates := range mr.manifestSearchPaths {
 		manifestPath := filepath.Join(path.Dir(referenceFile), candidates, mr.manifestName)
 		if _, err := os.Stat(manifestPath); err == nil {
-			modulePath := path.Dir(manifestPath)
+			packagePath := path.Dir(manifestPath)
 			return ResolvedPackage{
 				Name: mr.defaultPackageName,
-				Path: modulePath,
-				manifest: &packageManifest{
-					path: manifestPath,
+				Path: packagePath,
+				Manifest: &PackageManifest{
+					Path: manifestPath,
 				},
 			}
 		}
@@ -96,11 +97,28 @@ func (mr *ModuleResolver) ResolvePackageForReferenceFile(referenceFile string) R
 	return ResolvedPackage{Name: mr.defaultPackageName, Path: dir}
 }
 
+func (mr *ModuleResolver) ResolvePackageAndModuleForReferenceFile(referenceFile string) ResolvedModule {
+	referenceFile = removingFilePrefix(referenceFile)
+	pkg := mr.ResolvePackageForReferenceFile(referenceFile)
+	relativeFile, err := filepath.Rel(pkg.Path, referenceFile)
+	if err != nil {
+		return mr.CreateSingleFileModule(pkg, referenceFile)
+	}
+	moduleFilepath := filepath.Dir(relativeFile)
+	moduleParts := filepath.SplitList(moduleFilepath)
+	resolvedModule, err := mr.resolveModuleWithinPackage(pkg, moduleParts)
+	if err != nil {
+		return mr.CreateSingleFileModule(pkg, referenceFile)
+	}
+	return resolvedModule
+}
+
 func (mr *ModuleResolver) AddRootImportPath(path string) {
 	mr.externalImportRoots = append([]string{path}, mr.externalImportRoots...)
 }
 
 func (mr *ModuleResolver) CreateSingleFileModule(pkg ResolvedPackage, file string) ResolvedModule {
+	file = removingFilePrefix(file)
 	return ResolvedModule{
 		packageRef:   &pkg,
 		relativeName: ast.ModuleName(strings.ReplaceAll(strings.TrimSuffix(filepath.Base(file), ".lithia"), ".", "_")),
@@ -130,8 +148,8 @@ func (mr *ModuleResolver) ResolveModuleFromPackage(pkg ResolvedPackage, moduleNa
 				match = ResolvedPackage{
 					Name: packageName,
 					Path: packagePath,
-					manifest: &packageManifest{
-						path: manifestPath,
+					Manifest: &PackageManifest{
+						Path: manifestPath,
 					},
 				}
 			} else {
@@ -149,7 +167,7 @@ func (mr *ModuleResolver) resolveModuleWithinPackage(pkg ResolvedPackage, module
 		if len(files) > 0 {
 			return ResolvedModule{
 				packageRef: &pkg,
-				Path:       pkg.Path,
+				Path:       path.Join(pkg.Path, mr.defaultSrcDir),
 				Files:      files,
 			}, err
 		}
@@ -166,7 +184,7 @@ func (mr *ModuleResolver) resolveModuleWithinPackage(pkg ResolvedPackage, module
 	return ResolvedModule{
 		packageRef:   &pkg,
 		relativeName: ast.ModuleName(strings.Join(moduleParts, ".")),
-		Path:         pkg.Path,
+		Path:         modulePath,
 		Files:        files,
 	}, err
 }
@@ -181,4 +199,8 @@ func (mod ResolvedModule) AbsoluteModuleName() ast.ModuleName {
 	} else {
 		return ast.ModuleName(mod.packageRef.Name) + "." + mod.relativeName
 	}
+}
+
+func removingFilePrefix(str string) string {
+	return strings.TrimPrefix(str, "file://")
 }

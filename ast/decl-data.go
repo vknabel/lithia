@@ -1,6 +1,12 @@
 package ast
 
+import (
+	"fmt"
+	"strings"
+)
+
 var _ Decl = DeclData{}
+var _ Overviewable = DeclData{}
 
 type DeclData struct {
 	Name   Identifier
@@ -12,6 +18,17 @@ type DeclData struct {
 
 func (e DeclData) DeclName() Identifier {
 	return e.Name
+}
+
+func (e DeclData) DeclOverview() string {
+	if len(e.Fields) == 0 {
+		return fmt.Sprintf("data %s", e.Name)
+	}
+	fieldLines := make([]string, 0)
+	for _, field := range e.Fields {
+		fieldLines = append(fieldLines, "    "+field.DeclOverview())
+	}
+	return fmt.Sprintf("data %s {\n%s\n}", e.Name, strings.Join(fieldLines, "\n"))
 }
 
 func (e DeclData) Meta() *MetaDecl {

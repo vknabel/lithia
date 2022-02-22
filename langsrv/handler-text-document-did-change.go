@@ -7,6 +7,7 @@ import (
 )
 
 func textDocumentDidChange(context *glsp.Context, params *protocol.DidChangeTextDocumentParams) error {
+	mod := langserver.resolver.ResolvePackageAndModuleForReferenceFile(params.TextDocument.URI)
 	entry := langserver.documentCache.documents[params.TextDocument.URI]
 	text := entry.item.Text
 	for _, event := range params.ContentChanges {
@@ -19,7 +20,7 @@ func textDocumentDidChange(context *glsp.Context, params *protocol.DidChangeText
 	}
 	entry.item.Text = text
 	syntaxErrs := make([]parser.SyntaxError, 0)
-	fileParser, errs := entry.parser.Parse("default-module", string(params.TextDocument.URI), text)
+	fileParser, errs := entry.parser.Parse(mod.AbsoluteModuleName(), string(params.TextDocument.URI), text)
 	syntaxErrs = append(syntaxErrs, errs...)
 	sourceFile, errs := fileParser.ParseSourceFile()
 	syntaxErrs = append(syntaxErrs, errs...)
