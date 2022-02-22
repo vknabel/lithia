@@ -1,52 +1,24 @@
 package runtime
 
 import (
-	"fmt"
 	"os"
-	"path/filepath"
-	"strings"
 
 	"github.com/vknabel/lithia/ast"
 	"github.com/vknabel/lithia/parser"
+	"github.com/vknabel/lithia/resolution"
 )
 
 type Interpreter struct {
-	ImportRoots         []string
+	Resolver            resolution.ModuleResolver
 	Parser              *parser.Parser
 	Modules             map[ast.ModuleName]*RuntimeModule
 	ExternalDefinitions map[ast.ModuleName]ExternalDefinition
 	Prelude             *Environment
 }
 
-func defaultImportRootPaths() []string {
-	roots := []string{}
-	if path, ok := os.LookupEnv("LITHIA_LOCALS"); ok {
-		roots = append(roots, path)
-	}
-	if path, ok := os.LookupEnv("LITHIA_PACKAGES"); ok {
-		roots = append(roots, path)
-	}
-	if path, ok := os.LookupEnv("LITHIA_STDLIB"); ok {
-		roots = append(roots, path)
-	} else {
-		roots = append(roots, "/usr/local/opt/lithia/stdlib")
-	}
-	return roots
-}
-
-func NewInterpreter(importRoots ...string) *Interpreter {
-	importRoots = append(importRoots, defaultImportRootPaths()...)
-	absoluteImportRoots := make([]string, len(importRoots))
-	for i, root := range importRoots {
-		absolute, err := filepath.Abs(root)
-		if err == nil {
-			absoluteImportRoots[i] = absolute
-		} else {
-			absoluteImportRoots[i] = root
-		}
-	}
+func NewInterpreter(referenceFile string, importRoots ...string) *Interpreter {
 	inter := &Interpreter{
-		ImportRoots:         absoluteImportRoots,
+		Resolver:            resolution.DefaultModuleResolver(),
 		Parser:              parser.NewParser(),
 		Modules:             make(map[ast.ModuleName]*RuntimeModule),
 		ExternalDefinitions: make(map[ast.ModuleName]ExternalDefinition),
@@ -65,8 +37,9 @@ func (inter *Interpreter) LoadExternalDefinition(name ast.ModuleName, definition
 }
 
 func (inter *Interpreter) Interpret(fileName string, script string) (RuntimeValue, error) {
-	moduleName := ast.ModuleName(strings.ReplaceAll(filepath.Base(fileName), ".", "_"))
-	module := inter.NewModule(moduleName)
+	pkg := inter.Resolver.ResolvePackageForReferenceFile(fileName)
+	resolvedModule := inter.Resolver.CreateSingleFileModule(pkg, fileName)
+	module := inter.NewModule(resolvedModule)
 	ix, err := inter.LoadFileIntoModule(module, fileName, script)
 	if err != nil {
 		return nil, err
@@ -80,10 +53,12 @@ func (inter *Interpreter) Interpret(fileName string, script string) (RuntimeValu
 }
 
 func (inter *Interpreter) InterpretEmbed(fileName string, script string) (RuntimeValue, error) {
-	moduleName := ast.ModuleName(strings.ReplaceAll(filepath.Base(fileName), ".", "_"))
+	pkg := inter.Resolver.ResolvePackageForReferenceFile(fileName)
+	resolvedModule := inter.Resolver.CreateSingleFileModule(pkg, fileName)
+	moduleName := resolvedModule.AbsoluteModuleName()
 	module := inter.Modules[moduleName]
 	if module == nil {
-		module = inter.NewModule(moduleName)
+		module = inter.NewModule(resolvedModule)
 	}
 	ex, err := inter.EmbedFileIntoModule(module, fileName, script)
 	if err != nil {
@@ -150,37 +125,27 @@ func (inter *Interpreter) EmbedFileIntoModule(module *RuntimeModule, fileName st
 	return ex, nil
 }
 
-func (inter *Interpreter) LoadModuleIfNeeded(moduleName ast.ModuleName) (*RuntimeModule, error) {
+func (inter *Interpreter) LoadModuleIfNeeded(queryModuleName ast.ModuleName, fromResolvedModule resolution.ResolvedModule) (*RuntimeModule, error) {
+	resolvedModule, err := inter.Resolver.ResolveModuleFromPackage(fromResolvedModule.Package(), queryModuleName)
+	if err != nil {
+		return nil, err
+	}
+	moduleName := resolvedModule.AbsoluteModuleName()
 	if module, ok := inter.Modules[moduleName]; ok {
 		return module, nil
 	}
-	for _, root := range inter.ImportRoots {
-		relativeModulePath := strings.ReplaceAll(string(moduleName), ".", string(filepath.Separator))
-		modulePath := filepath.Join(root, relativeModulePath)
-		matches, err := filepath.Glob(filepath.Join(modulePath, "*.lithia"))
-		if err != nil {
-			continue
-		}
-		if len(matches) == 0 {
-			continue
-		}
-
-		module := inter.NewModule(moduleName)
-		contexts, err := inter.LoadFilesIntoModule(module, matches)
+	module := inter.NewModule(resolvedModule)
+	contexts, err := inter.LoadFilesIntoModule(module, resolvedModule.Files)
+	if err != nil {
+		return module, err
+	}
+	for _, context := range contexts {
+		_, err := context.Evaluate()
 		if err != nil {
 			return module, err
 		}
-
-		for _, context := range contexts {
-			_, err := context.Evaluate()
-			if err != nil {
-				return module, err
-			}
-		}
-
-		return module, nil
 	}
-	return nil, fmt.Errorf("module %s not found", moduleName)
+	return module, nil
 }
 
 func (inter *Interpreter) LoadFilesIntoModule(module *RuntimeModule, files []string) ([]InterpreterContext, error) {

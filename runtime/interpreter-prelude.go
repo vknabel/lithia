@@ -5,16 +5,17 @@ import (
 	"os"
 
 	"github.com/vknabel/lithia/ast"
+	"github.com/vknabel/lithia/resolution"
 )
 
-func (inter *Interpreter) NewPreludeEnvironment() *Environment {
+func (inter *Interpreter) NewPreludeEnvironment(resolvedModule resolution.ResolvedModule) *Environment {
 	if inter.Prelude != nil {
 		return inter.Prelude
 	}
 	env := NewEnvironment(nil)
 	inter.Prelude = env
 
-	module, err := inter.LoadModuleIfNeeded(ast.ModuleName("prelude"))
+	module, err := inter.LoadModuleIfNeeded(ast.ModuleName("prelude"), resolvedModule)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "error: prelude not loaded\n    %s\n", err)
 	}

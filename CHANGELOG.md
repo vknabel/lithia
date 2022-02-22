@@ -3,6 +3,9 @@
 ## v0.0.16-next
 
 - fix: undeclared enum case error due to file order within a module
+- compiler: new concept of packages containing modules, optionally marked by a `Potfile`
+- compiler: implicit `src` module for package imports if folder exists
+- compiler: `import package` imports the current package (imports `src` if folder exists)
 
 ## v0.0.15
 
