@@ -17,6 +17,7 @@ type ModuleResolver struct {
 	manifestName        string
 	manifestSearchPaths []string
 	defaultSrcDir       string
+	lithiaSourceGlob    string
 }
 
 func DefaultModuleResolver() ModuleResolver {
@@ -26,6 +27,7 @@ func DefaultModuleResolver() ModuleResolver {
 		manifestName:        "Potfile",
 		manifestSearchPaths: []string{".", "..", "../..", "../../..", "../../../.."},
 		defaultSrcDir:       "src",
+		lithiaSourceGlob:    "*.lithia",
 	}
 }
 
@@ -105,7 +107,7 @@ func (mr *ModuleResolver) ResolvePackageAndModuleForReferenceFile(referenceFile 
 		return mr.CreateSingleFileModule(pkg, referenceFile)
 	}
 	moduleFilepath := filepath.Dir(relativeFile)
-	moduleParts := filepath.SplitList(moduleFilepath)
+	moduleParts := strings.Split(moduleFilepath, string(filepath.Separator))
 	resolvedModule, err := mr.resolveModuleWithinPackage(pkg, moduleParts)
 	if err != nil {
 		return mr.CreateSingleFileModule(pkg, referenceFile)
@@ -163,7 +165,7 @@ func (mr *ModuleResolver) ResolveModuleFromPackage(pkg ResolvedPackage, moduleNa
 
 func (mr *ModuleResolver) resolveModuleWithinPackage(pkg ResolvedPackage, moduleParts []string) (ResolvedModule, error) {
 	if len(moduleParts) == 0 {
-		files, err := filepath.Glob(path.Join(pkg.Path, mr.defaultSrcDir, "*.lithia"))
+		files, err := filepath.Glob(path.Join(pkg.Path, mr.defaultSrcDir, mr.lithiaSourceGlob))
 		if len(files) > 0 {
 			return ResolvedModule{
 				packageRef: &pkg,
@@ -171,7 +173,7 @@ func (mr *ModuleResolver) resolveModuleWithinPackage(pkg ResolvedPackage, module
 				Files:      files,
 			}, err
 		}
-		files, err = filepath.Glob(path.Join(pkg.Path, "*.lithia"))
+		files, err = filepath.Glob(path.Join(pkg.Path, mr.lithiaSourceGlob))
 		return ResolvedModule{
 			packageRef: &pkg,
 			Path:       pkg.Path,
@@ -180,7 +182,7 @@ func (mr *ModuleResolver) resolveModuleWithinPackage(pkg ResolvedPackage, module
 	}
 	pathElems := append([]string{pkg.Path}, moduleParts...)
 	modulePath := path.Join(pathElems...)
-	files, err := filepath.Glob(path.Join(modulePath, "*.lithia"))
+	files, err := filepath.Glob(path.Join(modulePath, mr.lithiaSourceGlob))
 	return ResolvedModule{
 		packageRef:   &pkg,
 		relativeName: ast.ModuleName(strings.Join(moduleParts, ".")),

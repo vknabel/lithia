@@ -38,3 +38,13 @@ func (sf *SourceFile) AddExpr(expr Expr) {
 	}
 	sf.Statements = append(sf.Statements, expr)
 }
+
+func (sf *SourceFile) ExportedDeclarations() []Decl {
+	decls := make([]Decl, 0)
+	for _, decl := range sf.Declarations {
+		if decl.IsExportedDecl() {
+			decls = append(decls, decl)
+		}
+	}
+	return decls
+}
