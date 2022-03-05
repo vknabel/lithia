@@ -11,81 +11,69 @@ import (
 
 func textDocumentCompletion(context *glsp.Context, params *protocol.CompletionParams) (interface{}, error) {
 	rc := NewReqContextAtPosition(&params.TextDocumentPositionParams)
-	sourceFile := rc.textDocumentEntry.sourceFile
-	if sourceFile == nil {
-		return nil, nil
-	}
-	globalDeclarations := sourceFile.Declarations
-	for _, sameModuleFile := range rc.textDocumentEntry.module.Files {
-		fileUrl := "file://" + sameModuleFile
-		if rc.item.URI == fileUrl {
-			continue
-		}
-		docEntry := langserver.documentCache.documents[fileUrl]
-		if docEntry == nil || docEntry.sourceFile == nil {
-			continue
-		}
-
-		globalDeclarations = append(globalDeclarations, docEntry.sourceFile.ExportedDeclarations()...)
-	}
 
 	completionItems := []protocol.CompletionItem{}
-	for _, decl := range globalDeclarations {
-		insertText := insertTextForDecl(decl)
+	for _, imported := range rc.globalDeclarations(context) {
+		insertText := insertTextForImportedDecl(imported)
 		var detail string
-		if decl.Meta().ModuleName != "" {
-			detail = string(decl.Meta().ModuleName) +
+		if imported.decl.Meta().ModuleName != "" {
+			detail = string(imported.decl.Meta().ModuleName) +
 				"." +
-				string(decl.DeclName())
+				string(imported.decl.DeclName())
 		}
 		completionItems = append(completionItems, protocol.CompletionItem{
-			Label:         string(decl.DeclName()),
-			Kind:          completionItemKindForDecl(decl),
+			Label:         string(imported.decl.DeclName()),
+			Kind:          completionItemKindForDecl(imported.decl),
 			InsertText:    &insertText,
 			Detail:        &detail,
-			Documentation: documentationMarkupContentForDecl(decl),
+			Documentation: documentationMarkupContentForDecl(imported.decl),
 		})
 	}
 	return &completionItems, nil
 }
 
-func insertTextForDecl(decl ast.Decl) string {
-	switch decl := decl.(type) {
+func insertTextForImportedDecl(imported importedDecl) string {
+	var importPrefix string
+	if imported.importDecl != nil {
+		importPrefix = fmt.Sprintf("%s.", imported.importDecl.DeclName())
+	}
+
+	switch decl := imported.decl.(type) {
 	case ast.DeclFunc:
-		return insertTextForCallableDeclParams(decl, decl.Impl.Parameters)
+		return insertTextForCallableDeclParams(decl, importPrefix, decl.Impl.Parameters)
 	case ast.DeclExternFunc:
-		return insertTextForCallableDeclParams(decl, decl.Parameters)
+		return insertTextForCallableDeclParams(decl, importPrefix, decl.Parameters)
 	case ast.DeclData:
-		return insertTextForCallableDeclFields(decl, decl.Fields)
+		return insertTextForCallableDeclFields(decl, importPrefix, decl.Fields)
 	default:
 		return string(decl.DeclName())
 	}
 }
 
-func insertTextForCallableDeclParams(decl ast.Decl, parameters []ast.DeclParameter) string {
+func insertTextForCallableDeclParams(decl ast.Decl, importPrefix string, parameters []ast.DeclParameter) string {
 	paramNames := make([]string, len(parameters))
 	for i, param := range parameters {
 		paramNames[i] = string(param.DeclName())
 	}
-	return insertTextForCallableDecl(decl, paramNames)
+	return insertTextForCallableDecl(decl, importPrefix, paramNames)
 }
 
-func insertTextForCallableDeclFields(decl ast.Decl, fields []ast.DeclField) string {
+func insertTextForCallableDeclFields(decl ast.Decl, importPrefix string, fields []ast.DeclField) string {
 	fieldNames := make([]string, len(fields))
 	for i, param := range fields {
 		fieldNames[i] = string(param.DeclName())
 	}
-	return insertTextForCallableDecl(decl, fieldNames)
+	return insertTextForCallableDecl(decl, importPrefix, fieldNames)
 }
 
-func insertTextForCallableDecl(decl ast.Decl, parameters []string) string {
+func insertTextForCallableDecl(decl ast.Decl, importPrefix string, parameters []string) string {
 	if len(parameters) == 0 {
 		return string(decl.DeclName())
 	}
 	if len(parameters) == 1 {
-		return fmt.Sprintf("%s %s", decl.DeclName(), parameters[0])
+		return fmt.Sprintf("%s%s %s", importPrefix, decl.DeclName(), parameters[0])
 	}
-	return fmt.Sprintf("(%s %s)", decl.DeclName(), strings.Join(parameters, ", "))
+	return fmt.Sprintf("(%s%s %s)", importPrefix, decl.DeclName(), strings.Join(parameters, ", "))
 }
 
 func documentationMarkupContentForDecl(decl ast.Decl) *protocol.MarkupContent {

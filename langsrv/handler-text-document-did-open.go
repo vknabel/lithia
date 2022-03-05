@@ -1,10 +1,12 @@
 package langsrv
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/tliron/glsp"
 	protocol "github.com/tliron/glsp/protocol_3_16"
+	"github.com/vknabel/lithia/ast"
 	"github.com/vknabel/lithia/parser"
 	"github.com/vknabel/lithia/resolution"
 )
@@ -27,7 +29,8 @@ func textDocumentDidOpen(context *glsp.Context, params *protocol.DidOpenTextDocu
 		module:     mod,
 	}
 
-	publishSyntaxErrorDiagnostics(context, params.TextDocument.URI, uint32(params.TextDocument.Version), syntaxErrs)
+	analyzeErrs := analyzeErrorsForSourceFile(context, mod, *sourceFile)
+	publishSyntaxErrorDiagnostics(context, params.TextDocument.URI, uint32(params.TextDocument.Version), syntaxErrs, analyzeErrs)
 	return nil
 }
 
@@ -46,9 +49,11 @@ func openModuleTextDocumentsIfNeeded(context *glsp.Context, mod resolution.Resol
 		syntaxErrs := make([]parser.SyntaxError, 0)
 		bytes, err := os.ReadFile(filePath)
 		if err != nil {
+			langserver.server.Log.Errorf("failed to read %s, due %s", fileUri, err.Error())
 			continue
 		}
-		fileParser, errs := lithiaParser.Parse(mod.AbsoluteModuleName(), string(fileUri), string(bytes))
+		contents := string(bytes)
+		fileParser, errs := lithiaParser.Parse(mod.AbsoluteModuleName(), string(fileUri), contents)
 		syntaxErrs = append(syntaxErrs, errs...)
 		sourceFile, errs := fileParser.ParseSourceFile()
 		syntaxErrs = append(syntaxErrs, errs...)
@@ -60,6 +65,27 @@ func openModuleTextDocumentsIfNeeded(context *glsp.Context, mod resolution.Resol
 			module:     mod,
 		}
 
-		publishSyntaxErrorDiagnosticsForFile(context, fileUri, syntaxErrs)
+		analyzeErrs := analyzeErrorsForSourceFile(context, mod, *sourceFile)
+		publishSyntaxErrorDiagnosticsForFile(context, fileUri, syntaxErrs, analyzeErrs)
 	}
+}
+
+func analyzeErrorsForSourceFile(context *glsp.Context, mod resolution.ResolvedModule, sourceFile ast.SourceFile) []analyzeError {
+	analyzeErrs := make([]analyzeError, 0)
+	for _, decl := range sourceFile.Declarations {
+		if _, ok := decl.(ast.DeclImport); !ok {
+			continue
+		}
+		importDecl := decl.(ast.DeclImport)
+		resolvedModule, err := langserver.resolver.ResolveModuleFromPackage(mod.Package(), importDecl.ModuleName)
+		if err != nil {
+			analyzeErrs = append(
+				analyzeErrs,
+				newAnalyzeErrorAtLocation("error", fmt.Sprintf("module %s not found", importDecl.ModuleName), importDecl.Meta().Source),
+			)
+		} else {
+			openModuleTextDocumentsIfNeeded(context, resolvedModule)
+		}
+	}
+	return analyzeErrs
 }

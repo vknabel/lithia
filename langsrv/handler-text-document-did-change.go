@@ -26,6 +26,8 @@ func textDocumentDidChange(context *glsp.Context, params *protocol.DidChangeText
 	syntaxErrs = append(syntaxErrs, errs...)
 	langserver.documentCache.documents[params.TextDocument.URI].fileParser = fileParser
 	langserver.documentCache.documents[params.TextDocument.URI].sourceFile = sourceFile
-	publishSyntaxErrorDiagnostics(context, params.TextDocument.URI, uint32(params.TextDocument.Version), syntaxErrs)
+
+	analyzeErrs := analyzeErrorsForSourceFile(context, mod, *sourceFile)
+	publishSyntaxErrorDiagnostics(context, params.TextDocument.URI, uint32(params.TextDocument.Version), syntaxErrs, analyzeErrs)
 	return nil
 }
