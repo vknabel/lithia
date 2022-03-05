@@ -10,7 +10,7 @@ import (
 )
 
 func textDocumentSemanticTokensFull(context *glsp.Context, params *protocol.SemanticTokensParams) (*protocol.SemanticTokens, error) {
-	entry := langserver.documentCache.documents[params.TextDocument.URI]
+	entry := ls.documentCache.documents[params.TextDocument.URI]
 	if entry == nil {
 		return nil, nil
 	}

@@ -13,7 +13,7 @@ import (
 
 func textDocumentDidOpen(context *glsp.Context, params *protocol.DidOpenTextDocumentParams) error {
 	lithiaParser := parser.NewParser()
-	mod := langserver.resolver.ResolvePackageAndModuleForReferenceFile(params.TextDocument.URI)
+	mod := ls.resolver.ResolvePackageAndModuleForReferenceFile(params.TextDocument.URI)
 	openModuleTextDocumentsIfNeeded(context, mod)
 
 	syntaxErrs := make([]parser.SyntaxError, 0)
@@ -21,7 +21,7 @@ func textDocumentDidOpen(context *glsp.Context, params *protocol.DidOpenTextDocu
 	syntaxErrs = append(syntaxErrs, errs...)
 	sourceFile, errs := fileParser.ParseSourceFile()
 	syntaxErrs = append(syntaxErrs, errs...)
-	langserver.documentCache.documents[params.TextDocument.URI] = &textDocumentEntry{
+	ls.documentCache.documents[params.TextDocument.URI] = &textDocumentEntry{
 		item:       params.TextDocument,
 		parser:     lithiaParser,
 		fileParser: fileParser,
@@ -41,7 +41,7 @@ func openModuleTextDocumentsIfNeeded(context *glsp.Context, mod resolution.Resol
 	}
 	for _, filePath := range fileNames {
 		fileUri := "file://" + filePath
-		if langserver.documentCache.documents[fileUri] != nil {
+		if ls.documentCache.documents[fileUri] != nil {
 			continue
 		}
 		lithiaParser := parser.NewParser()
@@ -49,7 +49,7 @@ func openModuleTextDocumentsIfNeeded(context *glsp.Context, mod resolution.Resol
 		syntaxErrs := make([]parser.SyntaxError, 0)
 		bytes, err := os.ReadFile(filePath)
 		if err != nil {
-			langserver.server.Log.Errorf("failed to read %s, due %s", fileUri, err.Error())
+			ls.server.Log.Errorf("failed to read %s, due %s", fileUri, err.Error())
 			continue
 		}
 		contents := string(bytes)
@@ -58,7 +58,7 @@ func openModuleTextDocumentsIfNeeded(context *glsp.Context, mod resolution.Resol
 		sourceFile, errs := fileParser.ParseSourceFile()
 		syntaxErrs = append(syntaxErrs, errs...)
 
-		langserver.documentCache.documents[fileUri] = &textDocumentEntry{
+		ls.documentCache.documents[fileUri] = &textDocumentEntry{
 			parser:     lithiaParser,
 			fileParser: fileParser,
 			sourceFile: sourceFile,
@@ -77,7 +77,7 @@ func analyzeErrorsForSourceFile(context *glsp.Context, mod resolution.ResolvedMo
 			continue
 		}
 		importDecl := decl.(ast.DeclImport)
-		resolvedModule, err := langserver.resolver.ResolveModuleFromPackage(mod.Package(), importDecl.ModuleName)
+		resolvedModule, err := ls.resolver.ResolveModuleFromPackage(mod.Package(), importDecl.ModuleName)
 		if err != nil {
 			analyzeErrs = append(
 				analyzeErrs,

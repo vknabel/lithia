@@ -17,7 +17,7 @@ type ReqContext struct {
 func NewReqContext(textDocument protocol.TextDocumentIdentifier) *ReqContext {
 	return &ReqContext{
 		textDocument:      textDocument,
-		textDocumentEntry: *langserver.documentCache.documents[textDocument.URI],
+		textDocumentEntry: *ls.documentCache.documents[textDocument.URI],
 	}
 }
 
@@ -25,7 +25,7 @@ func NewReqContextAtPosition(position *protocol.TextDocumentPositionParams) *Req
 	return &ReqContext{
 		textDocument:      position.TextDocument,
 		position:          position.Position,
-		textDocumentEntry: *langserver.documentCache.documents[position.TextDocument.URI],
+		textDocumentEntry: *ls.documentCache.documents[position.TextDocument.URI],
 	}
 }
 
@@ -77,7 +77,7 @@ func (rc *ReqContext) moduleDeclarations() []ast.Decl {
 		if rc.item.URI == fileUrl {
 			continue
 		}
-		docEntry := langserver.documentCache.documents[fileUrl]
+		docEntry := ls.documentCache.documents[fileUrl]
 		if docEntry == nil || docEntry.sourceFile == nil {
 			continue
 		}
@@ -100,19 +100,19 @@ func (rc *ReqContext) importedDeclarations(context *glsp.Context) []importedDecl
 
 	globals := make([]importedDecl, 0)
 
-	resolvedPrelude, err := langserver.resolver.ResolveModuleFromPackage(rc.textDocumentEntry.module.Package(), "prelude")
+	resolvedPrelude, err := ls.resolver.ResolveModuleFromPackage(rc.textDocumentEntry.module.Package(), "prelude")
 	if err != nil {
-		langserver.server.Log.Error(err.Error())
+		ls.server.Log.Error(err.Error())
 	} else {
 		openModuleTextDocumentsIfNeeded(context, resolvedPrelude)
 	}
 
 	for _, sameModuleFile := range resolvedPrelude.Files {
 		fileUri := "file://" + sameModuleFile
-		if langserver.documentCache.documents[fileUri] == nil {
+		if ls.documentCache.documents[fileUri] == nil {
 			continue
 		}
-		entry := langserver.documentCache.documents[fileUri]
+		entry := ls.documentCache.documents[fileUri]
 		if entry.sourceFile == nil {
 			continue
 		}
@@ -126,19 +126,19 @@ func (rc *ReqContext) importedDeclarations(context *glsp.Context) []importedDecl
 			continue
 		}
 		importDecl := decl.(ast.DeclImport)
-		resolvedModule, err := langserver.resolver.ResolveModuleFromPackage(rc.textDocumentEntry.module.Package(), importDecl.ModuleName)
+		resolvedModule, err := ls.resolver.ResolveModuleFromPackage(rc.textDocumentEntry.module.Package(), importDecl.ModuleName)
 		if err != nil {
-			langserver.server.Log.Error(err.Error())
+			ls.server.Log.Error(err.Error())
 		} else {
 			openModuleTextDocumentsIfNeeded(context, resolvedModule)
 		}
 
 		for _, sameModuleFile := range resolvedModule.Files {
 			fileUri := "file://" + sameModuleFile
-			if langserver.documentCache.documents[fileUri] == nil {
+			if ls.documentCache.documents[fileUri] == nil {
 				continue
 			}
-			entry := langserver.documentCache.documents[fileUri]
+			entry := ls.documentCache.documents[fileUri]
 			if entry.sourceFile == nil {
 				continue
 			}

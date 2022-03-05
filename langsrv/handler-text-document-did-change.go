@@ -7,8 +7,8 @@ import (
 )
 
 func textDocumentDidChange(context *glsp.Context, params *protocol.DidChangeTextDocumentParams) error {
-	mod := langserver.resolver.ResolvePackageAndModuleForReferenceFile(params.TextDocument.URI)
-	entry := langserver.documentCache.documents[params.TextDocument.URI]
+	mod := ls.resolver.ResolvePackageAndModuleForReferenceFile(params.TextDocument.URI)
+	entry := ls.documentCache.documents[params.TextDocument.URI]
 	text := entry.item.Text
 	for _, event := range params.ContentChanges {
 		switch e := event.(type) {
@@ -24,8 +24,8 @@ func textDocumentDidChange(context *glsp.Context, params *protocol.DidChangeText
 	syntaxErrs = append(syntaxErrs, errs...)
 	sourceFile, errs := fileParser.ParseSourceFile()
 	syntaxErrs = append(syntaxErrs, errs...)
-	langserver.documentCache.documents[params.TextDocument.URI].fileParser = fileParser
-	langserver.documentCache.documents[params.TextDocument.URI].sourceFile = sourceFile
+	ls.documentCache.documents[params.TextDocument.URI].fileParser = fileParser
+	ls.documentCache.documents[params.TextDocument.URI].sourceFile = sourceFile
 
 	analyzeErrs := analyzeErrorsForSourceFile(context, mod, *sourceFile)
 	publishSyntaxErrorDiagnostics(context, params.TextDocument.URI, uint32(params.TextDocument.Version), syntaxErrs, analyzeErrs)

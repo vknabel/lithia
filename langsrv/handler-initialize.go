@@ -34,11 +34,11 @@ func initialize(context *glsp.Context, params *protocol.InitializeParams) (inter
 		for i, workspace := range params.WorkspaceFolders {
 			workspaceRoots[i] = workspace.URI
 		}
-		langserver.setWorkspaceRoots(workspaceRoots...)
+		ls.setWorkspaceRoots(workspaceRoots...)
 	} else if params.RootURI != nil {
-		langserver.setWorkspaceRoots(*params.RootURI)
+		ls.setWorkspaceRoots(*params.RootURI)
 	} else if params.RootPath != nil {
-		langserver.setWorkspaceRoots(*params.RootPath)
+		ls.setWorkspaceRoots(*params.RootPath)
 	}
 
 	return protocol.InitializeResult{

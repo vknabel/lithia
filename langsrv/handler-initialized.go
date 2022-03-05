@@ -10,14 +10,14 @@ import (
 )
 
 func initialized(context *glsp.Context, params *protocol.InitializedParams) error {
-	for _, root := range langserver.workspaceRoots {
+	for _, root := range ls.workspaceRoots {
 		matches, err := filepath.Glob(path.Join(strings.TrimPrefix("file://", root), "*/*.lithia"))
 		if err != nil {
-			langserver.server.Log.Errorf("package detection failed, due %s", err)
+			ls.server.Log.Errorf("package detection failed, due %s", err)
 			continue
 		}
 		for _, match := range matches {
-			mod := langserver.resolver.ResolvePackageAndModuleForReferenceFile(match)
+			mod := ls.resolver.ResolvePackageAndModuleForReferenceFile(match)
 			openModuleTextDocumentsIfNeeded(context, mod)
 		}
 	}
