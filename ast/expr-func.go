@@ -32,3 +32,19 @@ func (e *ExprFunc) AddDecl(decl Decl) {
 func (e *ExprFunc) AddExpr(expr Expr) {
 	e.Expressions = append(e.Expressions, expr)
 }
+
+func (e ExprFunc) EnumerateNestedDecls(enumerate func(interface{}, []Decl)) {
+	enumeratedDecls := make([]Decl, len(e.Parameters)+len(e.Declarations))
+	for i, param := range e.Parameters {
+		enumeratedDecls[i] = param
+	}
+	for i, decl := range e.Declarations {
+		decl.EnumerateNestedDecls(enumerate)
+		enumeratedDecls[len(e.Parameters)+i] = decl
+	}
+	enumerate(e, enumeratedDecls)
+
+	for _, expr := range e.Expressions {
+		expr.EnumerateNestedDecls(enumerate)
+	}
+}

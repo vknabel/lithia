@@ -53,3 +53,7 @@ func MakeDeclField(name Identifier, params []DeclParameter, source *Source) *Dec
 func (decl DeclField) ProvidedDocs() *Docs {
 	return decl.Docs
 }
+
+func (DeclField) EnumerateNestedDecls(enumerate func(interface{}, []Decl)) {
+	// no nested decls
+}

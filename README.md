@@ -26,7 +26,7 @@ Currently Lithia is an early proof of concept. Basic language features exist, bu
 - [x] Creating a custom language server
 - [x] ... with diagnostics
 - [x] ... with syntax highlighting
-- [ ] ... with auto completion _proof of concept_
+- [x] ... with auto completion _basic_
 - [ ] ... with highlights
 - [ ] ... with refactorings
 - [ ] ... with formatter
@@ -264,9 +264,26 @@ As shown, a common use case is to pass the module itself instead of multiple wit
 
 ### Module resolution
 
-Lithia will search for a folder containing source files at the following locations:
+To create your own package of modules, you can create a `Potfile`. Every module defined by the package is a directory next to the Potfile, with `.lithia` files in it.
 
-- when executing a file, relative to it
+Though there are a few special cases:
+
+- the `cmd`-folder is typically used for individual files rather than a module. You execute them with `$ lithia cmd/<file>`.
+- the `src`-folder represents the `root` of the package.
+- if the `src`-folder is missing, the package `root` is next to the Potfile.
+
+```
+.
+├── Potfile
+├── cmd
+│   ├── main.lithia
+│   └── test.lithia
+└── src
+    └── greet.lithia
+```
+
+If there aren't any matching local modules, Lithia will search for a package containing source files at the following locations:
+
 - when in REPL, inside the current working directory
 - at `$LITHIA_LOCALS` if set
 - at `$LITHIA_PACKAGES` if set

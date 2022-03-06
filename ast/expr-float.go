@@ -11,3 +11,7 @@ type ExprFloat struct {
 func (e ExprFloat) Meta() *MetaExpr {
 	return e.MetaInfo
 }
+
+func (e ExprFloat) EnumerateNestedDecls(enumerate func(interface{}, []Decl)) {
+	// no nested decls
+}

@@ -55,3 +55,7 @@ func (e *DeclExternType) AddField(decl DeclField) {
 func (decl DeclExternType) ProvidedDocs() *Docs {
 	return decl.Docs
 }
+
+func (DeclExternType) EnumerateNestedDecls(enumerate func(interface{}, []Decl)) {
+	// no nested decls
+}

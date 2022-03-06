@@ -35,3 +35,7 @@ func MakeDeclModule(internalName Identifier, source *Source) *DeclModule {
 func (decl DeclModule) ProvidedDocs() *Docs {
 	return decl.Docs
 }
+
+func (DeclModule) EnumerateNestedDecls(enumerate func(interface{}, []Decl)) {
+	// no nested decls
+}

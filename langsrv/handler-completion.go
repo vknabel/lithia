@@ -13,7 +13,7 @@ func textDocumentCompletion(context *glsp.Context, params *protocol.CompletionPa
 	rc := NewReqContextAtPosition(&params.TextDocumentPositionParams)
 
 	completionItems := []protocol.CompletionItem{}
-	for _, imported := range rc.globalDeclarations(context) {
+	for _, imported := range rc.accessibleDeclarations(context) {
 		insertText := insertTextForImportedDecl(imported)
 		var detail string
 		if imported.decl.Meta().ModuleName != "" {
@@ -21,8 +21,12 @@ func textDocumentCompletion(context *glsp.Context, params *protocol.CompletionPa
 				"." +
 				string(imported.decl.DeclName())
 		}
+		var importPrefix string
+		if imported.importDecl != nil {
+			importPrefix = fmt.Sprintf("%s.", imported.importDecl.DeclName())
+		}
 		completionItems = append(completionItems, protocol.CompletionItem{
-			Label:         string(imported.decl.DeclName()),
+			Label:         importPrefix + string(imported.decl.DeclName()),
 			Kind:          completionItemKindForDecl(imported.decl),
 			InsertText:    &insertText,
 			Detail:        &detail,

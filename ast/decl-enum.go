@@ -69,3 +69,7 @@ func (e DeclEnum) String() string {
 func (decl DeclEnum) ProvidedDocs() *Docs {
 	return decl.Docs
 }
+
+func (decl DeclEnum) EnumerateNestedDecls(enumerate func(interface{}, []Decl)) {
+	// no nested decls - will be handled by the parser
+}

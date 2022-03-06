@@ -43,3 +43,7 @@ func MakeDeclImport(name ModuleName, source *Source) *DeclImport {
 		MetaInfo:   &MetaDecl{source},
 	}
 }
+
+func (DeclImport) EnumerateNestedDecls(enumerate func(interface{}, []Decl)) {
+	// no nested decls
+}

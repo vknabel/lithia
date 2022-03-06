@@ -48,3 +48,12 @@ func (sf *SourceFile) ExportedDeclarations() []Decl {
 	}
 	return decls
 }
+
+func (sf SourceFile) EnumerateNestedDecls(enumerate func(interface{}, []Decl)) {
+	for _, decl := range sf.Declarations {
+		decl.EnumerateNestedDecls(enumerate)
+	}
+	for _, stmt := range sf.Statements {
+		stmt.EnumerateNestedDecls(enumerate)
+	}
+}

@@ -18,3 +18,7 @@ func MakeExprGroup(expr Expr, source *Source) *ExprGroup {
 		MetaInfo: &MetaExpr{Source: source},
 	}
 }
+
+func (e ExprGroup) EnumerateNestedDecls(enumerate func(interface{}, []Decl)) {
+	e.Expr.EnumerateNestedDecls(enumerate)
+}

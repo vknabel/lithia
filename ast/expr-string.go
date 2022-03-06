@@ -20,3 +20,7 @@ func MakeExprString(literal string, source *Source) *ExprString {
 		},
 	}
 }
+
+func (e ExprString) EnumerateNestedDecls(enumerate func(interface{}, []Decl)) {
+	// no nested decls
+}

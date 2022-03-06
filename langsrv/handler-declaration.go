@@ -13,7 +13,7 @@ func textDocumentDeclaration(context *glsp.Context, params *protocol.Declaration
 		return nil, nil
 	}
 
-	for _, imported := range rc.globalDeclarations(context) {
+	for _, imported := range rc.accessibleDeclarations(context) {
 		if string(imported.decl.DeclName()) != token || imported.decl.Meta().Source == nil {
 			continue
 		}

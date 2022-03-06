@@ -53,7 +53,34 @@ func (rc *ReqContext) findNode() (*sitter.Node, error) {
 	return node, nil
 }
 
-func (rc *ReqContext) globalDeclarations(context *glsp.Context) []importedDecl {
+func (rc *ReqContext) accessibleDeclarations(context *glsp.Context) []importedDecl {
+	importedDecls := rc.globalAndModuleDeclarations(context)
+	for _, local := range rc.localDeclarations(context) {
+		importedDecls = append(importedDecls, importedDecl{local, rc.module, nil})
+	}
+	return importedDecls
+}
+
+func (rc *ReqContext) localDeclarations(context *glsp.Context) []ast.Decl {
+	if rc.sourceFile == nil {
+		return nil
+	}
+	decls := make([]ast.Decl, 0)
+	rc.sourceFile.EnumerateNestedDecls(func(at interface{}, locals []ast.Decl) {
+		var source *ast.Source
+		if decl, ok := at.(ast.Decl); ok {
+			source = decl.Meta().Source
+		} else if expr, ok := at.(ast.Expr); ok {
+			source = expr.Meta().Source
+		}
+		if includesAstSourcePosition(source, rc.position) {
+			decls = append(decls, locals...)
+		}
+	})
+	return decls
+}
+
+func (rc *ReqContext) globalAndModuleDeclarations(context *glsp.Context) []importedDecl {
 	if rc.sourceFile == nil {
 		return nil
 	}

@@ -50,3 +50,7 @@ func MakeDeclExternFunc(name Identifier, params []DeclParameter, source *Source)
 func (decl DeclExternFunc) ProvidedDocs() *Docs {
 	return decl.Docs
 }
+
+func (DeclExternFunc) EnumerateNestedDecls(enumerate func(interface{}, []Decl)) {
+	// no nested decls
+}

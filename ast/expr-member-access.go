@@ -22,3 +22,7 @@ func MakeExprMemberAccess(target Expr, accessPath []Identifier, source *Source) 
 		},
 	}
 }
+
+func (e ExprMemberAccess) EnumerateNestedDecls(enumerate func(interface{}, []Decl)) {
+	e.Target.EnumerateNestedDecls(enumerate)
+}

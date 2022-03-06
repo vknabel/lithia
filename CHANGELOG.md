@@ -8,6 +8,7 @@
 - compiler: `import root` imports the current package (imports `src` if folder exists)
 - lsp: improved autocompletion and hover information
 - lsp: autocompletion and hover information across module and file boundaries
+- lsp: local autocompletion #30
 
 ## v0.0.15
 

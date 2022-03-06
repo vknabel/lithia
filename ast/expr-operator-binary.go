@@ -24,3 +24,8 @@ func MakeExprOperatorBinary(operator OperatorBinary, left, right Expr, source *S
 		},
 	}
 }
+
+func (e ExprOperatorBinary) EnumerateNestedDecls(enumerate func(interface{}, []Decl)) {
+	e.Left.EnumerateNestedDecls(enumerate)
+	e.Right.EnumerateNestedDecls(enumerate)
+}

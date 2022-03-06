@@ -40,3 +40,7 @@ func MakeDeclConstant(name Identifier, value Expr, source *Source) *DeclConstant
 func (e DeclConstant) ProvidedDocs() *Docs {
 	return e.Docs
 }
+
+func (e DeclConstant) EnumerateNestedDecls(enumerate func(interface{}, []Decl)) {
+	e.Value.EnumerateNestedDecls(enumerate)
+}

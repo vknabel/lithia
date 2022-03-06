@@ -20,3 +20,7 @@ func MakeExprInt(literal int64, source *Source) *ExprInt {
 		},
 	}
 }
+
+func (e ExprInt) EnumerateNestedDecls(enumerate func(interface{}, []Decl)) {
+	// no nested decls
+}
