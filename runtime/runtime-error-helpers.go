@@ -59,6 +59,18 @@ func ReportBinaryOperatorOnlySupportsType(operator string, supportedTypes []Runt
 		gotValue.String(),
 	)
 }
+func ReportUnatyOperatorOnlySupportsType(operator string, supportedTypes []RuntimeTypeRef, gotValue RuntimeValue) *RuntimeError {
+	supportedTypesNames := []string{}
+	for _, supported := range supportedTypes {
+		supportedTypesNames = append(supportedTypesNames, string(supported.Name))
+	}
+	return NewTypeErrorf(
+		"unary operator %q only supports %s; value given: %q",
+		operator,
+		strings.Join(supportedTypesNames, ", "),
+		gotValue.String(),
+	)
+}
 
 func ReportNonExhaustiveTypeSwitch(
 	enumDecl PreludeEnumDecl,

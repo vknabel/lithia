@@ -49,7 +49,8 @@ func textDocumentSemanticTokensFull(context *glsp.Context, params *protocol.Sema
 	(unary_expression operator: (["!"]) @operator)
 	
 	(parameter_list (identifier) @variable.parameter)
-	(number_literal) @constant.numeric
+	(int_literal) @constant.numeric
+	(float_literal) @constant.numeric
 	(comment) @comment
 	(function_declaration name: (identifier) @function)
 	(let_declaration name: (identifier) @variable)

@@ -64,8 +64,15 @@ func (fp *FileParser) ParseExpressionIfGiven() (ast.Expr, []SyntaxError) {
 		} else {
 			return expr, errs
 		}
-	case TYPE_NODE_NUMBER_LITERAL:
+	case TYPE_NODE_INT_LITERAL:
 		expr, errs := fp.ParseIntExpr()
+		if expr == nil {
+			return nil, errs
+		} else {
+			return expr, errs
+		}
+	case TYPE_NODE_FLOAT_LITERAL:
+		expr, errs := fp.ParseFloatExpr()
 		if expr == nil {
 			return nil, errs
 		} else {

@@ -166,7 +166,16 @@ func (e EvaluatableExpr) EvaluateExprOperatorBinary(expr ast.ExprOperatorBinary)
 }
 
 func (e EvaluatableExpr) EvaluateExprOperatorUnary(expr ast.ExprOperatorUnary) (RuntimeValue, *RuntimeError) {
-	panic("unary expressions https://github.com/vknabel/lithia/issues/22")
+	impl, err := e.Context.unaryOperatorFunction(string(expr.Operator))
+	if err != nil {
+		return nil, err.CascadeCall(nil, expr)
+	}
+	eval := MakeEvaluatableExpr(e.Context, expr.Expr)
+	result, err := impl(eval)
+	if err != nil {
+		return nil, err.CascadeCall(nil, expr)
+	}
+	return result, nil
 }
 
 func (e EvaluatableExpr) EvaluateExprString(expr ast.ExprString) (RuntimeValue, *RuntimeError) {

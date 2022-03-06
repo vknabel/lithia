@@ -2,6 +2,9 @@
 
 ## v0.0.17-next
 
+- stdlib: Float-support! #24
+- stdlib: `!` operator #22
+
 ## v0.0.16
 
 - fix: undeclared enum case error due to file order within a module

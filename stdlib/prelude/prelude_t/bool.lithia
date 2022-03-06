@@ -7,6 +7,11 @@ test "binary || operator", { fail =>
     unless True || True, fail "(True || True) == True"
 }
 
+test "unary ! operator", { fail =>
+    when !True, fail "!True == False"
+    unless !False, fail "!False == True"
+}
+
 test "binary && operator", { fail =>
     when False && False, fail "(False && False) == False"
     when True && False, fail "(True && False) == False"
