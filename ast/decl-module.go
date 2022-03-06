@@ -1,6 +1,9 @@
 package ast
 
+import "fmt"
+
 var _ Decl = DeclModule{}
+var _ Overviewable = DeclModule{}
 
 type DeclModule struct {
 	Name Identifier
@@ -11,6 +14,10 @@ type DeclModule struct {
 
 func (e DeclModule) DeclName() Identifier {
 	return e.Name
+}
+
+func (e DeclModule) DeclOverview() string {
+	return fmt.Sprintf("module %s", e.Name)
 }
 
 func (e DeclModule) Meta() *MetaDecl {
@@ -27,4 +34,8 @@ func MakeDeclModule(internalName Identifier, source *Source) *DeclModule {
 
 func (decl DeclModule) ProvidedDocs() *Docs {
 	return decl.Docs
+}
+
+func (DeclModule) EnumerateNestedDecls(enumerate func(interface{}, []Decl)) {
+	// no nested decls
 }

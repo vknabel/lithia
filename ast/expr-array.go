@@ -20,3 +20,9 @@ func MakeExprArray(elements []Expr, source *Source) *ExprArray {
 		},
 	}
 }
+
+func (e ExprArray) EnumerateNestedDecls(enumerate func(interface{}, []Decl)) {
+	for _, el := range e.Elements {
+		el.EnumerateNestedDecls(enumerate)
+	}
+}

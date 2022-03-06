@@ -3,6 +3,7 @@ package langsrv
 import (
 	sitter "github.com/smacker/go-tree-sitter"
 	protocol "github.com/tliron/glsp/protocol_3_16"
+	"github.com/vknabel/lithia/ast"
 )
 
 func NodeAtPosition(node *sitter.Node, position protocol.Position) *sitter.Node {
@@ -50,6 +51,27 @@ func includesNodePosition(node *sitter.Node, position protocol.Position) bool {
 	startCol := uint32(node.StartPoint().Column)
 	endRow := uint32(node.EndPoint().Row)
 	endCol := uint32(node.EndPoint().Column)
+
+	if startRow <= position.Line && endRow >= position.Line {
+		if startRow == position.Line && startCol > position.Character {
+			return false
+		}
+		if endRow == position.Line && endCol < position.Character {
+			return false
+		}
+		return true
+	}
+	return false
+}
+
+func includesAstSourcePosition(source *ast.Source, position protocol.Position) bool {
+	if source == nil {
+		return false
+	}
+	startRow := uint32(source.Start.Line)
+	startCol := uint32(source.Start.Column)
+	endRow := uint32(source.End.Line)
+	endCol := uint32(source.End.Column)
 
 	if startRow <= position.Line && endRow >= position.Line {
 		if startRow == position.Line && startCol > position.Character {

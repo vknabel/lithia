@@ -1,0 +1,5 @@
+import tests
+
+test "example", { fail =>
+    unless True, fail "True is False and False is True 🤯"
+}

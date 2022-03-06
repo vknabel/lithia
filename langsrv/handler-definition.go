@@ -7,15 +7,14 @@ import (
 
 func textDocumentDefinition(context *glsp.Context, params *protocol.DefinitionParams) (interface{}, error) {
 	rc := NewReqContextAtPosition(&params.TextDocumentPositionParams)
-	sourceFile, err := rc.parseSourceFile()
-	if err != nil && sourceFile == nil {
-		return nil, nil
-	}
+
 	token, _, err := rc.findToken()
 	if err != nil && token == "" {
 		return nil, nil
 	}
-	for _, decl := range sourceFile.Declarations {
+
+	for _, imported := range rc.accessibleDeclarations(context) {
+		decl := imported.decl
 		if string(decl.DeclName()) != token || decl.Meta().Source == nil {
 			continue
 		}

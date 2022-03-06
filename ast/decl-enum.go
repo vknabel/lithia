@@ -1,8 +1,12 @@
 package ast
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 var _ Decl = DeclEnum{}
+var _ Overviewable = DeclEnum{}
 
 type DeclEnum struct {
 	Name  Identifier
@@ -14,6 +18,17 @@ type DeclEnum struct {
 
 func (e DeclEnum) DeclName() Identifier {
 	return e.Name
+}
+
+func (e DeclEnum) DeclOverview() string {
+	if len(e.Cases) == 0 {
+		return fmt.Sprintf("enum %s", e.Name)
+	}
+	caseLines := make([]string, 0)
+	for _, cs := range e.Cases {
+		caseLines = append(caseLines, "    "+string(cs.Name))
+	}
+	return fmt.Sprintf("enum %s {\n%s\n}", e.Name, strings.Join(caseLines, "\n"))
 }
 
 func (e DeclEnum) Meta() *MetaDecl {
@@ -53,4 +68,8 @@ func (e DeclEnum) String() string {
 
 func (decl DeclEnum) ProvidedDocs() *Docs {
 	return decl.Docs
+}
+
+func (decl DeclEnum) EnumerateNestedDecls(enumerate func(interface{}, []Decl)) {
+	// no nested decls - will be handled by the parser
 }

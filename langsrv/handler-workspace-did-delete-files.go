@@ -12,7 +12,7 @@ func workspaceDidDeleteFiles(context *glsp.Context, params *protocol.DeleteFiles
 			Version:     nil,
 			Diagnostics: []protocol.Diagnostic{},
 		})
-		delete(langserver.documentCache.documents, deleted.URI)
+		delete(ls.documentCache.documents, deleted.URI)
 	}
 	return nil
 }

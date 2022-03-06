@@ -7,7 +7,8 @@ import (
 )
 
 func textDocumentDidChange(context *glsp.Context, params *protocol.DidChangeTextDocumentParams) error {
-	entry := langserver.documentCache.documents[params.TextDocument.URI]
+	mod := ls.resolver.ResolvePackageAndModuleForReferenceFile(params.TextDocument.URI)
+	entry := ls.documentCache.documents[params.TextDocument.URI]
 	text := entry.item.Text
 	for _, event := range params.ContentChanges {
 		switch e := event.(type) {
@@ -19,12 +20,14 @@ func textDocumentDidChange(context *glsp.Context, params *protocol.DidChangeText
 	}
 	entry.item.Text = text
 	syntaxErrs := make([]parser.SyntaxError, 0)
-	fileParser, errs := entry.parser.Parse("default-module", string(params.TextDocument.URI), text)
+	fileParser, errs := entry.parser.Parse(mod.AbsoluteModuleName(), string(params.TextDocument.URI), text)
 	syntaxErrs = append(syntaxErrs, errs...)
 	sourceFile, errs := fileParser.ParseSourceFile()
 	syntaxErrs = append(syntaxErrs, errs...)
-	langserver.documentCache.documents[params.TextDocument.URI].fileParser = fileParser
-	langserver.documentCache.documents[params.TextDocument.URI].sourceFile = sourceFile
-	publishSyntaxErrorDiagnostics(context, params.TextDocument.URI, uint32(params.TextDocument.Version), syntaxErrs)
+	ls.documentCache.documents[params.TextDocument.URI].fileParser = fileParser
+	ls.documentCache.documents[params.TextDocument.URI].sourceFile = sourceFile
+
+	analyzeErrs := analyzeErrorsForSourceFile(context, mod, *sourceFile)
+	publishSyntaxErrorDiagnostics(context, params.TextDocument.URI, uint32(params.TextDocument.Version), syntaxErrs, analyzeErrs)
 	return nil
 }

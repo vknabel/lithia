@@ -39,14 +39,14 @@ func MakeRuntimeValueDecl(context *InterpreterContext, decl ast.Decl) (Evaluatab
 	case ast.DeclModule:
 		return NewConstantRuntimeValue(PreludeModule{Module: context.module}), nil
 	case ast.DeclImport:
-		module, err := context.interpreter.LoadModuleIfNeeded(decl.ModuleName)
+		module, err := context.interpreter.LoadModuleIfNeeded(decl.ModuleName, context.module.resolved)
 		if err != nil {
 			return nil, NewRuntimeError(err).CascadeDecl(decl)
 		}
 		return NewConstantRuntimeValue(PreludeModule{Module: module}), nil
 	case ast.DeclImportMember:
 		return NewLazyRuntimeValue(func() (RuntimeValue, *RuntimeError) {
-			module, err := context.interpreter.LoadModuleIfNeeded(decl.ModuleName)
+			module, err := context.interpreter.LoadModuleIfNeeded(decl.ModuleName, context.module.resolved)
 			if err != nil {
 				return nil, NewRuntimeError(err).CascadeDecl(decl)
 			}

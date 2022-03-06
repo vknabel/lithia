@@ -1,59 +1,32 @@
 package langsrv
 
 import (
-	"io/ioutil"
-	"net/url"
-	"strings"
-
 	sitter "github.com/smacker/go-tree-sitter"
+	"github.com/tliron/glsp"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 	"github.com/vknabel/lithia/ast"
-	"github.com/vknabel/lithia/parser"
+	"github.com/vknabel/lithia/resolution"
 )
 
 type ReqContext struct {
 	textDocument protocol.TextDocumentIdentifier
 	position     protocol.Position
-	parser       *parser.Parser
-
-	contents   string
-	token      string
-	fileParser *parser.FileParser
-	sourceFile *ast.SourceFile
+	textDocumentEntry
 }
 
 func NewReqContext(textDocument protocol.TextDocumentIdentifier) *ReqContext {
 	return &ReqContext{
-		textDocument: textDocument,
-		parser:       parser.NewParser(),
+		textDocument:      textDocument,
+		textDocumentEntry: *ls.documentCache.documents[textDocument.URI],
 	}
 }
 
 func NewReqContextAtPosition(position *protocol.TextDocumentPositionParams) *ReqContext {
 	return &ReqContext{
-		textDocument: position.TextDocument,
-		position:     position.Position,
-		parser:       parser.NewParser(),
+		textDocument:      position.TextDocument,
+		position:          position.Position,
+		textDocumentEntry: *ls.documentCache.documents[position.TextDocument.URI],
 	}
-}
-
-func (rc *ReqContext) readFile() (string, error) {
-	if rc.contents != "" {
-		return rc.contents, nil
-	}
-	enEscapeUrl, _ := url.QueryUnescape(string(rc.textDocument.URI))
-	var data []byte
-	var err error
-	if strings.HasPrefix(enEscapeUrl, "file://") {
-		data, err = ioutil.ReadFile(enEscapeUrl[7:])
-	} else {
-		data, err = ioutil.ReadFile(enEscapeUrl)
-	}
-	if err != nil {
-		return "", err
-	}
-	rc.contents = string(data)
-	return rc.contents, nil
 }
 
 func (rc *ReqContext) findToken() (string, *protocol.Range, error) {
@@ -61,7 +34,8 @@ func (rc *ReqContext) findToken() (string, *protocol.Range, error) {
 	if err != nil || node == nil {
 		return "", nil, err
 	}
-	name := node.Content([]byte(rc.contents))
+	contents := rc.textDocumentEntry.item.Text
+	name := node.Content([]byte(contents))
 	return name, &protocol.Range{
 		Start: protocol.Position{
 			Line:      uint32(node.StartPoint().Row),
@@ -74,44 +48,131 @@ func (rc *ReqContext) findToken() (string, *protocol.Range, error) {
 	}, nil
 }
 
-func (rc *ReqContext) createFileParser() (*parser.FileParser, error) {
-	if rc.fileParser != nil {
-		return rc.fileParser, nil
-	}
-	contents, err := rc.readFile()
-	if err != nil {
-		return nil, err
-	}
-	fileParser, errs := rc.parser.Parse("default-module", string(rc.textDocument.URI), contents)
-	if len(errs) > 0 {
-		return nil, parser.NewGroupedSyntaxError(errs)
-	}
-	rc.fileParser = fileParser
-	return rc.fileParser, nil
-}
-
-func (rc *ReqContext) parseSourceFile() (*ast.SourceFile, error) {
-	if rc.sourceFile != nil {
-		return rc.sourceFile, nil
-	}
-	fileParser, err := rc.createFileParser()
-	if err != nil {
-		return nil, err
-	}
-
-	sourceFile, errs := fileParser.ParseSourceFile()
-	if len(errs) > 0 {
-		return nil, parser.NewGroupedSyntaxError(errs)
-	}
-	rc.sourceFile = sourceFile
-	return rc.sourceFile, nil
-}
-
 func (rc *ReqContext) findNode() (*sitter.Node, error) {
-	_, err := rc.parseSourceFile()
-	if err != nil {
-		return nil, err
-	}
 	node := NodeAtPosition(rc.fileParser.Tree.RootNode(), rc.position)
 	return node, nil
+}
+
+func (rc *ReqContext) accessibleDeclarations(context *glsp.Context) []importedDecl {
+	importedDecls := rc.globalAndModuleDeclarations(context)
+	for _, local := range rc.localDeclarations(context) {
+		importedDecls = append(importedDecls, importedDecl{local, rc.module, nil})
+	}
+	return importedDecls
+}
+
+func (rc *ReqContext) localDeclarations(context *glsp.Context) []ast.Decl {
+	if rc.sourceFile == nil {
+		return nil
+	}
+	decls := make([]ast.Decl, 0)
+	rc.sourceFile.EnumerateNestedDecls(func(at interface{}, locals []ast.Decl) {
+		var source *ast.Source
+		if decl, ok := at.(ast.Decl); ok {
+			source = decl.Meta().Source
+		} else if expr, ok := at.(ast.Expr); ok {
+			source = expr.Meta().Source
+		}
+		if includesAstSourcePosition(source, rc.position) {
+			decls = append(decls, locals...)
+		}
+	})
+	return decls
+}
+
+func (rc *ReqContext) globalAndModuleDeclarations(context *glsp.Context) []importedDecl {
+	if rc.sourceFile == nil {
+		return nil
+	}
+
+	globals := make([]importedDecl, 0)
+	for _, moduleDecl := range rc.moduleDeclarations() {
+		globals = append(globals, importedDecl{decl: moduleDecl, module: rc.textDocumentEntry.module, importDecl: nil})
+	}
+	globals = append(globals, rc.importedDeclarations(context)...)
+
+	return globals
+}
+
+func (rc *ReqContext) moduleDeclarations() []ast.Decl {
+	if rc.sourceFile == nil {
+		return nil
+	}
+	globalDeclarations := rc.sourceFile.Declarations
+	for _, sameModuleFile := range rc.textDocumentEntry.module.Files {
+		fileUrl := "file://" + sameModuleFile
+		if rc.item.URI == fileUrl {
+			continue
+		}
+		docEntry := ls.documentCache.documents[fileUrl]
+		if docEntry == nil || docEntry.sourceFile == nil {
+			continue
+		}
+
+		globalDeclarations = append(globalDeclarations, docEntry.sourceFile.ExportedDeclarations()...)
+	}
+	return globalDeclarations
+}
+
+type importedDecl struct {
+	decl       ast.Decl
+	module     resolution.ResolvedModule
+	importDecl *ast.DeclImport
+}
+
+func (rc *ReqContext) importedDeclarations(context *glsp.Context) []importedDecl {
+	if rc.sourceFile == nil {
+		return nil
+	}
+
+	globals := make([]importedDecl, 0)
+
+	resolvedPrelude, err := ls.resolver.ResolveModuleFromPackage(rc.textDocumentEntry.module.Package(), "prelude")
+	if err != nil {
+		ls.server.Log.Error(err.Error())
+	} else {
+		openModuleTextDocumentsIfNeeded(context, resolvedPrelude)
+	}
+
+	for _, sameModuleFile := range resolvedPrelude.Files {
+		fileUri := "file://" + sameModuleFile
+		if ls.documentCache.documents[fileUri] == nil {
+			continue
+		}
+		entry := ls.documentCache.documents[fileUri]
+		if entry.sourceFile == nil {
+			continue
+		}
+		for _, decl := range entry.sourceFile.ExportedDeclarations() {
+			globals = append(globals, importedDecl{decl, resolvedPrelude, nil})
+		}
+	}
+
+	for _, decl := range rc.sourceFile.Declarations {
+		if _, ok := decl.(ast.DeclImport); !ok {
+			continue
+		}
+		importDecl := decl.(ast.DeclImport)
+		resolvedModule, err := ls.resolver.ResolveModuleFromPackage(rc.textDocumentEntry.module.Package(), importDecl.ModuleName)
+		if err != nil {
+			ls.server.Log.Error(err.Error())
+		} else {
+			openModuleTextDocumentsIfNeeded(context, resolvedModule)
+		}
+
+		for _, sameModuleFile := range resolvedModule.Files {
+			fileUri := "file://" + sameModuleFile
+			if ls.documentCache.documents[fileUri] == nil {
+				continue
+			}
+			entry := ls.documentCache.documents[fileUri]
+			if entry.sourceFile == nil {
+				continue
+			}
+			for _, decl := range entry.sourceFile.ExportedDeclarations() {
+				globals = append(globals, importedDecl{decl, resolvedModule, &importDecl})
+			}
+		}
+	}
+	return globals
 }

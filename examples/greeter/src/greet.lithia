@@ -1,0 +1,5 @@
+import strings
+
+func greet { name =>
+    print strings.concat ["Hello ", name, "!"]
+}

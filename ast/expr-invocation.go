@@ -23,3 +23,11 @@ func MakeExprInvocation(function Expr, source *Source) *ExprInvocation {
 func (e *ExprInvocation) AddArgument(argument Expr) {
 	e.Arguments = append(e.Arguments, &argument)
 }
+
+func (e ExprInvocation) EnumerateNestedDecls(enumerate func(interface{}, []Decl)) {
+	e.Function.EnumerateNestedDecls(enumerate)
+
+	for _, arg := range e.Arguments {
+		(*arg).EnumerateNestedDecls(enumerate)
+	}
+}

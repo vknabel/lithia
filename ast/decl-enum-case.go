@@ -31,3 +31,7 @@ func MakeDeclEnumCase(name Identifier) *DeclEnumCase {
 func (decl DeclEnumCase) ProvidedDocs() *Docs {
 	return decl.Docs
 }
+
+func (DeclEnumCase) EnumerateNestedDecls(enumerate func(interface{}, []Decl)) {
+	// no nested decls
+}

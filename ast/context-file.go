@@ -38,3 +38,22 @@ func (sf *SourceFile) AddExpr(expr Expr) {
 	}
 	sf.Statements = append(sf.Statements, expr)
 }
+
+func (sf *SourceFile) ExportedDeclarations() []Decl {
+	decls := make([]Decl, 0)
+	for _, decl := range sf.Declarations {
+		if decl.IsExportedDecl() {
+			decls = append(decls, decl)
+		}
+	}
+	return decls
+}
+
+func (sf SourceFile) EnumerateNestedDecls(enumerate func(interface{}, []Decl)) {
+	for _, decl := range sf.Declarations {
+		decl.EnumerateNestedDecls(enumerate)
+	}
+	for _, stmt := range sf.Statements {
+		stmt.EnumerateNestedDecls(enumerate)
+	}
+}

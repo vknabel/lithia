@@ -1,0 +1,3 @@
+import pot.cmds
+
+cmds.run "test", "cmd/test.lithia"

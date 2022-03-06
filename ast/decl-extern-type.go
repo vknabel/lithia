@@ -1,6 +1,12 @@
 package ast
 
+import (
+	"fmt"
+	"strings"
+)
+
 var _ Decl = DeclExternType{}
+var _ Overviewable = DeclExternType{}
 
 type DeclExternType struct {
 	Name   Identifier
@@ -12,6 +18,17 @@ type DeclExternType struct {
 
 func (e DeclExternType) DeclName() Identifier {
 	return e.Name
+}
+
+func (e DeclExternType) DeclOverview() string {
+	if len(e.Fields) == 0 {
+		return fmt.Sprintf("extern %s", e.Name)
+	}
+	fieldLines := make([]string, 0)
+	for _, field := range e.Fields {
+		fieldLines = append(fieldLines, "    "+field.DeclOverview())
+	}
+	return fmt.Sprintf("extern %s {\n%s\n}", e.Name, strings.Join(fieldLines, "\n"))
 }
 
 func (e DeclExternType) Meta() *MetaDecl {
@@ -37,4 +54,8 @@ func (e *DeclExternType) AddField(decl DeclField) {
 
 func (decl DeclExternType) ProvidedDocs() *Docs {
 	return decl.Docs
+}
+
+func (DeclExternType) EnumerateNestedDecls(enumerate func(interface{}, []Decl)) {
+	// no nested decls
 }

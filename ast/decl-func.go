@@ -1,6 +1,12 @@
 package ast
 
+import (
+	"fmt"
+	"strings"
+)
+
 var _ Decl = DeclFunc{}
+var _ Overviewable = DeclFunc{}
 
 type DeclFunc struct {
 	Name Identifier
@@ -12,6 +18,17 @@ type DeclFunc struct {
 
 func (e DeclFunc) DeclName() Identifier {
 	return e.Name
+}
+
+func (e DeclFunc) DeclOverview() string {
+	if len(e.Impl.Parameters) == 0 {
+		return fmt.Sprintf("func %s { => }", e.Name)
+	}
+	paramNames := make([]string, len(e.Impl.Parameters))
+	for i, param := range e.Impl.Parameters {
+		paramNames[i] = string(param.Name)
+	}
+	return fmt.Sprintf("func %s { %s => }", e.Name, strings.Join(paramNames, ", "))
 }
 
 func (e DeclFunc) Meta() *MetaDecl {
@@ -34,4 +51,8 @@ func MakeDeclFunc(name Identifier, impl *ExprFunc, source *Source) *DeclFunc {
 
 func (decl DeclFunc) ProvidedDocs() *Docs {
 	return decl.Docs
+}
+
+func (decl DeclFunc) EnumerateNestedDecls(enumerate func(interface{}, []Decl)) {
+	decl.Impl.EnumerateNestedDecls(enumerate)
 }

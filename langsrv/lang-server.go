@@ -5,21 +5,28 @@ import (
 	protocol "github.com/tliron/glsp/protocol_3_16"
 	"github.com/tliron/glsp/server"
 	"github.com/tliron/kutil/logging"
+	"github.com/vknabel/lithia/info"
+	"github.com/vknabel/lithia/resolution"
 
 	_ "github.com/tliron/kutil/logging/simple"
 )
 
 var lsName = "lithia"
-var debug = true
+var debug = info.Debug
 var handler protocol.Handler
 
 type lithiaLangserver struct {
-	server        *server.Server
-	documentCache *documentCache
+	resolver resolution.ModuleResolver
+
+	server         *server.Server
+	documentCache  *documentCache
+	workspaceRoots []string
 }
 
-var langserver lithiaLangserver = lithiaLangserver{
-	documentCache: &documentCache{documents: make(map[protocol.URI]*textDocumentEntry)},
+var ls lithiaLangserver = lithiaLangserver{
+	resolver:       resolution.DefaultModuleResolver(),
+	documentCache:  &documentCache{documents: make(map[protocol.URI]*textDocumentEntry)},
+	workspaceRoots: []string{},
 }
 
 func init() {
@@ -48,21 +55,25 @@ func init() {
 }
 
 func RunStdio() error {
-	langserver.server = server.NewServer(&handler, lsName, debug)
-	return langserver.server.RunStdio()
+	ls.server = server.NewServer(&handler, lsName, debug)
+	return ls.server.RunStdio()
 }
 
 func RunIPC() error {
-	langserver.server = server.NewServer(&handler, lsName, debug)
-	return langserver.server.RunNodeJs()
+	ls.server = server.NewServer(&handler, lsName, debug)
+	return ls.server.RunNodeJs()
 }
 
 func RunSocket(address string) error {
-	langserver.server = server.NewServer(&handler, lsName, debug)
-	return langserver.server.RunWebSocket(address)
+	ls.server = server.NewServer(&handler, lsName, debug)
+	return ls.server.RunWebSocket(address)
 }
 
 func RunTCP(address string) error {
-	langserver.server = server.NewServer(&handler, lsName, debug)
-	return langserver.server.RunTCP(address)
+	ls.server = server.NewServer(&handler, lsName, debug)
+	return ls.server.RunTCP(address)
+}
+
+func (ls *lithiaLangserver) setWorkspaceRoots(roots ...string) {
+	ls.workspaceRoots = roots
 }

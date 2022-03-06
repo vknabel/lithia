@@ -20,3 +20,7 @@ func MakeExprIdentifier(name Identifier, source *Source) *ExprIdentifier {
 		},
 	}
 }
+
+func (e ExprIdentifier) EnumerateNestedDecls(enumerate func(interface{}, []Decl)) {
+	// no nested decls
+}

@@ -3,6 +3,12 @@
 ## v0.0.16-next
 
 - fix: undeclared enum case error due to file order within a module
+- compiler: new concept of packages containing modules, optionally marked by a `Potfile`
+- compiler: implicit `src` module for package imports if folder exists
+- compiler: `import root` imports the current package (imports `src` if folder exists)
+- lsp: improved autocompletion and hover information
+- lsp: autocompletion and hover information across module and file boundaries
+- lsp: local autocompletion #30
 
 ## v0.0.15
 
