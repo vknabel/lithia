@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.0.16-next
+## v0.0.16
 
 - fix: undeclared enum case error due to file order within a module
 - compiler: new concept of packages containing modules, optionally marked by a `Potfile`
