@@ -93,6 +93,7 @@ dockers:
       - langsrv
       - parser
       - reporting
+      - resolution
       - runtime
       - stdlib
       - go.mod
