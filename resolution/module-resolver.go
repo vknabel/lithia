@@ -20,9 +20,9 @@ type ModuleResolver struct {
 	lithiaSourceGlob    string
 }
 
-func DefaultModuleResolver() ModuleResolver {
+func DefaultModuleResolver(importRoots ...string) ModuleResolver {
 	return ModuleResolver{
-		externalImportRoots: defaultImportRoots(),
+		externalImportRoots: defaultImportRoots(importRoots...),
 		defaultPackageName:  "root",
 		manifestName:        "Potfile",
 		manifestSearchPaths: []string{".", "..", "../..", "../../..", "../../../.."},
@@ -52,8 +52,8 @@ type PackageManifest struct {
 	Path string
 }
 
-func defaultImportRoots() []string {
-	roots := []string{}
+func defaultImportRoots(importRoots ...string) []string {
+	roots := importRoots
 	if path, ok := os.LookupEnv("LITHIA_LOCALS"); ok {
 		roots = append(roots, path)
 	}

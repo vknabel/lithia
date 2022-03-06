@@ -18,7 +18,7 @@ type Interpreter struct {
 
 func NewInterpreter(referenceFile string, importRoots ...string) *Interpreter {
 	inter := &Interpreter{
-		Resolver:            resolution.DefaultModuleResolver(),
+		Resolver:            resolution.DefaultModuleResolver(importRoots...),
 		Parser:              parser.NewParser(),
 		Modules:             make(map[ast.ModuleName]*RuntimeModule),
 		ExternalDefinitions: make(map[ast.ModuleName]ExternalDefinition),
