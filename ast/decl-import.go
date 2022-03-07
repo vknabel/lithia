@@ -9,6 +9,7 @@ var _ Decl = DeclImport{}
 var _ Overviewable = DeclImport{}
 
 type DeclImport struct {
+	Alias      Identifier
 	ModuleName ModuleName
 	Members    []DeclImportMember
 
@@ -16,8 +17,7 @@ type DeclImport struct {
 }
 
 func (e DeclImport) DeclName() Identifier {
-	segments := strings.Split(string(e.ModuleName), ".")
-	return Identifier(segments[len(segments)-1])
+	return e.Alias
 }
 
 func (e DeclImport) DeclOverview() string {
@@ -37,7 +37,19 @@ func (e *DeclImport) AddMember(member DeclImportMember) {
 }
 
 func MakeDeclImport(name ModuleName, source *Source) *DeclImport {
+	segments := strings.Split(string(name), ".")
+	alias := Identifier(segments[len(segments)-1])
 	return &DeclImport{
+		Alias:      alias,
+		ModuleName: name,
+		Members:    make([]DeclImportMember, 0),
+		MetaInfo:   &MetaDecl{source},
+	}
+}
+
+func MakeDeclAliasImport(alias Identifier, name ModuleName, source *Source) *DeclImport {
+	return &DeclImport{
+		Alias:      alias,
 		ModuleName: name,
 		Members:    make([]DeclImportMember, 0),
 		MetaInfo:   &MetaDecl{source},

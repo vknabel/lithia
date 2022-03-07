@@ -9,6 +9,7 @@ Will always be imported implicitly.
 - _enum_ [Bool](#Bool)
 - _extern_ [Char](#Char)
 - _data_ [Cons](#Cons)
+- _extern_ [Dict](#Dict)
 - _data_ [False](#False)
 - _extern_ [Float](#Float)
 - _extern_ [Function](#Function)
@@ -20,6 +21,7 @@ Will always be imported implicitly.
 - _data_ [Nil](#Nil)
 - _data_ [None](#None)
 - _enum_ [Optional](#Optional)
+- _data_ [Pair](#Pair)
 - _data_ [Some](#Some)
 - _extern_ [String](#String)
 - _data_ [True](#True)
@@ -65,6 +67,24 @@ _data_ Represents a non-empty List.
 - `head` - The first element
 - `tail` - The remaining list.
 @type List
+
+## Dict
+
+_extern_
+Stores values for given String-keys.
+As dicts are immutable, all changing operations return new copies.
+
+### Properties
+
+- `length` - The count of all key-value-pairs.
+- `get key` - Returns Some value for a specific key or None.
+- `set key, value` - Creates a copy Dict, which includes the given key-value-pair.
+The current Dict stays at it is.
+- `delete key` - Creates a copy Dict, which includes no value for the given key.
+The current Dict stays at it is.
+- `entries` - A List of all entries as Pair.
+- `keys` - A List of all keys.
+- `values` - A List of all values.
 
 ## False
 
@@ -146,6 +166,15 @@ An optional value. Either some value or none.
 
 - [Some](#Some)
 - [None](#None)
+
+## Pair
+
+_data_ A pair of values.
+
+### Properties
+
+- `key` - The associated key.
+- `value` - The associated value.
 
 ## Some
 

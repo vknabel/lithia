@@ -45,3 +45,18 @@ func (env *Environment) MakeEagerList(slice []RuntimeValue) (DataRuntimeValue, *
 		})
 	}
 }
+
+func (env *Environment) MakeSome(value Evaluatable) (DataRuntimeValue, *RuntimeError) {
+	return env.MakeDataRuntimeValue("Some", map[string]Evaluatable{
+		"value": value,
+	})
+}
+func (env *Environment) MakeNone() (DataRuntimeValue, *RuntimeError) {
+	return env.MakeEmptyDataRuntimeValue("None")
+}
+func (env *Environment) MakePair(key Evaluatable, value Evaluatable) (DataRuntimeValue, *RuntimeError) {
+	return env.MakeDataRuntimeValue("Pair", map[string]Evaluatable{
+		"key":   key,
+		"value": value,
+	})
+}

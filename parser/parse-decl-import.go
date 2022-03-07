@@ -8,6 +8,7 @@ import (
 
 func (fp *FileParser) ParseImportDeclaration() (*ast.DeclImport, []SyntaxError) {
 	importModuleNode := fp.Node.ChildByFieldName("name")
+	aliasNode := fp.Node.ChildByFieldName("alias")
 	membersNode := fp.Node.ChildByFieldName("members")
 	var membersCount int
 	if membersNode == nil {
@@ -21,7 +22,13 @@ func (fp *FileParser) ParseImportDeclaration() (*ast.DeclImport, []SyntaxError) 
 		modulePath = append(modulePath, importModuleNode.NamedChild(i).Content(fp.Source))
 	}
 	moduleName := ast.ModuleName(strings.Join(modulePath, "."))
-	importDecl := ast.MakeDeclImport(moduleName, fp.AstSource())
+
+	var importDecl *ast.DeclImport
+	if aliasNode == nil {
+		importDecl = ast.MakeDeclImport(moduleName, fp.AstSource())
+	} else {
+		importDecl = ast.MakeDeclAliasImport(ast.Identifier(aliasNode.Content(fp.Source)), moduleName, fp.AstSource())
+	}
 
 	for i := 0; i < membersCount; i++ {
 		child := membersNode.NamedChild(i)

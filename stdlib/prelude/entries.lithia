@@ -1,0 +1,7 @@
+/// A pair of values.
+data Pair {
+    /// The associated key.
+    key
+    /// The associated value.
+    value
+}

@@ -41,6 +41,8 @@ func (e EvaluatableExpr) Evaluate() (RuntimeValue, *RuntimeError) {
 		switch expr := e.Expr.(type) {
 		case *ast.ExprArray:
 			return e.EvaluateExprArray(*expr)
+		case *ast.ExprDict:
+			return e.EvaluateExprDict(*expr)
 		case *ast.ExprFloat:
 			return e.EvaluateExprFloat(*expr)
 		case *ast.ExprFunc:
@@ -78,6 +80,22 @@ func (e EvaluatableExpr) EvaluateExprArray(expr ast.ExprArray) (RuntimeValue, *R
 	}
 	list, err := e.Context.environment.MakeList(evaluatables)
 	return list, err.CascadeExpr(expr)
+}
+
+func (e EvaluatableExpr) EvaluateExprDict(expr ast.ExprDict) (RuntimeValue, *RuntimeError) {
+	rawDict := make(map[PreludeString]Evaluatable)
+	for _, entry := range expr.Entries {
+		keyValue, err := MakeEvaluatableExpr(e.Context, entry.Key).Evaluate()
+		if err != nil {
+			return nil, err.CascadeExpr(expr)
+		}
+		if key, ok := keyValue.(PreludeString); ok {
+			rawDict[key] = MakeEvaluatableExpr(e.Context, entry.Value)
+		} else {
+			return nil, NewRuntimeErrorf("dict key must be a string, got %s", keyValue).CascadeExpr(expr)
+		}
+	}
+	return MakePreludeDict(e.Context, rawDict), nil
 }
 
 func (e EvaluatableExpr) EvaluateExprFloat(expr ast.ExprFloat) (RuntimeValue, *RuntimeError) {

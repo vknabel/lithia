@@ -27,6 +27,8 @@ var (
 	TYPE_NODE_INT_LITERAL                   = "int_literal"
 	TYPE_NODE_FLOAT_LITERAL                 = "float_literal"
 	TYPE_NODE_ARRAY_LITERAL                 = "array_literal"
+	TYPE_NODE_DICT_LITERAL                  = "dict_literal"
+	TYPE_NODE_DICT_ENTRY                    = "dict_entry"
 	TYPE_NODE_FUNCTION_LITERAL              = "function_literal"
 	TYPE_NODE_PARAMETER_LIST                = "parameter_list"
 	TYPE_NODE_IDENTIFIER                    = "identifier"

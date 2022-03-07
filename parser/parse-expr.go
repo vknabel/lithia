@@ -85,6 +85,13 @@ func (fp *FileParser) ParseExpressionIfGiven() (ast.Expr, []SyntaxError) {
 		} else {
 			return expr, errs
 		}
+	case TYPE_NODE_DICT_LITERAL:
+		expr, errs := fp.ParseExprDict()
+		if expr == nil {
+			return nil, errs
+		} else {
+			return expr, errs
+		}
 	case TYPE_NODE_FUNCTION_LITERAL:
 		expr, errs := fp.ParseFunctionExpr(fmt.Sprintf("func#%d", fp.CountFunction()))
 		if expr == nil {

@@ -33,3 +33,24 @@ extern Function {
 extern Module
 /// Any value that exists.
 extern Any
+
+/// Stores values for given String-keys.
+/// As dicts are immutable, all changing operations return new copies.
+extern Dict {
+    /// The count of all key-value-pairs.
+    length
+    /// Returns Some value for a specific key or None.
+    get key
+    /// Creates a copy Dict, which includes the given key-value-pair.
+    /// The current Dict stays at it is.
+    set key, value
+    /// Creates a copy Dict, which includes no value for the given key.
+    /// The current Dict stays at it is.
+    delete key
+    /// A List of all entries as Pair.
+    entries
+    /// A List of all keys.
+    keys
+    /// A List of all values.
+    values
+}

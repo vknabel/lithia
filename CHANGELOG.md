@@ -2,6 +2,10 @@
 
 ## v0.0.17-next
 
+- compiler: alias imports `import alias = module.name` #32
+- compiler: dictionary literals `[:]` and `["a": "b"]` #9
+- stdlib: new type `prelude.Dict` #9
+- stdlib: new type `prelude.Pair`
 - stdlib: Float-support! #24
 - stdlib: `!` operator #22
 

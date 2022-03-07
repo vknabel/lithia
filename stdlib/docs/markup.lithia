@@ -54,7 +54,7 @@ func docsToMarkup { =>
                         markup.i "data",
                         d.docs,
                     ],
-                ]
+                ],
                 properties,
             ]
         },

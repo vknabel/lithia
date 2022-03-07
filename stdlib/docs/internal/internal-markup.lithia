@@ -26,8 +26,8 @@ func moduleMemberDocsToMarkup { =>
         FunctionDocs: { d =>
             markup.inline [
                 markup.i "func",
-                (markup.ref d.name, d.name)
-                (strings.join ", ", d.params)
+                (markup.ref d.name, d.name),
+                (strings.join ", ", d.params),
             ]
         },
         ConstantDocs: { d =>
@@ -45,7 +45,7 @@ func moduleMemberDocsToMarkup { =>
         ExternFunctionDocs: { d =>
             markup.inline [
                 markup.i "extern",
-                (markup.ref d.name, d.name)
+                (markup.ref d.name, d.name),
                 (strings.join ", ", d.params)
             ]
         },

@@ -79,6 +79,59 @@ test "lists.replicate", { fail =>
     when (lists.replicate 2, 42) != [42, 42], fail "two elements"
 }
 
+test "dict length", { fail =>
+    unless [:].length == 0, fail "[:] length 0"
+    unless ["a": "b"].length == 1, fail "[a: b] length 1"
+    unless ["a": "b", "c": "d"].length == 2, fail "[a: b, c: d] length 2"
+}
+
+test "dict get", { fail =>
+    let user = [
+        "username": "vknabel",
+    ]
+    unless (user.get "username") == (Some "vknabel"), fail "found returns Some value"
+    unless (user.get "notfound") == None, fail "not found returns None"
+}
+
+test "dict set", { fail =>
+    let user = [
+        "username": "vknabel",
+    ]
+    let changed = user.set "username", "@vknabel"
+    unless (user.get "username") == (Some "vknabel"), fail "does not change original"
+    unless (changed.get "username") == (Some "@vknabel"), fail "updates copy"
+    unless changed != user, fail "both dicts are not equal"
+}
+
+test "dict delete", { fail =>
+    let user = [
+        "username": "vknabel",
+        "id": 123
+    ]
+    let changed = user.delete "id"
+    unless (user.get "id") == (Some 123), fail "does not change original"
+    unless (changed.get "id") == None, fail "updates copy"
+    unless changed != user, fail "both dicts are not equal"
+}
+
+test "dict keys", { fail =>
+    let user = [
+        "username": "vknabel",
+        "id": 123
+    ]
+    unless user.keys == ["username", "id"] ||
+        user.keys == ["id", "username"], fail "must list all keys"
+}
+
+test "dict values", { fail =>
+    let user = [
+        "username": "vknabel",
+        "id": 123
+    ]
+    unless user.values == ["vknabel", 123] ||
+        user.values == [123, "vknabel"], fail "must list all values"
+}
+
 func main { =>
     print "main not implemented."
     print "to run tests, set LITHIA_TESTS=1"

@@ -39,6 +39,15 @@ func (e ExternalPrelude) Lookup(name string, env *Environment, decl ast.Decl) (R
 		} else {
 			return nil, false
 		}
+	case "Dict":
+		if externDecl, ok := decl.(ast.DeclExternType); ok {
+			return PreludePrimitiveExternType{&externDecl, func(value RuntimeValue) (bool, *RuntimeError) {
+				_, ok := value.(PreludeDict)
+				return ok, nil
+			}}, true
+		} else {
+			return nil, false
+		}
 	case "Char":
 		if externDecl, ok := decl.(ast.DeclExternType); ok {
 			return PreludePrimitiveExternType{&externDecl, func(value RuntimeValue) (bool, *RuntimeError) {
