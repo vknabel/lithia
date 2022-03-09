@@ -89,6 +89,7 @@ dockers:
     extra_files:
       - app
       - ast
+      - external
       - info
       - langsrv
       - parser
@@ -98,3 +99,4 @@ dockers:
       - stdlib
       - go.mod
       - go.sum
+      - lithia.go
