@@ -14,71 +14,71 @@ func (e ExternalPrelude) Lookup(name string, env *Environment, decl ast.Decl) (R
 	switch name {
 	case "Int":
 		if externDecl, ok := decl.(ast.DeclExternType); ok {
-			return PreludePrimitiveExternType{&externDecl, func(value RuntimeValue) (bool, *RuntimeError) {
+			return MakePrimitiveExternType(externDecl, func(value RuntimeValue) (bool, *RuntimeError) {
 				_, ok := value.(PreludeInt)
 				return ok, nil
-			}}, true
+			}), true
 		} else {
 			return nil, false
 		}
 	case "Float":
 		if externDecl, ok := decl.(ast.DeclExternType); ok {
-			return PreludePrimitiveExternType{&externDecl, func(value RuntimeValue) (bool, *RuntimeError) {
+			return MakePrimitiveExternType(externDecl, func(value RuntimeValue) (bool, *RuntimeError) {
 				_, ok := value.(PreludeFloat)
 				return ok, nil
-			}}, true
+			}), true
 		} else {
 			return nil, false
 		}
 	case "String":
 		if externDecl, ok := decl.(ast.DeclExternType); ok {
-			return PreludePrimitiveExternType{&externDecl, func(value RuntimeValue) (bool, *RuntimeError) {
+			return MakePrimitiveExternType(externDecl, func(value RuntimeValue) (bool, *RuntimeError) {
 				_, ok := value.(PreludeString)
 				return ok, nil
-			}}, true
+			}), true
 		} else {
 			return nil, false
 		}
 	case "Dict":
 		if externDecl, ok := decl.(ast.DeclExternType); ok {
-			return PreludePrimitiveExternType{&externDecl, func(value RuntimeValue) (bool, *RuntimeError) {
+			return MakePrimitiveExternType(externDecl, func(value RuntimeValue) (bool, *RuntimeError) {
 				_, ok := value.(PreludeDict)
 				return ok, nil
-			}}, true
+			}), true
 		} else {
 			return nil, false
 		}
 	case "Char":
 		if externDecl, ok := decl.(ast.DeclExternType); ok {
-			return PreludePrimitiveExternType{&externDecl, func(value RuntimeValue) (bool, *RuntimeError) {
+			return MakePrimitiveExternType(externDecl, func(value RuntimeValue) (bool, *RuntimeError) {
 				panic("char https://github.com/vknabel/lithia/issues/23")
-			}}, true
+			}), true
 		} else {
 			return nil, false
 		}
 	case "Function":
 		if externDecl, ok := decl.(ast.DeclExternType); ok {
-			return PreludePrimitiveExternType{&externDecl, func(value RuntimeValue) (bool, *RuntimeError) {
+			return MakePrimitiveExternType(externDecl, func(value RuntimeValue) (bool, *RuntimeError) {
 				_, ok := value.(CallableRuntimeValue)
 				return ok, nil
-			}}, true
+			}), true
 		} else {
 			return nil, false
 		}
 	case "Module":
 		if externDecl, ok := decl.(ast.DeclExternType); ok {
-			return PreludePrimitiveExternType{&externDecl, func(value RuntimeValue) (bool, *RuntimeError) {
+			return MakePrimitiveExternType(externDecl, func(value RuntimeValue) (bool, *RuntimeError) {
 				_, ok := value.(PreludeModule)
 				return ok, nil
-			}}, true
+			}), true
 		} else {
 			return nil, false
 		}
 	case "Any":
 		if externDecl, ok := decl.(ast.DeclExternType); ok {
-			return PreludePrimitiveExternType{&externDecl, func(value RuntimeValue) (bool, *RuntimeError) {
+			return MakePrimitiveExternType(externDecl, func(value RuntimeValue) (bool, *RuntimeError) {
 				return true, nil
-			}}, true
+			}), true
 		} else {
 			return nil, false
 		}

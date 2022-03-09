@@ -7,8 +7,8 @@ import (
 	"os"
 
 	cobra "github.com/muesli/coral"
+	"github.com/vknabel/lithia"
 	"github.com/vknabel/lithia/reporting"
-	"github.com/vknabel/lithia/runtime"
 )
 
 func init() {
@@ -32,7 +32,7 @@ func runPrompt() {
 		os.Exit(1)
 	}
 	reader := bufio.NewReader(os.Stdin)
-	inter := runtime.NewInterpreter(importRoot)
+	inter := lithia.NewDefaultInterpreter(importRoot)
 	for {
 		fmt.Print("> ")
 		line, err := reader.ReadString('\n')

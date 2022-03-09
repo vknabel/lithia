@@ -6,7 +6,7 @@ import (
 	"path"
 
 	cobra "github.com/muesli/coral"
-	"github.com/vknabel/lithia/runtime"
+	"github.com/vknabel/lithia"
 )
 
 func init() {
@@ -28,7 +28,7 @@ func runFile(fileName string) {
 		fmt.Fprint(os.Stderr, err)
 		os.Exit(1)
 	}
-	inter := runtime.NewInterpreter(path.Dir(fileName))
+	inter := lithia.NewDefaultInterpreter(path.Dir(fileName))
 	script := string(scriptData) + "\n"
 	_, err = inter.Interpret(fileName, script)
 	if err != nil {

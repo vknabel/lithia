@@ -5,13 +5,14 @@ import (
 	"path/filepath"
 	"testing"
 
+	l "github.com/vknabel/lithia"
 	"github.com/vknabel/lithia/ast"
 	r "github.com/vknabel/lithia/runtime"
 )
 
 func TestStdlib(t *testing.T) {
 	pathToStdlib := "../stdlib"
-	inter := r.NewInterpreter(pathToStdlib, "../stdlib")
+	inter := l.NewDefaultInterpreter(pathToStdlib, "../stdlib")
 	mockOS := &mockExternalOS{
 		calledExitCode: -1,
 		env:            map[string]string{"LITHIA_TESTS": "1"},

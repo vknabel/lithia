@@ -18,19 +18,14 @@ type Interpreter struct {
 	Prelude             *Environment
 }
 
-func NewInterpreter(referenceFile string, importRoots ...string) *Interpreter {
+func NewIsolatedInterpreter(referenceFile string, importRoots ...string) *Interpreter {
 	inter := &Interpreter{
 		Resolver:            resolution.DefaultModuleResolver(importRoots...),
 		Parser:              parser.NewParser(),
 		Modules:             make(map[ast.ModuleName]*RuntimeModule),
 		ExternalDefinitions: make(map[ast.ModuleName]ExternalDefinition),
 	}
-	// TODO: External definitions
 	inter.ExternalDefinitions["prelude"] = ExternalPrelude{}
-	inter.ExternalDefinitions["os"] = ExternalOS{}
-	inter.ExternalDefinitions["rx"] = ExternalRx{}
-	inter.ExternalDefinitions["docs"] = ExternalDocs{}
-	inter.ExternalDefinitions["fs"] = ExternalFS{}
 	interpreter = inter
 	return inter
 }

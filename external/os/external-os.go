@@ -1,9 +1,10 @@
-package runtime
+package os
 
 import (
 	"os"
 
 	"github.com/vknabel/lithia/ast"
+	. "github.com/vknabel/lithia/runtime"
 )
 
 var _ ExternalDefinition = ExternalOS{}

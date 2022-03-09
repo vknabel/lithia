@@ -10,6 +10,13 @@ type PreludePrimitiveExternType struct {
 	hasInstance func(value RuntimeValue) (bool, *RuntimeError)
 }
 
+func MakePrimitiveExternType(decl ast.DeclExternType, hasInstance func(value RuntimeValue) (bool, *RuntimeError)) PreludePrimitiveExternType {
+	return PreludePrimitiveExternType{
+		DeclExternType: &decl,
+		hasInstance:    hasInstance,
+	}
+}
+
 func (t PreludePrimitiveExternType) String() string {
 	return string(t.DeclExternType.Name)
 }

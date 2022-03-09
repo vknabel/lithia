@@ -1,11 +1,13 @@
-package runtime
+package rx
 
 import (
 	"fmt"
 	"sync"
+
+	"github.com/vknabel/lithia/runtime"
 )
 
-var _ RuntimeValue = &RxFuture{}
+var _ runtime.RuntimeValue = &RxFuture{}
 
 type internalPromise struct {
 	lock    *sync.RWMutex
@@ -14,8 +16,8 @@ type internalPromise struct {
 }
 
 type promiseResult struct {
-	value *RuntimeValue
-	err   *RuntimeError
+	value *runtime.RuntimeValue
+	err   *runtime.RuntimeError
 }
 
 type RxFuture struct {
@@ -23,7 +25,7 @@ type RxFuture struct {
 	storage    *internalPromise
 }
 
-func MakeRxFuture(futureType *RxFutureType, configure CallableRuntimeValue) RxFuture {
+func MakeRxFuture(futureType *RxFutureType, configure runtime.CallableRuntimeValue) RxFuture {
 	future := RxFuture{
 		futureType: futureType,
 		storage: &internalPromise{
@@ -33,23 +35,23 @@ func MakeRxFuture(futureType *RxFutureType, configure CallableRuntimeValue) RxFu
 		},
 	}
 	go func() {
-		receive := MakeAnonymousFunction("receive", []string{"event"}, func(args []Evaluatable) (RuntimeValue, *RuntimeError) {
+		receive := runtime.MakeAnonymousFunction("receive", []string{"event"}, func(args []runtime.Evaluatable) (runtime.RuntimeValue, *runtime.RuntimeError) {
 			value, err := args[0].Evaluate()
 			if err != nil {
 				return nil, err.CascadeDecl(futureType.DeclExternType)
 			}
-			resultTypeRef := MakeRuntimeTypeRef("Result", "results")
+			resultTypeRef := runtime.MakeRuntimeTypeRef("Result", "results")
 			isResult, err := resultTypeRef.HasInstance(value)
 			if err != nil {
 				return nil, err.CascadeDecl(futureType.DeclExternType)
 			} else if !isResult {
-				return nil, NewRuntimeErrorf("future %s received non-result %s", fmt.Sprint(future), fmt.Sprint(value)).CascadeDecl(futureType.DeclExternType)
+				return nil, runtime.NewRuntimeErrorf("future %s received non-result %s", fmt.Sprint(future), fmt.Sprint(value)).CascadeDecl(futureType.DeclExternType)
 			}
 			future.accept(value)
 			return future, nil
 		})
-		_, err := configure.Call([]Evaluatable{
-			NewConstantRuntimeValue(receive),
+		_, err := configure.Call([]runtime.Evaluatable{
+			runtime.NewConstantRuntimeValue(receive),
 		}, nil)
 		if err != nil {
 			future.fail(*err)
@@ -58,7 +60,7 @@ func MakeRxFuture(futureType *RxFutureType, configure CallableRuntimeValue) RxFu
 	return future
 }
 
-func (RxFuture) RuntimeType() RuntimeTypeRef {
+func (RxFuture) RuntimeType() runtime.RuntimeTypeRef {
 	return RxVariableTypeRef
 }
 
@@ -74,18 +76,18 @@ func (v RxFuture) String() string {
 	}
 }
 
-func (v RxFuture) Lookup(member string) (Evaluatable, *RuntimeError) {
+func (v RxFuture) Lookup(member string) (runtime.Evaluatable, *runtime.RuntimeError) {
 	switch member {
 	case "await":
-		return NewLazyRuntimeValue(func() (RuntimeValue, *RuntimeError) {
+		return runtime.NewLazyRuntimeValue(func() (runtime.RuntimeValue, *runtime.RuntimeError) {
 			return v.Await()
 		}), nil
 	default:
-		return nil, NewRuntimeErrorf("future %s has no member %s", fmt.Sprint(v), member)
+		return nil, runtime.NewRuntimeErrorf("future %s has no member %s", fmt.Sprint(v), member)
 	}
 }
 
-func (v RxFuture) Await() (RuntimeValue, *RuntimeError) {
+func (v RxFuture) Await() (runtime.RuntimeValue, *runtime.RuntimeError) {
 	v.storage.lock.RLock()
 
 	if v.storage.result != nil {
@@ -110,7 +112,7 @@ func (v RxFuture) Await() (RuntimeValue, *RuntimeError) {
 	}
 }
 
-func (v RxFuture) accept(value RuntimeValue) (RuntimeValue, *RuntimeError) {
+func (v RxFuture) accept(value runtime.RuntimeValue) (runtime.RuntimeValue, *runtime.RuntimeError) {
 	v.storage.lock.RLock()
 	if v.storage.result != nil {
 		defer v.storage.lock.RUnlock()
@@ -131,7 +133,7 @@ func (v RxFuture) accept(value RuntimeValue) (RuntimeValue, *RuntimeError) {
 	}
 }
 
-func (v RxFuture) fail(err RuntimeError) (RuntimeValue, *RuntimeError) {
+func (v RxFuture) fail(err runtime.RuntimeError) (runtime.RuntimeValue, *runtime.RuntimeError) {
 	v.storage.lock.Lock()
 	defer v.storage.lock.Unlock()
 	if v.storage.result != nil {

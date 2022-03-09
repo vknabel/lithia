@@ -1,9 +1,10 @@
-package runtime
+package fs
 
 import (
 	"os"
 
 	"github.com/vknabel/lithia/ast"
+	. "github.com/vknabel/lithia/runtime"
 )
 
 var _ ExternalDefinition = ExternalFS{}

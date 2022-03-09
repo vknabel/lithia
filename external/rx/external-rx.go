@@ -1,14 +1,15 @@
-package runtime
+package rx
 
 import (
 	"github.com/vknabel/lithia/ast"
+	"github.com/vknabel/lithia/runtime"
 )
 
-var _ ExternalDefinition = ExternalRx{}
+var _ runtime.ExternalDefinition = ExternalRx{}
 
 type ExternalRx struct{}
 
-func (e ExternalRx) Lookup(name string, env *Environment, decl ast.Decl) (RuntimeValue, bool) {
+func (e ExternalRx) Lookup(name string, env *runtime.Environment, decl ast.Decl) (runtime.RuntimeValue, bool) {
 	switch name {
 	case "Variable":
 		if decl, ok := decl.(ast.DeclExternType); ok {

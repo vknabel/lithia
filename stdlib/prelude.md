@@ -191,8 +191,8 @@ Represents text like "hello world".
 
 ### Properties
 
-- `length` - The length of the string.
 - `append str` - Allows to append another string.
+- `length` - The length of the string.
 
 ## True
 
