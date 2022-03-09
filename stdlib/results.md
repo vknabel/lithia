@@ -30,14 +30,14 @@ A result of a failable operation.
 
 ```lithia
 func positive { n =>
-if n < 0,
-Failure "negative values not supported!",
-Success n
+    if n < 0,
+        Failure "negative values not supported!",
+        Success n
 }
 
 with positive, type Result {
-Success: { success => print success.value },
-Failure: { failure => print strings.concat ["failed: ", failure.error] },
+    Success: { success => print success.value },
+    Failure: { failure => print strings.concat ["failed: ", failure.error] },
 }
 ```
 

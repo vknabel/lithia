@@ -15,8 +15,8 @@ type RuntimeValue interface {
 }
 
 type RuntimeType interface {
-	Declaration(*Interpreter) (ast.Decl, *RuntimeError)
-	HasInstance(interpreter *Interpreter, value RuntimeValue) (bool, *RuntimeError)
+	Declaration() (ast.Decl, *RuntimeError)
+	HasInstance(value RuntimeValue) (bool, *RuntimeError)
 }
 
 type CallableRuntimeValue interface {
@@ -30,5 +30,5 @@ type CallableRuntimeValue interface {
 
 type DeclRuntimeValue interface {
 	RuntimeValue
-	HasInstance(interpreter *Interpreter, value RuntimeValue) (bool, *RuntimeError)
+	HasInstance(value RuntimeValue) (bool, *RuntimeError)
 }

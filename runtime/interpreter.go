@@ -8,6 +8,8 @@ import (
 	"github.com/vknabel/lithia/resolution"
 )
 
+var interpreter *Interpreter
+
 type Interpreter struct {
 	Resolver            resolution.ModuleResolver
 	Parser              *parser.Parser
@@ -29,6 +31,7 @@ func NewInterpreter(referenceFile string, importRoots ...string) *Interpreter {
 	inter.ExternalDefinitions["rx"] = ExternalRx{}
 	inter.ExternalDefinitions["docs"] = ExternalDocs{}
 	inter.ExternalDefinitions["fs"] = ExternalFS{}
+	interpreter = inter
 	return inter
 }
 

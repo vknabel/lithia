@@ -26,7 +26,7 @@ func (t RxVariableType) Declaration(*Interpreter) (ast.Decl, *RuntimeError) {
 	return t.DeclExternType, nil
 }
 
-func (d RxVariableType) HasInstance(interpreter *Interpreter, value RuntimeValue) (bool, *RuntimeError) {
+func (d RxVariableType) HasInstance(value RuntimeValue) (bool, *RuntimeError) {
 	if _, ok := value.(RxVariable); ok {
 		return true, nil
 	} else {

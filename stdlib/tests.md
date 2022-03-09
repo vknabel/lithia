@@ -9,7 +9,7 @@ Instead there is only a fail function.
 import tests
 
 tests.test "my test case", { fail =>
-when False, fail "when should not trigger when False"
+  when False, fail "when should not trigger when False"
 }
 
 when tests.enabled, tests.runTests
@@ -62,7 +62,7 @@ Adds a new test case to the queue and will be executed once `runTests` has been 
 import tests
 
 tests.test "my test case", { fail =>
-when False, fail "when should not trigger when False"
+  when False, fail "when should not trigger when False"
 }
 ```
 

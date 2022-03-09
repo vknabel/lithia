@@ -256,7 +256,7 @@ func (ex *InterpreterContext) lazyLogicComparision(
 	// // 	moduleName: "prelude",
 	// // 	typeValue:  &trueTypeValue,
 	// // }
-	if ok, err := boolRef.HasInstance(ex.interpreter, left); !ok || err != nil {
+	if ok, err := boolRef.HasInstance(left); !ok || err != nil {
 		if err != nil {
 			return nil, err
 		}
@@ -268,7 +268,7 @@ func (ex *InterpreterContext) lazyLogicComparision(
 	}
 
 	trueRef := MakeRuntimeTypeRef("True", "prelude")
-	isLeftTrue, err := trueRef.HasInstance(ex.interpreter, left)
+	isLeftTrue, err := trueRef.HasInstance(left)
 	if err != nil {
 		return nil, NewRuntimeError(err)
 	}
@@ -278,7 +278,7 @@ func (ex *InterpreterContext) lazyLogicComparision(
 		if err != nil {
 			return false, nil
 		}
-		isRightTrue, err := trueRef.HasInstance(ex.interpreter, right)
+		isRightTrue, err := trueRef.HasInstance(right)
 		if err != nil {
 			return false, nil
 		}

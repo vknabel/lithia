@@ -6,8 +6,11 @@
 - compiler: dictionary literals `[:]` and `["a": "b"]` #9
 - stdlib: new type `prelude.Dict` #9
 - stdlib: new type `prelude.Pair`
+- stdlib: moved `results.Result` to `prelude.Result`
 - stdlib: Float-support! #24
 - stdlib: `!` operator #22
+- stdlib: only the first leading space will be trimmed in docs
+- stdlib: new type `rx.Future` and `rx.Async` and associated functions
 
 ## v0.0.16
 

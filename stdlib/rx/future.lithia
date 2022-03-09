@@ -1,0 +1,30 @@
+module rx
+import results
+
+/// Represents a value calculated in background.
+/// It will arrive some time in the future.
+///
+/// ```lithia
+/// import results
+/// import rx
+///
+/// let future = rx.Future { receive =>
+///     // will be performed in background
+///     receive results.Success 42
+/// }
+///
+/// // the .await will block and wait for the result
+/// with future.await, type results.Result {
+///     Success: { value => value },
+///     Failure: { err =>
+///         print err
+///         0 // as default
+///     },
+/// }
+/// ```
+extern Future {
+    /// Waits for the future to complete.
+    /// This will lock the current function until the result has arrived.
+    /// At the end, returns the `results.Result`.
+    await
+}

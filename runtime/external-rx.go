@@ -16,6 +16,12 @@ func (e ExternalRx) Lookup(name string, env *Environment, decl ast.Decl) (Runtim
 		} else {
 			panic("rx.Variable must be an extern type")
 		}
+	case "Future":
+		if decl, ok := decl.(ast.DeclExternType); ok {
+			return RxFutureType{decl}, true
+		} else {
+			panic("rx.Future must be an extern type")
+		}
 	default:
 		return nil, false
 	}

@@ -1,0 +1,103 @@
+import results {
+    Result
+}
+
+enum Async {
+    Result
+    Future
+    Variable
+}
+
+func await { async =>
+    with async, type Async {
+        Result: identity,
+        Future: { future => future.await },
+        Variable: { var =>
+            with var.current, type Result {
+                Success: identity,
+                Failure: identity,
+                Any: results.Success,
+            }
+        },
+    }
+}
+
+func map { transform =>
+    type Async {
+        Result: results.map,
+        Future: { future =>
+            Future { receive =>
+                receive (results.map transform, future.await)
+            }
+        },
+        Variable: { var =>
+            // TODO: should be a stream!
+            Future { receive =>
+                with var.current, type Result {
+                    Success: identity,
+                    Failure: identity,
+                    Any: results.Success,
+                }
+            }
+        },
+    }
+}
+
+func onSuccess { sideEffect =>
+    map { result =>
+        sideEffect result
+        result
+    }
+}
+
+func flatten { async =>
+    with async, type Async {
+        Result: type Result {
+            Success: identity,
+            Failure: async
+        },
+        Future: { future =>
+            Future { receive =>
+                receive await future.await
+            }
+        },
+        Variable: { var =>
+            // should return a flattened stream instead
+            var.current
+        }
+    }
+}
+
+func flatMap { transform =>
+    pipe [
+        map transform,
+        flatten,
+    ]
+}
+
+func catch { transform =>
+    type Async {
+        Result: type Result {
+            Success: async,
+            Failure: { err =>
+                transform err
+            },
+        },
+        Future: { future =>
+            Future { receive =>
+                with future.await, type Result {
+                    Success: { value =>
+                        receive results.Success value
+                    },
+                    Failure: { err =>
+                        receive await (transform err)
+                    },
+                }
+            }
+        },
+        Variable: { var =>
+            // should return a flattened stream instead
+            var.current
+        }
+    }
+}

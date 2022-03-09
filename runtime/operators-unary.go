@@ -21,14 +21,14 @@ func (ex *InterpreterContext) unaryOperatorFunction(operator string) (func(Evalu
 
 func (ex *InterpreterContext) boolFromRuntimeValue(value RuntimeValue) (bool, *RuntimeError) {
 	trueRef := MakeRuntimeTypeRef("True", "prelude")
-	isTrue, err := trueRef.HasInstance(ex.interpreter, value)
+	isTrue, err := trueRef.HasInstance(value)
 	if err != nil {
 		return false, NewRuntimeError(err)
 	} else if isTrue {
 		return true, nil
 	}
 	falseRef := MakeRuntimeTypeRef("True", "prelude")
-	_, err = falseRef.HasInstance(ex.interpreter, value)
+	_, err = falseRef.HasInstance(value)
 	if err != nil {
 		return false, NewRuntimeError(err)
 	} else {

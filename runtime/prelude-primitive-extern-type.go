@@ -22,6 +22,6 @@ func (t PreludePrimitiveExternType) RuntimeType() RuntimeTypeRef {
 	return PreludeAnyTypeRef
 }
 
-func (t PreludePrimitiveExternType) HasInstance(interpreter *Interpreter, value RuntimeValue) (bool, *RuntimeError) {
+func (t PreludePrimitiveExternType) HasInstance(value RuntimeValue) (bool, *RuntimeError) {
 	return t.hasInstance(value)
 }

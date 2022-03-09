@@ -60,3 +60,14 @@ func (env *Environment) MakePair(key Evaluatable, value Evaluatable) (DataRuntim
 		"value": value,
 	})
 }
+
+func (env *Environment) MakeSuccess(value Evaluatable) (DataRuntimeValue, *RuntimeError) {
+	return env.MakeDataRuntimeValue("Success", map[string]Evaluatable{
+		"value": value,
+	})
+}
+func (env *Environment) MakeFailure(err Evaluatable) (DataRuntimeValue, *RuntimeError) {
+	return env.MakeDataRuntimeValue("Failure", map[string]Evaluatable{
+		"error": err,
+	})
+}

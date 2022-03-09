@@ -39,8 +39,8 @@ _data_ The documentation of a data declaration.
 ```lithia
 /// The docs string
 data DataName {
-someFields with, params
-orWithout
+   someFields with, params
+   orWithout
 }
 ```
 
@@ -114,8 +114,8 @@ _data_ The documentation of an extern type declaration.
 ```lithia
 /// The docs string
 extern ExternTypeName {
-someFields with, params
-orWithout
+   someFields with, params
+   orWithout
 }
 ```
 

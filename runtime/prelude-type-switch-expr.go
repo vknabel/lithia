@@ -110,7 +110,7 @@ func (t PreludeTypeSwitchExpr) Call(args []Evaluatable, fromExpr ast.Expr) (Runt
 			).CascadeExpr(t.Decl)
 		}
 
-		ok, err = runtimeDecl.HasInstance(t.context.interpreter, primaryArg)
+		ok, err = runtimeDecl.HasInstance(primaryArg)
 		if err != nil {
 			return nil, err.CascadeExpr(t.Decl)
 		}

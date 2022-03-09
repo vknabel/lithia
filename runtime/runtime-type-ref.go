@@ -21,18 +21,18 @@ func (r RuntimeTypeRef) String() string {
 	return fmt.Sprintf("%s.%s", r.Module, r.Name)
 }
 
-func (r RuntimeTypeRef) Declaration(interpreter *Interpreter) (ast.Decl, *RuntimeError) {
-	valueType, err := r.ResolveType(interpreter)
+func (r RuntimeTypeRef) Declaration() (ast.Decl, *RuntimeError) {
+	valueType, err := r.ResolveType()
 	if err != nil {
 		return nil, err
 	}
 	if runtimeType, ok := valueType.(RuntimeType); ok {
-		return runtimeType.Declaration(interpreter)
+		return runtimeType.Declaration()
 	}
 	panic(fmt.Errorf("TODO: decl runtime value %s has no declaration", valueType))
 }
 
-func (r RuntimeTypeRef) ResolveType(interpreter *Interpreter) (DeclRuntimeValue, *RuntimeError) {
+func (r RuntimeTypeRef) ResolveType() (DeclRuntimeValue, *RuntimeError) {
 	module, ok := interpreter.Modules[r.Module]
 	if !ok {
 		return nil, NewRuntimeErrorf("module not found %s", r.Module)
@@ -50,13 +50,13 @@ func (r RuntimeTypeRef) ResolveType(interpreter *Interpreter) (DeclRuntimeValue,
 	}
 }
 
-func (ref RuntimeTypeRef) HasInstance(interpreter *Interpreter, value RuntimeValue) (bool, *RuntimeError) {
+func (ref RuntimeTypeRef) HasInstance(value RuntimeValue) (bool, *RuntimeError) {
 	if ref == PreludeAnyTypeRef {
 		return true, nil
 	}
-	runtimeType, err := ref.ResolveType(interpreter)
+	runtimeType, err := ref.ResolveType()
 	if err != nil {
 		return false, err
 	}
-	return runtimeType.HasInstance(interpreter, value)
+	return runtimeType.HasInstance(value)
 }
