@@ -11,6 +11,7 @@
 - stdlib: `!` operator #22
 - stdlib: only the first leading space will be trimmed in docs
 - stdlib: new type `rx.Future` and `rx.Async` and associated functions
+- stdlib: new module `tea` which wraps [github.com/charmbracelet/bubbletea](https://github.com/charmbracelet/bubbletea)
 
 ## v0.0.16
 

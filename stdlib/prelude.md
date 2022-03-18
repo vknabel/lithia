@@ -27,7 +27,7 @@ Will always be imported implicitly.
 - _data_ [True](#True)
 - _data_ [Void](#Void)
 - _func_ [compose](#compose) f, g, value
-- _func_ [const](#const) value, _
+- _func_ [const](#const) value, \_
 - _extern_ [debug](#debug) message
 - _func_ [identity](#identity) value
 - _func_ [if](#if) condition, then, else
@@ -66,7 +66,7 @@ _data_ Represents a non-empty List.
 
 - `head` - The first element
 - `tail` - The remaining list.
-@type List
+  @type List
 
 ## Dict
 
@@ -77,9 +77,9 @@ As dicts are immutable, all changing operations return new copies.
 ### Properties
 
 - `set key, value` - Creates a copy Dict, which includes the given key-value-pair.
-The current Dict stays at it is.
+  The current Dict stays at it is.
 - `delete key` - Creates a copy Dict, which includes no value for the given key.
-The current Dict stays at it is.
+  The current Dict stays at it is.
 - `entries` - A List of all entries as Pair.
 - `keys` - A List of all keys.
 - `values` - A List of all values.
@@ -103,7 +103,7 @@ A function that may be called.
 ### Properties
 
 - `arity` - The minimum arity of the function.
-If it returns another function, the actual arity might be higher.
+  If it returns another function, the actual arity might be higher.
 
 ## Int
 
@@ -275,4 +275,3 @@ Mostly useful for readability, e.g. in destructings.
 ```
 with True, Bool(True: { _ => }, False: { _ => })
 ```
-

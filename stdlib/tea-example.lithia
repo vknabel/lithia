@@ -1,0 +1,16 @@
+import tea
+
+let model = (tea.newModel (tea.Update "Works", None),
+    { state, msg =>
+        with msg, type tea.Msg {
+            Key: { key =>
+                (if (key.string == "q") || (key.string == "ctrl+c"),
+                    (tea.Update state, tea.Quit),
+                    (tea.Update state, None))
+            },
+            Any: { _ => tea.Update state, None }
+        }
+    },
+    { state => state })
+
+(tea.newProgram model).start

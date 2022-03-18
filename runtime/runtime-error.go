@@ -116,7 +116,7 @@ func (r *RuntimeError) CascadeExpr(expr ast.Expr) *RuntimeError {
 }
 
 func (r *RuntimeError) CascadeCall(callable CallableRuntimeValue, fromExpr ast.Expr) *RuntimeError {
-	if fromExpr.Meta().Source == nil {
+	if fromExpr == nil || fromExpr.Meta().Source == nil {
 		return r
 	} else {
 		return r.cascadeEntry(stackEntry{

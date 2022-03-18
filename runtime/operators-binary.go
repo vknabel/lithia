@@ -292,7 +292,7 @@ func (ex *InterpreterContext) lazyLogicComparision(
 	return ex.boolToRuntimeValue(isComparisionTrue)
 }
 
-func (env *Environment) boolToRuntimeValue(value bool) (RuntimeValue, *RuntimeError) {
+func (env *Environment) BoolToRuntimeValue(value bool) (RuntimeValue, *RuntimeError) {
 	if value {
 		return env.MakeEmptyDataRuntimeValue("True")
 	} else {
@@ -301,7 +301,7 @@ func (env *Environment) boolToRuntimeValue(value bool) (RuntimeValue, *RuntimeEr
 }
 
 func (ex *InterpreterContext) boolToRuntimeValue(value bool) (RuntimeValue, *RuntimeError) {
-	return ex.environment.boolToRuntimeValue(value)
+	return ex.environment.BoolToRuntimeValue(value)
 }
 
 func (ex *InterpreterContext) DeepEqual(left, right RuntimeValue) (bool, *RuntimeError) {

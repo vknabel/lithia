@@ -1,0 +1,30 @@
+module tea
+
+extern Model {
+    /// Init is the first function that will be called.
+    /// It returns an `Update`.
+    init
+    /// Updates the model with the given msg.
+    /// Returns an `Update`.
+    update state, msg
+    /// Renders the model as a string.
+    view state
+}
+
+func newModel { init, update, view =>
+    Model init, update, view
+}
+
+data Update {
+    state
+    /// Returns a msg that will be passed to the update function.
+    cmd state
+}
+
+extern Program {
+    start
+}
+
+func newProgram { model =>
+    Program model
+}

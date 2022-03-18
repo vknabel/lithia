@@ -1,0 +1,30 @@
+enum Msg {
+    Any
+    None
+
+    data Key {
+        // type
+        // alt
+        string
+    }
+    data WindowSize {
+        width
+        height
+    }
+
+    	// x
+        // y    
+        // type
+        // alt  
+        // ctrl 
+    data Mouse {
+    }
+    data ClearScrollArea
+    data DisableMouse
+    data EnableMouseAllMotion
+    data EnableMouseCellMotion
+    data EnterAltScreen
+    data ExitAltScreen
+    data HideCursor
+    data Quit
+}

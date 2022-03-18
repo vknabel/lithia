@@ -38,36 +38,45 @@ func (e EvaluatableExpr) Evaluate() (RuntimeValue, *RuntimeError) {
 		if e.Expr == nil {
 			panic("cannot evaluate nil expr")
 		}
+		var result RuntimeValue
+		var err *RuntimeError
 		switch expr := e.Expr.(type) {
 		case *ast.ExprArray:
-			return e.EvaluateExprArray(*expr)
+			result, err = e.EvaluateExprArray(*expr)
 		case *ast.ExprDict:
-			return e.EvaluateExprDict(*expr)
+			result, err = e.EvaluateExprDict(*expr)
 		case *ast.ExprFloat:
-			return e.EvaluateExprFloat(*expr)
+			result, err = e.EvaluateExprFloat(*expr)
 		case *ast.ExprFunc:
-			return e.EvaluateExprFunc(*expr)
+			result, err = e.EvaluateExprFunc(*expr)
 		case *ast.ExprGroup:
-			return e.EvaluateExprGroup(*expr)
+			result, err = e.EvaluateExprGroup(*expr)
 		case *ast.ExprIdentifier:
-			return e.EvaluateExprIdentifier(*expr)
+			result, err = e.EvaluateExprIdentifier(*expr)
 		case *ast.ExprInt:
-			return e.EvaluateExprInt(*expr)
+			result, err = e.EvaluateExprInt(*expr)
 		case *ast.ExprInvocation:
-			return e.EvaluateExprInvocation(*expr)
+			result, err = e.EvaluateExprInvocation(*expr)
 		case *ast.ExprMemberAccess:
-			return e.EvaluateExprMemberAccess(*expr)
+			result, err = e.EvaluateExprMemberAccess(*expr)
 		case *ast.ExprOperatorBinary:
-			return e.EvaluateExprOperatorBinary(*expr)
+			result, err = e.EvaluateExprOperatorBinary(*expr)
 		case *ast.ExprOperatorUnary:
-			return e.EvaluateExprOperatorUnary(*expr)
+			result, err = e.EvaluateExprOperatorUnary(*expr)
 		case *ast.ExprString:
-			return e.EvaluateExprString(*expr)
+			result, err = e.EvaluateExprString(*expr)
 		case *ast.ExprTypeSwitch:
-			return e.EvaluateExprTypeSwitch(*expr)
+			result, err = e.EvaluateExprTypeSwitch(*expr)
 		default:
 			panic(fmt.Errorf("unknown expr: %T %s", expr, expr))
 		}
+		if err != nil {
+			return nil, err
+		}
+		if callableResult, ok := result.(CallableRuntimeValue); ok && callableResult.Arity() == 0 {
+			return callableResult.Call(nil, e.Expr)
+		}
+		return result, nil
 	})
 
 	return value, err.CascadeExpr(e.Expr)

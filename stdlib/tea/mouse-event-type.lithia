@@ -1,0 +1,10 @@
+enum MouseEventType {
+    data MouseUnknown
+	data MouseLeft
+	data MouseRight
+	data MouseMiddle
+	data MouseRelease
+	data MouseWheelUp
+	data MouseWheelDown
+	data MouseMotion
+}
