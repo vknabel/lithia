@@ -2,11 +2,11 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 	"path"
 
 	cobra "github.com/muesli/coral"
 	"github.com/vknabel/lithia"
+	"github.com/vknabel/lithia/world"
 )
 
 func init() {
@@ -23,16 +23,16 @@ var runCmd = &cobra.Command{
 }
 
 func runFile(fileName string) {
-	scriptData, err := os.ReadFile(fileName)
+	scriptData, err := world.Current.FS.ReadFile(fileName)
 	if err != nil {
-		fmt.Fprint(os.Stderr, err)
-		os.Exit(1)
+		fmt.Fprint(world.Current.Stderr, err)
+		world.Current.Env.Exit(1)
 	}
 	inter := lithia.NewDefaultInterpreter(path.Dir(fileName))
 	script := string(scriptData) + "\n"
 	_, err = inter.Interpret(fileName, script)
 	if err != nil {
-		fmt.Fprint(os.Stderr, err)
-		os.Exit(1)
+		fmt.Fprint(world.Current.Stderr, err)
+		world.Current.Env.Exit(1)
 	}
 }

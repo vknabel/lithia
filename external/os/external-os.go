@@ -1,10 +1,9 @@
 package os
 
 import (
-	"os"
-
 	"github.com/vknabel/lithia/ast"
 	. "github.com/vknabel/lithia/runtime"
+	"github.com/vknabel/lithia/world"
 )
 
 var _ ExternalDefinition = ExternalOS{}
@@ -31,7 +30,7 @@ func builtinOsExit(decl ast.Decl) PreludeExternFunction {
 				return nil, err
 			}
 			if code, ok := value.(PreludeInt); ok {
-				os.Exit(int(code))
+				world.Current.Env.Exit(int(code))
 				return value, nil
 			} else {
 				return nil, NewRuntimeErrorf("%s is not an int", value).CascadeDecl(decl)
@@ -49,7 +48,7 @@ func builtinOsEnv(prelude *Environment, decl ast.Decl) PreludeExternFunction {
 				return nil, err.CascadeDecl(decl)
 			}
 			if key, ok := value.(PreludeString); ok {
-				if env, ok := os.LookupEnv(string(key)); ok && env != "" {
+				if env, ok := world.Current.Env.LookupEnv(string(key)); ok && env != "" {
 					value, err := prelude.MakeDataRuntimeValue("Some", map[string]Evaluatable{
 						"value": NewConstantRuntimeValue(PreludeString(env)),
 					})

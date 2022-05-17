@@ -2,10 +2,10 @@ package runtime
 
 import (
 	"fmt"
-	"os"
 	"path/filepath"
 
 	"github.com/vknabel/lithia/ast"
+	"github.com/vknabel/lithia/world"
 )
 
 type RuntimeError struct {
@@ -136,10 +136,10 @@ func stackTraceEntryString(entry stackEntry) string {
 	}
 
 	fileName := entry.source.FileName
-	if dir, err := os.Getwd(); err == nil {
+	if dir, err := world.Current.FS.Getwd(); err == nil {
 		rel, err := filepath.Rel(dir, entry.source.FileName)
 		if err == nil {
-			fileName = "." + string(os.PathSeparator) + rel
+			fileName = "." + string(world.Current.FS.PathSeparator()) + rel
 		}
 	}
 	source := entry.source

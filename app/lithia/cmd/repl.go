@@ -4,11 +4,11 @@ import (
 	"bufio"
 	"fmt"
 	"io"
-	"os"
 
 	cobra "github.com/muesli/coral"
 	"github.com/vknabel/lithia"
 	"github.com/vknabel/lithia/reporting"
+	"github.com/vknabel/lithia/world"
 )
 
 func init() {
@@ -26,12 +26,12 @@ var replCmd = &cobra.Command{
 }
 
 func runPrompt() {
-	importRoot, err := os.Getwd()
+	importRoot, err := world.Current.FS.Getwd()
 	if err != nil {
-		fmt.Fprint(os.Stderr, err)
-		os.Exit(1)
+		fmt.Fprint(world.Current.Stderr, err)
+		world.Current.Env.Exit(1)
 	}
-	reader := bufio.NewReader(os.Stdin)
+	reader := bufio.NewReader(world.Current.Stdin)
 	inter := lithia.NewDefaultInterpreter(importRoot)
 	for {
 		fmt.Print("> ")

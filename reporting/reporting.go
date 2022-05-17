@@ -2,11 +2,12 @@ package reporting
 
 import (
 	"fmt"
-	"os"
+
+	"github.com/vknabel/lithia/world"
 )
 
 func ReportErrorOrPanic(err error) {
-	fmt.Fprintln(os.Stderr, err)
+	fmt.Fprintln(world.Current.Stderr, err)
 }
 
 func ReportError(line int, message string) {
@@ -14,7 +15,7 @@ func ReportError(line int, message string) {
 }
 
 func report(line int, where string, message string) {
-	fmt.Fprintln(os.Stderr, "[line"+fmt.Sprint(line)+"] Error"+where+": "+message)
+	fmt.Fprintln(world.Current.Stderr, "[line"+fmt.Sprint(line)+"] Error"+where+": "+message)
 }
 
 type LocatableError interface {

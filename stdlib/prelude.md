@@ -76,15 +76,15 @@ As dicts are immutable, all changing operations return new copies.
 
 ### Properties
 
-- `set key, value` - Creates a copy Dict, which includes the given key-value-pair.
-The current Dict stays at it is.
-- `delete key` - Creates a copy Dict, which includes no value for the given key.
-The current Dict stays at it is.
 - `entries` - A List of all entries as Pair.
 - `keys` - A List of all keys.
 - `values` - A List of all values.
 - `length` - The count of all key-value-pairs.
 - `get key` - Returns Some value for a specific key or None.
+- `set key, value` - Creates a copy Dict, which includes the given key-value-pair.
+The current Dict stays at it is.
+- `delete key` - Creates a copy Dict, which includes no value for the given key.
+The current Dict stays at it is.
 
 ## False
 

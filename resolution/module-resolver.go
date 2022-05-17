@@ -1,12 +1,12 @@
 package resolution
 
 import (
-	"os"
 	"path"
 	"path/filepath"
 	"strings"
 
 	"github.com/vknabel/lithia/ast"
+	"github.com/vknabel/lithia/world"
 )
 
 type ModuleResolver struct {
@@ -20,7 +20,7 @@ type ModuleResolver struct {
 	lithiaSourceGlob    string
 }
 
-func DefaultModuleResolver(importRoots ...string) ModuleResolver {
+func NewDefaultModuleResolver(importRoots ...string) ModuleResolver {
 	return ModuleResolver{
 		externalImportRoots: defaultImportRoots(importRoots...),
 		defaultPackageName:  "root",
@@ -54,13 +54,13 @@ type PackageManifest struct {
 
 func defaultImportRoots(importRoots ...string) []string {
 	roots := importRoots
-	if path, ok := os.LookupEnv("LITHIA_LOCALS"); ok {
+	if path, ok := world.Current.Env.LookupEnv("LITHIA_LOCALS"); ok {
 		roots = append(roots, path)
 	}
-	if path, ok := os.LookupEnv("LITHIA_PACKAGES"); ok {
+	if path, ok := world.Current.Env.LookupEnv("LITHIA_PACKAGES"); ok {
 		roots = append(roots, path)
 	}
-	if path, ok := os.LookupEnv("LITHIA_STDLIB"); ok {
+	if path, ok := world.Current.Env.LookupEnv("LITHIA_STDLIB"); ok {
 		roots = append(roots, path)
 	} else {
 		roots = append(roots, "/usr/local/opt/lithia/stdlib")
@@ -81,7 +81,7 @@ func (mr *ModuleResolver) ResolvePackageForReferenceFile(referenceFile string) R
 	referenceFile = removingFilePrefix(referenceFile)
 	for _, candidates := range mr.manifestSearchPaths {
 		manifestPath := filepath.Join(path.Dir(referenceFile), candidates, mr.manifestName)
-		if _, err := os.Stat(manifestPath); err == nil {
+		if _, err := world.Current.FS.Stat(manifestPath); err == nil {
 			packagePath := path.Dir(manifestPath)
 			return ResolvedPackage{
 				Name: mr.defaultPackageName,
@@ -92,7 +92,7 @@ func (mr *ModuleResolver) ResolvePackageForReferenceFile(referenceFile string) R
 			}
 		}
 	}
-	dir, err := os.Getwd()
+	dir, err := world.Current.FS.Getwd()
 	if err != nil {
 		dir = path.Dir(referenceFile)
 	}
@@ -108,6 +108,11 @@ func (mr *ModuleResolver) ResolvePackageAndModuleForReferenceFile(referenceFile 
 	}
 	moduleFilepath := filepath.Dir(relativeFile)
 	moduleParts := strings.Split(moduleFilepath, string(filepath.Separator))
+	for i := len(moduleParts) - 1; i >= 0; i-- {
+		if moduleParts[i] == "." {
+			moduleParts = append(moduleParts[:i], moduleParts[i+1:]...)
+		}
+	}
 	resolvedModule, err := mr.resolveModuleWithinPackage(pkg, moduleParts)
 	if err != nil {
 		return mr.CreateSingleFileModule(pkg, referenceFile)
@@ -121,9 +126,11 @@ func (mr *ModuleResolver) AddRootImportPath(path string) {
 
 func (mr *ModuleResolver) CreateSingleFileModule(pkg ResolvedPackage, file string) ResolvedModule {
 	file = removingFilePrefix(file)
+	trimmed := strings.TrimSuffix(filepath.Base(file), ".lithia")
+	uniform := strings.ReplaceAll(trimmed, ".", "_")
 	return ResolvedModule{
 		packageRef:   &pkg,
-		relativeName: ast.ModuleName(strings.ReplaceAll(strings.TrimSuffix(filepath.Base(file), ".lithia"), ".", "_")),
+		relativeName: ast.ModuleName(uniform),
 		Path:         file,
 		Files:        []string{file},
 	}
@@ -143,10 +150,10 @@ func (mr *ModuleResolver) ResolveModuleFromPackage(pkg ResolvedPackage, moduleNa
 	searchPaths := append([]string{pkg.Path}, mr.externalImportRoots...)
 	for _, searchPath := range searchPaths {
 		packagePath := path.Join(searchPath, packageName)
-		if info, err := os.Stat(packagePath); err == nil && info.IsDir() {
+		if info, err := world.Current.FS.Stat(packagePath); err == nil && info.IsDir() {
 			var match ResolvedPackage
 			manifestPath := path.Join(packagePath, mr.manifestName)
-			if _, err := os.Stat(manifestPath); err == nil && !info.IsDir() {
+			if _, err := world.Current.FS.Stat(manifestPath); err == nil && !info.IsDir() {
 				match = ResolvedPackage{
 					Name: packageName,
 					Path: packagePath,
@@ -165,7 +172,7 @@ func (mr *ModuleResolver) ResolveModuleFromPackage(pkg ResolvedPackage, moduleNa
 
 func (mr *ModuleResolver) resolveModuleWithinPackage(pkg ResolvedPackage, moduleParts []string) (ResolvedModule, error) {
 	if len(moduleParts) == 0 {
-		files, err := filepath.Glob(path.Join(pkg.Path, mr.defaultSrcDir, mr.lithiaSourceGlob))
+		files, err := world.Current.FS.Glob(path.Join(pkg.Path, mr.defaultSrcDir, mr.lithiaSourceGlob))
 		if len(files) > 0 {
 			return ResolvedModule{
 				packageRef: &pkg,
@@ -173,7 +180,7 @@ func (mr *ModuleResolver) resolveModuleWithinPackage(pkg ResolvedPackage, module
 				Files:      files,
 			}, err
 		}
-		files, err = filepath.Glob(path.Join(pkg.Path, mr.lithiaSourceGlob))
+		files, err = world.Current.FS.Glob(path.Join(pkg.Path, mr.lithiaSourceGlob))
 		return ResolvedModule{
 			packageRef: &pkg,
 			Path:       pkg.Path,
@@ -182,7 +189,7 @@ func (mr *ModuleResolver) resolveModuleWithinPackage(pkg ResolvedPackage, module
 	}
 	pathElems := append([]string{pkg.Path}, moduleParts...)
 	modulePath := path.Join(pathElems...)
-	files, err := filepath.Glob(path.Join(modulePath, mr.lithiaSourceGlob))
+	files, err := world.Current.FS.Glob(path.Join(modulePath, mr.lithiaSourceGlob))
 	return ResolvedModule{
 		packageRef:   &pkg,
 		relativeName: ast.ModuleName(strings.Join(moduleParts, ".")),

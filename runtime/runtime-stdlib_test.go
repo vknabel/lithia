@@ -1,13 +1,13 @@
 package runtime_test
 
 import (
-	"os"
 	"path/filepath"
 	"testing"
 
 	l "github.com/vknabel/lithia"
 	"github.com/vknabel/lithia/ast"
 	r "github.com/vknabel/lithia/runtime"
+	"github.com/vknabel/lithia/world"
 )
 
 func TestStdlib(t *testing.T) {
@@ -19,7 +19,7 @@ func TestStdlib(t *testing.T) {
 	}
 	inter.ExternalDefinitions["os"] = mockOS
 
-	scriptData, err := os.ReadFile(filepath.Join(pathToStdlib, "stdlib-tests.lithia"))
+	scriptData, err := world.Current.FS.ReadFile(filepath.Join(pathToStdlib, "stdlib-tests.lithia"))
 	if err != nil {
 		t.Errorf("Error reading stdlib-tests.lithia: %s", err)
 		return

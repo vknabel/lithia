@@ -2,13 +2,13 @@ package langsrv
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/tliron/glsp"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 	"github.com/vknabel/lithia/ast"
 	"github.com/vknabel/lithia/parser"
 	"github.com/vknabel/lithia/resolution"
+	"github.com/vknabel/lithia/world"
 )
 
 func textDocumentDidOpen(context *glsp.Context, params *protocol.DidOpenTextDocumentParams) error {
@@ -47,7 +47,7 @@ func openModuleTextDocumentsIfNeeded(context *glsp.Context, mod resolution.Resol
 		lithiaParser := parser.NewParser()
 
 		syntaxErrs := make([]parser.SyntaxError, 0)
-		bytes, err := os.ReadFile(filePath)
+		bytes, err := world.Current.FS.ReadFile(filePath)
 		if err != nil {
 			ls.server.Log.Errorf("failed to read %s, due %s", fileUri, err.Error())
 			continue

@@ -5,6 +5,7 @@ import (
 
 	"github.com/vknabel/lithia/ast"
 	. "github.com/vknabel/lithia/runtime"
+	"github.com/vknabel/lithia/world"
 )
 
 var _ ExternalDefinition = ExternalFS{}
@@ -48,7 +49,7 @@ func builtinFsWrite(env *Environment, decl ast.Decl) PreludeExternFunction {
 			if !ok {
 				return nil, NewRuntimeErrorf("%s is not a string", contentsValue)
 			}
-			writeError := os.WriteFile(string(toPath), []byte(string(contents)), 0644)
+			writeError := world.Current.FS.WriteFile(string(toPath), []byte(string(contents)), 0644)
 			if writeError != nil {
 				return env.MakeDataRuntimeValue("Failure", map[string]Evaluatable{
 					"error": NewConstantRuntimeValue(PreludeString(writeError.Error())),
@@ -74,7 +75,7 @@ func builtinFsRead(env *Environment, decl ast.Decl) PreludeExternFunction {
 			if !ok {
 				return nil, NewRuntimeErrorf("%s is not a string", fromPath)
 			}
-			bytes, writeError := os.ReadFile(string(fromPath))
+			bytes, writeError := world.Current.FS.ReadFile(string(fromPath))
 			if writeError != nil {
 				return env.MakeDataRuntimeValue("Failure", map[string]Evaluatable{
 					"error": NewConstantRuntimeValue(PreludeString(writeError.Error())),
@@ -100,7 +101,7 @@ func builtinFsExists(env *Environment, decl ast.Decl) PreludeExternFunction {
 			if !ok {
 				return nil, NewRuntimeErrorf("%s is not a string", atPath)
 			}
-			_, writeError := os.Stat(string(atPath))
+			_, writeError := world.Current.FS.Stat(string(atPath))
 			if os.IsNotExist(writeError) {
 				return env.MakeEmptyDataRuntimeValue("False")
 			} else {
@@ -122,7 +123,7 @@ func builtinFsDelete(env *Environment, decl ast.Decl) PreludeExternFunction {
 			if !ok {
 				return nil, NewRuntimeErrorf("%s is not a string", atPath)
 			}
-			writeError := os.Remove(string(atPath))
+			writeError := world.Current.FS.Remove(string(atPath))
 			if writeError != nil {
 				return env.MakeDataRuntimeValue("Failure", map[string]Evaluatable{
 					"error": NewConstantRuntimeValue(PreludeString(writeError.Error())),
@@ -148,7 +149,7 @@ func builtinFsDeleteAll(env *Environment, decl ast.Decl) PreludeExternFunction {
 			if !ok {
 				return nil, NewRuntimeErrorf("%s is not a string", atPath)
 			}
-			writeError := os.Remove(string(atPath))
+			writeError := world.Current.FS.Remove(string(atPath))
 			if writeError != nil {
 				return env.MakeDataRuntimeValue("Failure", map[string]Evaluatable{
 					"error": NewConstantRuntimeValue(PreludeString(writeError.Error())),

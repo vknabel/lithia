@@ -2,15 +2,15 @@ package main
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/vknabel/lithia/app/lithia/cmd"
+	"github.com/vknabel/lithia/world"
 )
 
 func main() {
 	err := cmd.Execute()
 	if err != nil {
-		fmt.Fprint(os.Stderr, err)
-		os.Exit(1)
+		fmt.Fprint(world.Current.Stderr, err)
+		world.Current.Env.Exit(1)
 	}
 }

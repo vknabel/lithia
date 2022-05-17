@@ -2,10 +2,10 @@ package runtime
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/vknabel/lithia/ast"
 	"github.com/vknabel/lithia/resolution"
+	"github.com/vknabel/lithia/world"
 )
 
 func (inter *Interpreter) NewPreludeEnvironment(resolvedModule resolution.ResolvedModule) *Environment {
@@ -17,7 +17,7 @@ func (inter *Interpreter) NewPreludeEnvironment(resolvedModule resolution.Resolv
 
 	module, err := inter.LoadModuleIfNeeded(ast.ModuleName("prelude"), resolvedModule)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "error: prelude not loaded\n    %s\n", err)
+		fmt.Fprintf(world.Current.Stderr, "error: prelude not loaded\n    %s\n", err)
 	}
 	// These declares override the ones in the prelude.
 	env.Parent = &Environment{Parent: nil, Scope: module.Environment.Scope, Unexported: module.Environment.Unexported}

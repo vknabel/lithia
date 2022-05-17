@@ -24,7 +24,7 @@ type lithiaLangserver struct {
 }
 
 var ls lithiaLangserver = lithiaLangserver{
-	resolver:       resolution.DefaultModuleResolver(),
+	resolver:       resolution.NewDefaultModuleResolver(),
 	documentCache:  &documentCache{documents: make(map[protocol.URI]*textDocumentEntry)},
 	workspaceRoots: []string{},
 }

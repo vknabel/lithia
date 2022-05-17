@@ -1,11 +1,10 @@
 package runtime
 
 import (
-	"os"
-
 	"github.com/vknabel/lithia/ast"
 	"github.com/vknabel/lithia/parser"
 	"github.com/vknabel/lithia/resolution"
+	"github.com/vknabel/lithia/world"
 )
 
 var interpreter *Interpreter
@@ -20,7 +19,7 @@ type Interpreter struct {
 
 func NewIsolatedInterpreter(referenceFile string, importRoots ...string) *Interpreter {
 	inter := &Interpreter{
-		Resolver:            resolution.DefaultModuleResolver(importRoots...),
+		Resolver:            resolution.NewDefaultModuleResolver(importRoots...),
 		Parser:              parser.NewParser(),
 		Modules:             make(map[ast.ModuleName]*RuntimeModule),
 		ExternalDefinitions: make(map[ast.ModuleName]ExternalDefinition),
@@ -149,7 +148,7 @@ func (inter *Interpreter) LoadModuleIfNeeded(queryModuleName ast.ModuleName, fro
 func (inter *Interpreter) LoadFilesIntoModule(module *RuntimeModule, files []string) ([]InterpreterContext, error) {
 	var contexts []InterpreterContext
 	for _, file := range files {
-		scriptData, err := os.ReadFile(file)
+		scriptData, err := world.Current.FS.ReadFile(file)
 		if err != nil {
 			return nil, err
 		}
