@@ -2,6 +2,7 @@ package runtime
 
 import (
 	"fmt"
+	"sort"
 	"strings"
 )
 
@@ -105,7 +106,8 @@ func (rv PreludeDict) Lookup(member string) (Evaluatable, *RuntimeError) {
 			})), nil
 	case "entries":
 		pairs := make([]RuntimeValue, 0, len(rv.dict))
-		for k, v := range rv.dict {
+		for _, k := range rv.orderedKeys() {
+			v := rv.dict[k]
 			pair, err := rv.context.environment.MakePair(NewConstantRuntimeValue(k), v)
 			if err != nil {
 				return nil, err
@@ -116,15 +118,15 @@ func (rv PreludeDict) Lookup(member string) (Evaluatable, *RuntimeError) {
 		return NewConstantRuntimeValue(dataList), err
 	case "keys":
 		keys := make([]RuntimeValue, 0, len(rv.dict))
-		for k := range rv.dict {
+		for _, k := range rv.orderedKeys() {
 			keys = append(keys, k)
 		}
 		dataList, err := rv.context.environment.MakeEagerList(keys)
 		return NewConstantRuntimeValue(dataList), err
 	case "values":
 		values := make([]Evaluatable, 0, len(rv.dict))
-		for _, v := range rv.dict {
-			values = append(values, v)
+		for _, k := range rv.orderedKeys() {
+			values = append(values, rv.dict[k])
 		}
 		dataList, err := rv.context.environment.MakeList(values)
 		return NewConstantRuntimeValue(dataList), err
@@ -136,3 +138,18 @@ func (rv PreludeDict) Lookup(member string) (Evaluatable, *RuntimeError) {
 func (rv PreludeDict) copy() PreludeDict {
 	return MakePreludeDict(rv.context, rv.dict)
 }
+
+func (rv PreludeDict) orderedKeys() []PreludeString {
+	keys := make([]PreludeString, 0, len(rv.dict))
+	for k := range rv.dict {
+		keys = append(keys, k)
+	}
+	sort.Sort(preludeStringSlice(keys))
+	return keys
+}
+
+type preludeStringSlice []PreludeString
+
+func (x preludeStringSlice) Len() int           { return len(x) }
+func (x preludeStringSlice) Less(i, j int) bool { return x[i] < x[j] }
+func (x preludeStringSlice) Swap(i, j int)      { x[i], x[j] = x[j], x[i] }

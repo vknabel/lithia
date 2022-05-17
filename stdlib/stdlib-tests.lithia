@@ -6,6 +6,7 @@ import tests {
 import tests.tests_t
 import os
 import lists
+import strings
 
 test "any in enums matches all types", { fail =>
     enum AnyEnum {
@@ -120,7 +121,10 @@ test "dict keys", { fail =>
         "id": 123
     ]
     unless user.keys == ["username", "id"] ||
-        user.keys == ["id", "username"], fail "must list all keys"
+        user.keys == ["id", "username"], fail (strings.join " ", [
+            "must list all keys, got",
+            user.keys
+        ])
 }
 
 test "dict values", { fail =>
@@ -129,7 +133,10 @@ test "dict values", { fail =>
         "id": 123
     ]
     unless user.values == ["vknabel", 123] ||
-        user.values == [123, "vknabel"], fail "must list all values"
+        user.values == [123, "vknabel"], fail (strings.join " ", [
+            "must list all values, got",
+            user.values
+        ])
 }
 
 func main { =>
