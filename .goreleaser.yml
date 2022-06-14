@@ -16,7 +16,8 @@ builds:
       # - windows
       - darwin
   # requires cross-compiler
-  # brew install FiloSottile/musl-cross/musl-cross --with-aarch64
+  # brew install FiloSottile/musl-cross/musl-cross
+  # brew reinstall FiloSottile/musl-cross/musl-cross --with-aarch64
   # brew install mingw-w64
   - id: lithia-x-linux-amd64
     main: ./app/lithia
