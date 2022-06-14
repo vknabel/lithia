@@ -1,6 +1,8 @@
 # Changelog
 
-## v0.0.17-next
+## v0.0.18-next
+
+## v0.0.17
 
 - compiler: alias imports `import alias = module.name` #32
 - compiler: dictionary literals `[:]` and `["a": "b"]` #9
