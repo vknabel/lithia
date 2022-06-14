@@ -21,7 +21,11 @@ func (e DeclImport) DeclName() Identifier {
 }
 
 func (e DeclImport) DeclOverview() string {
-	return fmt.Sprintf("import %s", e.ModuleName)
+	if e.Alias != "" {
+		return fmt.Sprintf("import %s = %s", e.Alias, e.ModuleName)
+	} else {
+		return fmt.Sprintf("import %s", e.ModuleName)
+	}
 }
 
 func (e DeclImport) Meta() *MetaDecl {
