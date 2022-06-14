@@ -2,6 +2,8 @@
 
 ## v0.0.18-next
 
+- stdlib: `docs.docsToMarkup` now sorts extern properties
+
 ## v0.0.17
 
 - compiler: alias imports `import alias = module.name` #32

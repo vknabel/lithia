@@ -112,7 +112,14 @@ func docsInspectValue(value runtime.RuntimeValue, env *runtime.Environment) (run
 		})
 	case runtime.PreludePrimitiveExternType:
 		fieldDocs := make([]runtime.RuntimeValue, 0)
+		sortedFields := make([]ast.DeclField, 0)
 		for _, field := range value.Fields {
+			sortedFields = append(sortedFields, field)
+		}
+		sort.Slice(sortedFields, func(i, j int) bool {
+			return sortedFields[i].Name < sortedFields[j].Name
+		})
+		for _, field := range sortedFields {
 			params := make([]runtime.RuntimeValue, 0)
 			for _, param := range field.Parameters {
 				params = append(params, runtime.PreludeString(param.Name))
