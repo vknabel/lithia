@@ -29,7 +29,7 @@ func (t RxFutureType) Declaration() (ast.Decl, *runtime.RuntimeError) {
 }
 
 func (d RxFutureType) HasInstance(value runtime.RuntimeValue) (bool, *runtime.RuntimeError) {
-	if _, ok := value.(RxVariable); ok {
+	if _, ok := value.(RxFuture); ok {
 		return true, nil
 	} else {
 		return false, nil

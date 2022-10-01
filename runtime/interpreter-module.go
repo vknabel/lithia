@@ -18,15 +18,19 @@ type RuntimeModule struct {
 	// docs can be derived from the files
 }
 
-func (inter *Interpreter) NewModule(resolvedModule resolution.ResolvedModule) *RuntimeModule {
+func (inter *Interpreter) NewModule(resolvedModule resolution.ResolvedModule) (*RuntimeModule, error) {
+	env, err := inter.NewPreludeEnvironment(resolvedModule)
+	if err != nil {
+		return nil, err
+	}
 	name := resolvedModule.AbsoluteModuleName()
 	module := &RuntimeModule{
 		Name:        name,
-		Environment: NewEnvironment(inter.NewPreludeEnvironment(resolvedModule)),
+		Environment: NewEnvironment(env),
 		Files:       make(map[FileName]*InterpreterContext),
 		Decl:        ast.MakeContextModule(name),
 		resolved:    resolvedModule,
 	}
 	inter.Modules[name] = module
-	return module
+	return module, nil
 }

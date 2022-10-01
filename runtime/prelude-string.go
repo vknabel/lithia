@@ -13,6 +13,10 @@ func (s PreludeString) String() string {
 	return string(s)
 }
 
+func (s PreludeString) EagerEvaluate() *RuntimeError {
+	return nil
+}
+
 func (i PreludeString) Lookup(member string) (Evaluatable, *RuntimeError) {
 	switch member {
 	case "length":

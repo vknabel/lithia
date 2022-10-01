@@ -5,6 +5,9 @@
  */
 module prelude
 
+/// Eagerly evaluates a given value recursively.
+/// All members of lists, dictionaries and data structures will be evaluated.
+extern eager value
 /// Prints a message to stdout.
 extern print message
 /// Prints a debug message to stdout.

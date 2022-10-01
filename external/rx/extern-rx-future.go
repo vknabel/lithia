@@ -67,12 +67,14 @@ func (RxFuture) RuntimeType() runtime.RuntimeTypeRef {
 func (v RxFuture) String() string {
 	v.storage.lock.RLock()
 	defer v.storage.lock.RUnlock()
-	if v.storage.result.err != nil {
+	if v.storage.result == nil {
+		return "(Future unresolved)"
+	} else if v.storage.result.err != nil {
 		return fmt.Sprintf("(%s %s)", v.RuntimeType().Name, *v.storage.result.err)
 	} else if v.storage.result.value != nil {
 		return fmt.Sprintf("(%s %s)", v.RuntimeType().Name, *v.storage.result.value)
 	} else {
-		return "Future"
+		return "(Future invalid)"
 	}
 }
 
@@ -127,6 +129,14 @@ func (v RxFuture) accept(value runtime.RuntimeValue) (runtime.RuntimeValue, *run
 
 		v.storage.result = &promiseResult{value: &value}
 		v.storage.lock.Unlock()
+		if eager, ok := value.(runtime.EagerEvaluatableRuntimeValue); ok {
+			err := eager.EagerEvaluate()
+			if err != nil {
+				v.storage.channel <- promiseResult{err: err}
+				close(v.storage.channel)
+				return nil, err
+			}
+		}
 		v.storage.channel <- promiseResult{value: &value}
 		close(v.storage.channel)
 		return value, nil
@@ -144,7 +154,6 @@ func (v RxFuture) fail(err runtime.RuntimeError) (runtime.RuntimeValue, *runtime
 		}
 	} else {
 		v.storage.result = &promiseResult{err: &err}
-		v.storage.lock.Unlock()
 
 		v.storage.channel <- promiseResult{err: &err}
 		close(v.storage.channel)

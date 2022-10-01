@@ -19,6 +19,10 @@ type RuntimeType interface {
 	HasInstance(value RuntimeValue) (bool, *RuntimeError)
 }
 
+type EagerEvaluatableRuntimeValue interface {
+	EagerEvaluate() *RuntimeError
+}
+
 type CallableRuntimeValue interface {
 	RuntimeValue
 	Arity() int

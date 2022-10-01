@@ -25,6 +25,24 @@ func MakePreludeDict(context *InterpreterContext, dict map[PreludeString]Evaluat
 	}
 }
 
+func (d PreludeDict) EagerEvaluate() *RuntimeError {
+	for _, m := range d.dict {
+		value, err := m.Evaluate()
+		if err != nil {
+			return err
+		}
+		eagerEvaluatable, ok := value.(EagerEvaluatableRuntimeValue)
+		if !ok {
+			continue
+		}
+		err = eagerEvaluatable.EagerEvaluate()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (PreludeDict) RuntimeType() RuntimeTypeRef {
 	return PreludeDictTypeRef
 }

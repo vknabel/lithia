@@ -3,6 +3,10 @@
 ## v0.0.18-next
 
 - stdlib: `docs.docsToMarkup` now sorts extern properties
+- stdlib: new function `prelude.eager` which recursively evaluates a given value
+- stdlib: new function `lists.prepend` for prepending lists
+- fix: improved type switch error message
+- fix: improved stdlib not found error message
 
 ## v0.0.17
 

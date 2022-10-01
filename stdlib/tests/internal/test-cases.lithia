@@ -7,8 +7,7 @@ import rx
 let testCases = rx.Variable Nil
 
 func runTestCase { summary, testCase =>
-    let eagerlyRunPreviousTests = summary.failedTests
-    eagerlyRunPreviousTests
+    eager summary.failedTests
 
     let testNumber = summary.ok + summary.notOk + 1
     let failure = rx.Variable None
