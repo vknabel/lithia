@@ -3,6 +3,7 @@ import lists
 
 test "lists.forEach", { fail =>
     unless (lists.forEach [], { i => i }) == Void, fail "Void when empty"
+    unless (lists.forEach [1], { i => i }) == 1, fail "returns first and last value"
     unless (lists.forEach [1, 2, 3], { i => i }) == 3, fail "returns last value"
     unless (lists.forEach [1, 2, 3], { i => Some i }) == (Some 3), fail "last value regardless of type"
 }

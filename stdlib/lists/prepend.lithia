@@ -1,0 +1,6 @@
+module lists
+
+/// Prepends an element to the start of a list.
+func prepend { element, list =>
+    Cons element, list
+}

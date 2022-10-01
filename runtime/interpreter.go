@@ -36,7 +36,10 @@ func (inter *Interpreter) LoadExternalDefinition(name ast.ModuleName, definition
 func (inter *Interpreter) Interpret(fileName string, script string) (RuntimeValue, error) {
 	pkg := inter.Resolver.ResolvePackageForReferenceFile(fileName)
 	resolvedModule := inter.Resolver.CreateSingleFileModule(pkg, fileName)
-	module := inter.NewModule(resolvedModule)
+	module, err := inter.NewModule(resolvedModule)
+	if err != nil {
+		return nil, err
+	}
 	ix, err := inter.LoadFileIntoModule(module, fileName, script)
 	if err != nil {
 		return nil, err
@@ -54,8 +57,12 @@ func (inter *Interpreter) InterpretEmbed(fileName string, script string) (Runtim
 	resolvedModule := inter.Resolver.CreateSingleFileModule(pkg, fileName)
 	moduleName := resolvedModule.AbsoluteModuleName()
 	module := inter.Modules[moduleName]
+	var err error
 	if module == nil {
-		module = inter.NewModule(resolvedModule)
+		module, err = inter.NewModule(resolvedModule)
+		if err != nil {
+			return nil, err
+		}
 	}
 	ex, err := inter.EmbedFileIntoModule(module, fileName, script)
 	if err != nil {
@@ -131,7 +138,10 @@ func (inter *Interpreter) LoadModuleIfNeeded(queryModuleName ast.ModuleName, fro
 	if module, ok := inter.Modules[moduleName]; ok {
 		return module, nil
 	}
-	module := inter.NewModule(resolvedModule)
+	module, err := inter.NewModule(resolvedModule)
+	if err != nil {
+		return nil, err
+	}
 	contexts, err := inter.LoadFilesIntoModule(module, resolvedModule.Files)
 	if err != nil {
 		return module, err

@@ -83,6 +83,8 @@ func (e ExternalPrelude) Lookup(name string, env *Environment, decl ast.Decl) (R
 			return nil, false
 		}
 
+	case "eager":
+		return builtinEager(decl), true
 	case "print":
 		return builtinPrint(decl), true
 	case "debug":
@@ -91,6 +93,22 @@ func (e ExternalPrelude) Lookup(name string, env *Environment, decl ast.Decl) (R
 	default:
 		return nil, false
 	}
+}
+
+func builtinEager(decl ast.Decl) PreludeExternFunction {
+	return MakeExternFunction(
+		decl,
+		func(args []Evaluatable) (RuntimeValue, *RuntimeError) {
+			value, err := args[0].Evaluate()
+			if err != nil {
+				return nil, err
+			}
+			if eager, ok := value.(EagerEvaluatableRuntimeValue); ok {
+				return value, eager.EagerEvaluate()
+			}
+			return value, nil
+		},
+	)
 }
 
 func builtinDebug(decl ast.Decl) PreludeExternFunction {

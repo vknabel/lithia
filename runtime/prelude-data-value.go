@@ -45,6 +45,24 @@ func (d DataRuntimeValue) String() string {
 	return fmt.Sprintf("(%s %s)", d.TypeDecl.Decl.Name, strings.Join(params, ", "))
 }
 
+func (d DataRuntimeValue) EagerEvaluate() *RuntimeError {
+	for _, m := range d.Members {
+		value, err := m.Evaluate()
+		if err != nil {
+			return err
+		}
+		eagerEvaluatable, ok := value.(EagerEvaluatableRuntimeValue)
+		if !ok {
+			continue
+		}
+		err = eagerEvaluatable.EagerEvaluate()
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func (d DataRuntimeValue) Lookup(name string) (Evaluatable, *RuntimeError) {
 	if value, ok := d.Members[name]; ok {
 		return value, nil

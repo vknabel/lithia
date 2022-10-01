@@ -104,15 +104,19 @@ func (r *RuntimeError) CascadeDecl(decl ast.Decl) *RuntimeError {
 }
 
 func (r *RuntimeError) CascadeExpr(expr ast.Expr) *RuntimeError {
-	return r
-	// if expr.Meta().Source == nil {
-	// 	return r
-	// } else {
-	// 	return r.cascadeEntry(stackEntry{
-	// 		source: *expr.Meta().Source,
-	// 		expr:   expr,
-	// 	})
-	// }
+	switch expr := expr.(type) {
+	case ast.ExprTypeSwitch:
+		if expr.Meta().Source == nil {
+			return r
+		} else {
+			return r.cascadeEntry(stackEntry{
+				source: *expr.Meta().Source,
+				expr:   expr,
+			})
+		}
+	default:
+		return r
+	}
 }
 
 func (r *RuntimeError) CascadeCall(callable CallableRuntimeValue, fromExpr ast.Expr) *RuntimeError {

@@ -39,6 +39,10 @@ func MakePreludeFuncDecl(context *InterpreterContext, decl ast.DeclFunc) (Prelud
 	}, nil
 }
 
+func (PreludeFuncDecl) EagerEvaluate() *RuntimeError {
+	return nil
+}
+
 func (f PreludeFuncDecl) Lookup(member string) (Evaluatable, *RuntimeError) {
 	switch member {
 	case "arity":

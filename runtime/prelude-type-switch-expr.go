@@ -123,7 +123,7 @@ func (t PreludeTypeSwitchExpr) Call(args []Evaluatable, fromExpr ast.Expr) (Runt
 		}
 		return Call(fun, args, t.Decl.Cases[caseIdentifier])
 	}
-	return nil, NewRuntimeErrorf("no matching case %s", primaryArg).CascadeExpr(t.Decl)
+	return nil, NewRuntimeErrorf("no matching case %s", primaryArg.String()).CascadeExpr(t.Decl)
 }
 
 func (f PreludeTypeSwitchExpr) Source() *ast.Source {
@@ -143,7 +143,7 @@ func validateTypeSwitchAgainstEnumDecl(enumDecl PreludeEnumDecl, typeSwitch ast.
 }
 
 func validateTypeSwitchAgainstEnumDeclForCount(enumDecl PreludeEnumDecl, typeSwitch ast.ExprTypeSwitch) *RuntimeError {
-	if len(typeSwitch.Cases) != len(enumDecl.Decl.Cases) {
+	if len(typeSwitch.Cases) < len(enumDecl.Decl.Cases) {
 		for caseIdentifier := range typeSwitch.Cases {
 			if caseIdentifier == "Any" {
 				return nil
