@@ -7,6 +7,7 @@
 - stdlib: new function `lists.prepend` for prepending lists
 - fix: improved type switch error message
 - fix: improved stdlib not found error message
+- chore: bump dependencies
 
 ## v0.0.17
 

@@ -1,27 +1,33 @@
 module github.com/vknabel/lithia
 
-go 1.18
+go 1.19
 
 require (
-	github.com/muesli/coral v1.0.0
-	github.com/smacker/go-tree-sitter v0.0.0-20220611151427-2c4b54ed41fe
+	github.com/smacker/go-tree-sitter v0.0.0-20221023091341-2009a4db91e4
+	github.com/spf13/cobra v1.6.1
 	github.com/tliron/glsp v0.1.1
-	github.com/tliron/kutil v0.1.60
-	github.com/vknabel/tree-sitter-lithia v0.2.1
+	github.com/tliron/kutil v0.1.62
+	github.com/vknabel/tree-sitter-lithia v0.2.2-0.20221001133044-2d70ec255b9f
 )
 
 require (
+	github.com/aymanbagabas/go-osc52 v1.2.1 // indirect
 	github.com/gorilla/websocket v1.5.0 // indirect
-	github.com/inconshreveable/mousetrap v1.0.0 // indirect
-	github.com/mattn/go-colorable v0.1.12 // indirect
-	github.com/mattn/go-isatty v0.0.14 // indirect
-	github.com/petermattis/goid v0.0.0-20220526132513-07eaf5d0b9f4 // indirect
+	github.com/iancoleman/strcase v0.2.0 // indirect
+	github.com/inconshreveable/mousetrap v1.0.1 // indirect
+	github.com/lucasb-eyer/go-colorful v1.2.0 // indirect
+	github.com/mattn/go-isatty v0.0.16 // indirect
+	github.com/mattn/go-runewidth v0.0.14 // indirect
+	github.com/muesli/termenv v0.13.0 // indirect
+	github.com/petermattis/goid v0.0.0-20221018141743-354ef7f2fd21 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/rivo/uniseg v0.4.2 // indirect
 	github.com/sasha-s/go-deadlock v0.3.1 // indirect
 	github.com/sourcegraph/jsonrpc2 v0.1.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
-	github.com/zchee/color/v2 v2.0.6 // indirect
-	golang.org/x/crypto v0.0.0-20220525230936-793ad666bf5e // indirect
-	golang.org/x/sys v0.0.0-20220610221304-9f5ed59c137d // indirect
-	golang.org/x/term v0.0.0-20220526004731-065cf7ba2467 // indirect
+	github.com/vmihailenco/msgpack/v5 v5.3.5 // indirect
+	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
+	golang.org/x/crypto v0.1.0 // indirect
+	golang.org/x/sys v0.1.0 // indirect
+	golang.org/x/term v0.1.0 // indirect
 )
