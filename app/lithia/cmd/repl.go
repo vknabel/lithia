@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"io"
 
-	cobra "github.com/muesli/coral"
+	"github.com/spf13/cobra"
 	"github.com/vknabel/lithia"
 	"github.com/vknabel/lithia/reporting"
 	"github.com/vknabel/lithia/world"
