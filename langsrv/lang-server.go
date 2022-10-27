@@ -38,6 +38,8 @@ func init() {
 		Shutdown:    shutdown,
 		SetTrace:    setTrace,
 
+		CancelRequest: func(context *glsp.Context, params *protocol.CancelParams) error { return nil },
+
 		TextDocumentDidOpen:   textDocumentDidOpen,
 		TextDocumentDidChange: textDocumentDidChange,
 		TextDocumentDidClose:  func(context *glsp.Context, params *protocol.DidCloseTextDocumentParams) error { return nil },

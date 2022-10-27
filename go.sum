@@ -47,8 +47,8 @@ github.com/stretchr/testify v1.6.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/
 github.com/stretchr/testify v1.7.1/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/stretchr/testify v1.7.4 h1:wZRexSlwd7ZXfKINDLsO4r7WBt3gTKONc6K/VesHvHM=
 github.com/stretchr/testify v1.7.4/go.mod h1:yNjHg4UonilssWZ8iaSj1OCr/vHnekPRkoO+kdMU+MU=
-github.com/tliron/glsp v0.1.1 h1:GNNgUX9p1Q9MoPQooJoZ0+WaLL03EkhcKZUYJAtiNqs=
-github.com/tliron/glsp v0.1.1/go.mod h1:RVyVKeY3U+Nlc3DRklUiaegNsQyjzNTEool6YWh1v7g=
+github.com/tliron/glsp v0.1.2-0.20220804144236-0fe570f215a5 h1:Qqqhhlk6YA+UsQCdWKStjHzK6UqMjblw5jZ0xJY2DLY=
+github.com/tliron/glsp v0.1.2-0.20220804144236-0fe570f215a5/go.mod h1:Hqz7gzsJnxJidRXTUsvqdmk1xeh4zdlB8B2Jv3244RU=
 github.com/tliron/kutil v0.1.62 h1:Nj4avenQO9t9QNaD6qXf1DsdyOjQrORIJjoc0FCnsBg=
 github.com/tliron/kutil v0.1.62/go.mod h1:Mo1pAtg/9yG3ClnUv32Hrl+t0BFFCg49RpCjHG3sY7c=
 github.com/vknabel/tree-sitter-lithia v0.2.2-0.20221001133044-2d70ec255b9f h1:6OyIrB3iRHe1zZq+VEBmxIk2WVTuNWdJrpoG91cThYU=

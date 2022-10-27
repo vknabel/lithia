@@ -7,12 +7,68 @@ import (
 	"github.com/tliron/glsp"
 	protocol "github.com/tliron/glsp/protocol_3_16"
 	"github.com/vknabel/lithia/ast"
+	"github.com/vknabel/lithia/parser"
 )
 
 func textDocumentCompletion(context *glsp.Context, params *protocol.CompletionParams) (interface{}, error) {
 	rc := NewReqContextAtPosition(&params.TextDocumentPositionParams)
 
+	targetNode, err := rc.findNode()
+	if err != nil {
+		return nil, err
+	}
+
 	completionItems := []protocol.CompletionItem{}
+
+	switch targetNode.Type() {
+	case parser.TYPE_NODE_IMPORT_DECLARATION:
+		kind := protocol.CompletionItemKindModule
+		mods, err := ls.resolver.ImportableModules(rc.module.Package())
+		if err != nil {
+			return nil, err
+		}
+		for _, mod := range mods {
+			completionItems = append(completionItems, protocol.CompletionItem{
+				Label: string(mod.RelativeName),
+				Kind:  &kind,
+				Documentation: &protocol.MarkupContent{
+					Kind:  protocol.MarkupKindMarkdown,
+					Value: fmt.Sprintf("`import %s`", mod.RelativeName),
+				},
+			})
+		}
+		return completionItems, nil
+	case parser.TYPE_NODE_MEMBER_ACCESS, ".":
+		decls := rc.accessibleDeclarations(context)
+
+		for _, imported := range decls {
+			switch decl := imported.decl.(type) {
+			case ast.DeclData:
+				for _, field := range decl.Fields {
+					insertText := string(field.DeclName())
+					var detail string
+					if imported.decl.Meta().ModuleName != "" {
+						detail = string(imported.decl.Meta().ModuleName) +
+							"." +
+							string(imported.decl.DeclName()) +
+							"." +
+							string(field.DeclName())
+					}
+
+					completionItems = append(completionItems, protocol.CompletionItem{
+						Label:            string(field.DeclName()),
+						Kind:             completionItemKindForDecl(imported.decl),
+						InsertText:       &insertText,
+						Detail:           &detail,
+						CommitCharacters: []string{"."},
+						Documentation:    documentationMarkupContentForDecl(imported.decl),
+					})
+				}
+			}
+		}
+		return completionItems, nil
+	}
+
 	for _, imported := range rc.accessibleDeclarations(context) {
 		insertText := insertTextForImportedDecl(imported)
 		var detail string
