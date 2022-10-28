@@ -84,12 +84,8 @@ func (mr *ModuleResolver) ResolvePackageForReferenceFile(referenceFile string) R
 		manifestPath := filepath.Join(path.Dir(referenceFile), candidates, mr.manifestName)
 		if _, err := world.Current.FS.Stat(manifestPath); err == nil {
 			packagePath := path.Dir(manifestPath)
-			packageName := path.Base(packagePath)
-			if packageName == "/" || packageName == "." {
-				packageName = mr.defaultPackageName
-			}
 			return ResolvedPackage{
-				Name: packageName,
+				Name: mr.defaultPackageName,
 				Path: packagePath,
 				Manifest: &PackageManifest{
 					Path: manifestPath,
