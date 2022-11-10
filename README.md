@@ -27,7 +27,7 @@ Currently Lithia is an early proof of concept. Basic language features exist, bu
 - [x] ... with diagnostics
 - [x] ... with syntax highlighting
 - [x] ... with auto completion _basic_
-- [ ] ... with highlights
+- [x] ... with symbols
 - [ ] ... with refactorings
 - [ ] ... with formatter
 - [ ] A package manager
