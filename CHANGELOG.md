@@ -7,6 +7,7 @@
 - stdlib: new function `lists.prepend` for prepending lists
 - fix: improved type switch error message
 - fix: improved stdlib not found error message
+- fix: source locations were off
 - lsp: complete importable modules #35
 - lsp: field completions #35
 - chore: bump dependencies

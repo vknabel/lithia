@@ -27,7 +27,7 @@ func textDocumentDeclaration(context *glsp.Context, params *protocol.Declaration
 					},
 					End: protocol.Position{
 						Line:      uint32(imported.decl.Meta().Source.End.Line),
-						Character: uint32(imported.decl.Meta().Source.End.Line),
+						Character: uint32(imported.decl.Meta().Source.End.Column),
 					},
 				},
 			},
