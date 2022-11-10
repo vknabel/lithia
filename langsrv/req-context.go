@@ -94,11 +94,18 @@ func (rc *ReqContext) globalAndModuleDeclarations(context *glsp.Context) []impor
 	return globals
 }
 
+func (rc *ReqContext) sourceFileDeclarations() []ast.Decl {
+	if rc.sourceFile == nil {
+		return nil
+	}
+	return rc.sourceFile.Declarations
+}
+
 func (rc *ReqContext) moduleDeclarations() []ast.Decl {
 	if rc.sourceFile == nil {
 		return nil
 	}
-	globalDeclarations := rc.sourceFile.Declarations
+	globalDeclarations := rc.sourceFileDeclarations()
 	for _, sameModuleFile := range rc.textDocumentEntry.module.Files {
 		fileUrl := "file://" + sameModuleFile
 		if rc.item.URI == fileUrl {

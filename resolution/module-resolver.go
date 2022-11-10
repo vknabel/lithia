@@ -1,6 +1,7 @@
 package resolution
 
 import (
+	"os"
 	"path"
 	"path/filepath"
 	"strings"
@@ -41,7 +42,7 @@ type ResolvedModule struct {
 	packageRef *ResolvedPackage
 	// all modules of this package are relative to this path
 	// might contain the package manifest file
-	relativeName ast.ModuleName
+	RelativeName ast.ModuleName
 	Path         string
 	Files        []string
 }
@@ -134,7 +135,7 @@ func (mr *ModuleResolver) CreateSingleFileModule(pkg ResolvedPackage, file strin
 	uniform := strings.ReplaceAll(trimmed, ".", "_")
 	return ResolvedModule{
 		packageRef:   &pkg,
-		relativeName: ast.ModuleName(uniform),
+		RelativeName: ast.ModuleName(uniform),
 		Path:         file,
 		Files:        []string{file},
 	}
@@ -196,7 +197,7 @@ func (mr *ModuleResolver) resolveModuleWithinPackage(pkg ResolvedPackage, module
 	files, err := world.Current.FS.Glob(path.Join(modulePath, mr.lithiaSourceGlob))
 	return ResolvedModule{
 		packageRef:   &pkg,
-		relativeName: ast.ModuleName(strings.Join(moduleParts, ".")),
+		RelativeName: ast.ModuleName(strings.Join(moduleParts, ".")),
 		Path:         modulePath,
 		Files:        files,
 	}, err
@@ -207,13 +208,37 @@ func (mod ResolvedModule) Package() ResolvedPackage {
 }
 
 func (mod ResolvedModule) AbsoluteModuleName() ast.ModuleName {
-	if mod.relativeName == "" {
+	if mod.RelativeName == "" {
 		return ast.ModuleName(mod.Package().Name)
 	} else {
-		return ast.ModuleName(mod.packageRef.Name) + "." + mod.relativeName
+		return ast.ModuleName(mod.packageRef.Name) + "." + mod.RelativeName
 	}
 }
 
 func removingFilePrefix(str string) string {
 	return strings.TrimPrefix(str, "file://")
+}
+
+func (mr *ModuleResolver) ImportableModules(pkg ResolvedPackage) ([]ResolvedModule, error) {
+	var modules []ResolvedModule
+
+	possibleModuleNames := make([]string, 0)
+	for _, root := range mr.externalImportRoots {
+		dirs, err := os.ReadDir(root)
+		if err != nil {
+			return nil, err
+		}
+		for _, dir := range dirs {
+			if dir.IsDir() {
+				possibleModuleNames = append(possibleModuleNames, dir.Name())
+			}
+		}
+	}
+
+	for _, modName := range possibleModuleNames {
+		mod := mr.ResolvePackageAndModuleForReferenceFile(modName)
+		modules = append(modules, mod)
+	}
+
+	return modules, nil
 }
