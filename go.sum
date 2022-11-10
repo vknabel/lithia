@@ -33,8 +33,8 @@ github.com/rivo/uniseg v0.4.2/go.mod h1:FN3SvrM+Zdj16jyLfmOkMNblXMcoc8DfTHruCPUc
 github.com/russross/blackfriday/v2 v2.1.0/go.mod h1:+Rmxgy9KzJVeS9/2gXHxylqXiyQDYRxCVz55jmeOWTM=
 github.com/sasha-s/go-deadlock v0.3.1 h1:sqv7fDNShgjcaxkO0JNcOAlr8B9+cV5Ey/OB71efZx0=
 github.com/sasha-s/go-deadlock v0.3.1/go.mod h1:F73l+cr82YSh10GxyRI6qZiCgK64VaZjwesgfQ1/iLM=
-github.com/smacker/go-tree-sitter v0.0.0-20221023091341-2009a4db91e4 h1:vyWxrGUBud85srrtUPRP2c1gQjRy6oV3feKpBAIGLnI=
-github.com/smacker/go-tree-sitter v0.0.0-20221023091341-2009a4db91e4/go.mod h1:q99oHDsbP0xRwmn7Vmob8gbSMNyvJ83OauXPSuHQuKE=
+github.com/smacker/go-tree-sitter v0.0.0-20221031025734-03a9c97d8039 h1:gcidAf9/pgFbPPJzzsOr+uf7sq7so5R99Q4c3hGaNFk=
+github.com/smacker/go-tree-sitter v0.0.0-20221031025734-03a9c97d8039/go.mod h1:q99oHDsbP0xRwmn7Vmob8gbSMNyvJ83OauXPSuHQuKE=
 github.com/sourcegraph/jsonrpc2 v0.1.0 h1:ohJHjZ+PcaLxDUjqk2NC3tIGsVa5bXThe1ZheSXOjuk=
 github.com/sourcegraph/jsonrpc2 v0.1.0/go.mod h1:ZafdZgk/axhT1cvZAPOhw+95nz2I/Ra5qMlU4gTRwIo=
 github.com/spf13/cobra v1.6.1 h1:o94oiPyS4KD1mPy2fmcYYHHfCxLqYjJOhGsCHFZtEzA=
@@ -49,8 +49,8 @@ github.com/stretchr/testify v1.7.4 h1:wZRexSlwd7ZXfKINDLsO4r7WBt3gTKONc6K/VesHvH
 github.com/stretchr/testify v1.7.4/go.mod h1:yNjHg4UonilssWZ8iaSj1OCr/vHnekPRkoO+kdMU+MU=
 github.com/tliron/glsp v0.1.2-0.20220804144236-0fe570f215a5 h1:Qqqhhlk6YA+UsQCdWKStjHzK6UqMjblw5jZ0xJY2DLY=
 github.com/tliron/glsp v0.1.2-0.20220804144236-0fe570f215a5/go.mod h1:Hqz7gzsJnxJidRXTUsvqdmk1xeh4zdlB8B2Jv3244RU=
-github.com/tliron/kutil v0.1.62 h1:Nj4avenQO9t9QNaD6qXf1DsdyOjQrORIJjoc0FCnsBg=
-github.com/tliron/kutil v0.1.62/go.mod h1:Mo1pAtg/9yG3ClnUv32Hrl+t0BFFCg49RpCjHG3sY7c=
+github.com/tliron/kutil v0.1.63 h1:/xOqEShxPymwhcVcPFAks8zj43HU+NljbmzYjNXIO+Y=
+github.com/tliron/kutil v0.1.63/go.mod h1:Mo1pAtg/9yG3ClnUv32Hrl+t0BFFCg49RpCjHG3sY7c=
 github.com/vknabel/tree-sitter-lithia v0.2.2-0.20221001133044-2d70ec255b9f h1:6OyIrB3iRHe1zZq+VEBmxIk2WVTuNWdJrpoG91cThYU=
 github.com/vknabel/tree-sitter-lithia v0.2.2-0.20221001133044-2d70ec255b9f/go.mod h1:pQXgwgGcLPikIr7/mxNbIXkSO6Po9Zmv0TYeyMI1i+Y=
 github.com/vmihailenco/msgpack/v5 v5.3.5 h1:5gO0H1iULLWGhs2H5tbAHIZTV8/cYafcFOr9znI5mJU=
@@ -60,10 +60,10 @@ github.com/vmihailenco/tagparser/v2 v2.0.0/go.mod h1:Wri+At7QHww0WTrCBeu4J6bNtoV
 golang.org/x/crypto v0.1.0 h1:MDRAIl0xIo9Io2xV565hzXHw3zVseKrJKodhohM5CjU=
 golang.org/x/crypto v0.1.0/go.mod h1:RecgLatLF4+eUMCP1PoPZQb+cVrJcOPbHkTkbkB9sbw=
 golang.org/x/sys v0.0.0-20220811171246-fbc7d0a398ab/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
-golang.org/x/sys v0.1.0 h1:kunALQeHf1/185U1i0GOB/fy1IPRDDpuoOOqRReG57U=
-golang.org/x/sys v0.1.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
-golang.org/x/term v0.1.0 h1:g6Z6vPFA9dYBAF7DWcH6sCcOntplXsDKcliusYijMlw=
-golang.org/x/term v0.1.0/go.mod h1:jbD1KX2456YbFQfuXm/mYQcufACuNUgVhRMnK/tPxf8=
+golang.org/x/sys v0.2.0 h1:ljd4t30dBnAvMZaQCevtY0xLLD0A+bRZXbgLMLU1F/A=
+golang.org/x/sys v0.2.0/go.mod h1:oPkhp1MJrh7nUepCBck5+mAzfO9JrbApNNgaTdGDITg=
+golang.org/x/term v0.2.0 h1:z85xZCsEl7bi/KwbNADeBYoOP0++7W1ipu+aGnpwzRM=
+golang.org/x/term v0.2.0/go.mod h1:TVmDHMZPmdnySmBfhjOoOdhjzdE1h4u1VwSiw2l1Nuc=
 gopkg.in/check.v1 v0.0.0-20161208181325-20d25e280405/go.mod h1:Co6ibVJAznAaIkqp8huTwlJQCZ016jof/cbN4VW5Yz0=
 gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c/go.mod h1:K4uyk7z7BCEPqu6E+C64Yfv1cQ7kz7rIZviUmN+EgEM=
 gopkg.in/yaml.v3 v3.0.1 h1:fxVm/GzAzEWqLHuvctI91KS9hhNmmWOoWu0XTYJS7CA=
