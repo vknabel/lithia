@@ -45,12 +45,14 @@ func init() {
 		TextDocumentDidClose:  func(context *glsp.Context, params *protocol.DidCloseTextDocumentParams) error { return nil },
 
 		WorkspaceDidDeleteFiles: workspaceDidDeleteFiles,
+		WorkspaceSymbol:         workspaceSymbol,
 
 		TextDocumentHover:          textDocumentHover,
 		TextDocumentCompletion:     textDocumentCompletion,
 		TextDocumentDefinition:     textDocumentDefinition,
 		TextDocumentTypeDefinition: textDocumentTypeDefinition,
 		TextDocumentDeclaration:    textDocumentDeclaration,
+		TextDocumentDocumentSymbol: textDocumentDocumentSymbol,
 
 		TextDocumentSemanticTokensFull: textDocumentSemanticTokensFull,
 	}

@@ -10,6 +10,8 @@
 - fix: source locations were off
 - lsp: complete importable modules #35
 - lsp: field completions #35
+- lsp: outline symbols for current file
+- lsp: workspace symbols for all files
 - chore: bump dependencies
 
 ## v0.0.17
