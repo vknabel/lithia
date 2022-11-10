@@ -8,6 +8,7 @@
 - fix: improved type switch error message
 - fix: improved stdlib not found error message
 - chore: bump dependencies
+- module: new module resolution algorithm
 
 ## v0.0.17
 

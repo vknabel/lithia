@@ -79,12 +79,13 @@ func defaultImportRoots(importRoots ...string) []string {
 
 func (mr *ModuleResolver) ResolvePackageForReferenceFile(referenceFile string) ResolvedPackage {
 	referenceFile = removingFilePrefix(referenceFile)
-	for _, candidates := range mr.manifestSearchPaths {
-		manifestPath := filepath.Join(path.Dir(referenceFile), candidates, mr.manifestName)
+	for _, candidate := range mr.manifestSearchPaths {
+		manifestPath := filepath.Join(path.Dir(referenceFile), candidate, mr.manifestName)
 		if _, err := world.Current.FS.Stat(manifestPath); err == nil {
 			packagePath := path.Dir(manifestPath)
+			packageName := path.Base(packagePath)
 			return ResolvedPackage{
-				Name: mr.defaultPackageName,
+				Name: packageName,
 				Path: packagePath,
 				Manifest: &PackageManifest{
 					Path: manifestPath,
@@ -92,16 +93,16 @@ func (mr *ModuleResolver) ResolvePackageForReferenceFile(referenceFile string) R
 			}
 		}
 	}
-	dir, err := world.Current.FS.Getwd()
-	if err != nil {
-		dir = path.Dir(referenceFile)
-	}
+	dir := path.Dir(referenceFile)
 	return ResolvedPackage{Name: mr.defaultPackageName, Path: dir}
 }
 
 func (mr *ModuleResolver) ResolvePackageAndModuleForReferenceFile(referenceFile string) ResolvedModule {
 	referenceFile = removingFilePrefix(referenceFile)
 	pkg := mr.ResolvePackageForReferenceFile(referenceFile)
+	if pkg.Manifest == nil {
+		return mr.CreateSingleFileModule(pkg, referenceFile)
+	}
 	relativeFile, err := filepath.Rel(pkg.Path, referenceFile)
 	if err != nil {
 		return mr.CreateSingleFileModule(pkg, referenceFile)
@@ -112,6 +113,9 @@ func (mr *ModuleResolver) ResolvePackageAndModuleForReferenceFile(referenceFile 
 		if moduleParts[i] == "." {
 			moduleParts = append(moduleParts[:i], moduleParts[i+1:]...)
 		}
+	}
+	if len(moduleParts) >= 1 && moduleParts[0] == mr.defaultSrcDir {
+		moduleParts = moduleParts[1:]
 	}
 	resolvedModule, err := mr.resolveModuleWithinPackage(pkg, moduleParts)
 	if err != nil {
