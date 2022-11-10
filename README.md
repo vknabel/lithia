@@ -266,11 +266,13 @@ As shown, a common use case is to pass the module itself instead of multiple wit
 
 To create your own package of modules, you can create a `Potfile`. Every module defined by the package is a directory next to the Potfile, with `.lithia` files in it.
 
-Though there are a few special cases:
+> To import a module relative to another source file, you always need to create a `Potfile` - otherwise you are only able to import global modules.
 
-- the `cmd`-folder is typically used for individual files rather than a module. You execute them with `$ lithia cmd/<file>`.
-- the `src`-folder represents the `root` of the package.
-- if the `src`-folder is missing, the package `root` is next to the Potfile.
+There are a few special cases:
+
+- the `src`-folder represents the root of the package. `src` is not required within the import.
+- if the `src`-folder is missing, the package root is next to the Potfile.
+- by convenience the `cmd`-folder is typically used for individual files rather than a module. You execute them with `$ lithia cmd/<file>`.
 
 ```
 .
