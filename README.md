@@ -26,7 +26,7 @@ Currently Lithia is an early proof of concept. Basic language features exist, bu
 - [x] Creating a custom language server
 - [x] ... with diagnostics
 - [x] ... with syntax highlighting
-- [x] ... with auto completion _basic_
+- [x] ... with auto completion
 - [x] ... with symbols
 - [ ] ... with refactorings
 - [ ] ... with formatter

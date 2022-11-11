@@ -3,6 +3,7 @@ package langsrv
 import (
 	"fmt"
 	"strings"
+	"unicode"
 
 	"github.com/tliron/glsp"
 	protocol "github.com/tliron/glsp/protocol_3_16"
@@ -40,13 +41,21 @@ func textDocumentCompletion(context *glsp.Context, params *protocol.CompletionPa
 		return completionItems, nil
 	case parser.TYPE_NODE_MEMBER_ACCESS, ".":
 		return rc.textDocumentMemberAccessCompletionItems(context)
+	case parser.TYPE_NODE_TYPE_EXPRESSION:
+		insert := "type Abc {}"
+		return []protocol.CompletionItem{
+			protocol.CompletionItem{
+				Label:      "Completion",
+				InsertText: &insert,
+			},
+		}, nil
 	}
 
 	for _, imported := range rc.accessibleDeclarations(context) {
-		completion := rc.generalCompletionItemsForDecl(imported)
-		completionItems = append(completionItems, completion)
+		completions := rc.generalCompletionItemsForDecl(imported)
+		completionItems = append(completionItems, completions...)
 	}
-	return &completionItems, nil
+	return completionItems, nil
 }
 
 func (rc *ReqContext) textDocumentMemberAccessCompletionItems(context *glsp.Context) ([]protocol.CompletionItem, error) {
@@ -82,7 +91,7 @@ func (rc *ReqContext) textDocumentMemberAccessCompletionItems(context *glsp.Cont
 			for _, imported := range scope {
 				completionItems = append(
 					completionItems,
-					rc.generalCompletionItemsForDecl(imported),
+					rc.generalCompletionItemsForDecl(imported)...,
 				)
 			}
 			return completionItems, nil
@@ -98,7 +107,7 @@ func (rc *ReqContext) textDocumentMemberAccessCompletionItems(context *glsp.Cont
 	return completionItems, nil
 }
 
-func (rc *ReqContext) generalCompletionItemsForDecl(imported importedDecl) protocol.CompletionItem {
+func (rc *ReqContext) generalCompletionItemsForDecl(imported importedDecl) []protocol.CompletionItem {
 	insertText := insertTextForImportedDecl(imported)
 	var detail string
 	if imported.decl.Meta().ModuleName != "" {
@@ -110,13 +119,38 @@ func (rc *ReqContext) generalCompletionItemsForDecl(imported importedDecl) proto
 	if imported.importDecl != nil {
 		importPrefix = fmt.Sprintf("%s.", imported.importDecl.DeclName())
 	}
-	return protocol.CompletionItem{
+	completionItems := make([]protocol.CompletionItem, 0, 2)
+	declCompletion := protocol.CompletionItem{
 		Label:         importPrefix + string(imported.decl.DeclName()),
 		Kind:          completionItemKindForDecl(imported.decl),
 		InsertText:    &insertText,
 		Detail:        &detail,
 		Documentation: documentationMarkupContentForDecl(imported.decl),
 	}
+	completionItems = append(completionItems, declCompletion)
+	if enumDecl, ok := imported.decl.(ast.DeclEnum); ok {
+		kind := protocol.CompletionItemKindSnippet
+		insertText := fmt.Sprintf("type %s%s {", importPrefix, string(enumDecl.DeclName()))
+		if len(enumDecl.Cases) != 0 {
+			insertText += "\n"
+		}
+		for _, enumCase := range enumDecl.Cases {
+			caseName := string(enumCase.DeclName())
+			lowerHead := unicode.ToLower(rune(caseName[0]))
+			varName := string(lowerHead) + caseName[1:]
+			insertText += fmt.Sprintf("    %s: { %s => },\n", caseName, varName)
+		}
+		insertText += "}"
+		typeCompletion := protocol.CompletionItem{
+			Label:         "type " + importPrefix + string(enumDecl.DeclName()),
+			Kind:          &kind,
+			InsertText:    &insertText,
+			Detail:        &detail,
+			Documentation: documentationMarkupContentForDecl(enumDecl),
+		}
+		completionItems = append(completionItems, typeCompletion)
+	}
+	return completionItems
 }
 
 func (rc *ReqContext) memberAccessCompletionItemsForDecl(imported importedDecl, accessedExpr string) []protocol.CompletionItem {
@@ -133,7 +167,7 @@ func (rc *ReqContext) memberAccessCompletionItemsForDecl(imported importedDecl, 
 		completionItems := make([]protocol.CompletionItem, 0)
 		for _, current := range importedDecls {
 			completion := rc.generalCompletionItemsForDecl(current)
-			completionItems = append(completionItems, completion)
+			completionItems = append(completionItems, completion...)
 		}
 		return completionItems
 	case ast.DeclImport:
