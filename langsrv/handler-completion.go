@@ -17,6 +17,12 @@ func textDocumentCompletion(context *glsp.Context, params *protocol.CompletionPa
 	if err != nil {
 		return nil, err
 	}
+	switch targetNode.Type() {
+	case "{", "}":
+		if targetNode.Parent() != nil {
+			targetNode = targetNode.Parent()
+		}
+	}
 
 	insertAsStatement := false
 	contextReferenceType := targetNode.Type()
@@ -37,6 +43,42 @@ func textDocumentCompletion(context *glsp.Context, params *protocol.CompletionPa
 	completionItems := []protocol.CompletionItem{}
 
 	switch targetNode.Type() {
+	case "import_members":
+		globalDeclarations := rc.sourceFile.Declarations
+		for _, decl := range globalDeclarations {
+			decl, ok := decl.(ast.DeclImport)
+			if !ok || !includesAstSourcePosition(decl.Meta().Source, rc.position) {
+				continue
+			}
+			exportedDecls, err := rc.moduleDeclarationsForImportDecl(decl)
+			if err != nil {
+				return nil, err
+			}
+			for _, exportedDecl := range exportedDecls {
+				skip := false
+				for _, alreadyImported := range decl.Members {
+					if alreadyImported.Name == exportedDecl.DeclName() {
+						skip = true
+						break
+					}
+				}
+				if skip {
+					continue
+				}
+				detail := "import member"
+				insertText := fmt.Sprintf("%s,\n", exportedDecl.DeclName())
+				completionItem := protocol.CompletionItem{
+					Label:            string(exportedDecl.DeclName()),
+					Kind:             completionItemKindForDecl(exportedDecl),
+					Documentation:    documentationMarkupContentForDecl(exportedDecl),
+					Detail:           &detail,
+					InsertText:       &insertText,
+					CommitCharacters: []string{" "},
+				}
+				completionItems = append(completionItems, completionItem)
+			}
+		}
+		return completionItems, nil
 	case parser.TYPE_NODE_IMPORT_DECLARATION, "import":
 		kind := protocol.CompletionItemKindModule
 		mods, err := ls.resolver.ImportableModules(rc.module.Package())
@@ -233,7 +275,6 @@ func (rc *ReqContext) textDocumentMemberAccessCompletionItems(context *glsp.Cont
 			if string(decl.DeclName()) != accessedExpr {
 				continue
 			}
-			// TODO: support imported module
 			moduleDecls, err := rc.moduleDeclarationsForImportDecl(decl)
 			if err != nil {
 				return nil, err
