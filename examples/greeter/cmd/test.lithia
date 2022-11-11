@@ -1,5 +1,13 @@
-import tests
+module example
 
-test "example", { fail =>
-    unless True, fail "True is False and False is True 🤯"
+import tests
+import results
+
+tests.test "example", { fail =>
+    unless True, fail "should never happen"
+    with type Maybe {
+        Some: { some => unless some.value == 42, fail "should be 42" },
+        None: { none => fail "none instead of 42" },
+        Any: { any => fail "should be Some 42" },
+    }, Some 42
 }
