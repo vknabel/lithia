@@ -11,6 +11,7 @@
 - lsp: complete importable modules #35
 - lsp: field completions #35
 - lsp: type switch completions #35
+- lsp: improved statement completions
 - lsp: outline symbols for current file
 - lsp: workspace symbols for all files
 - chore: bump dependencies

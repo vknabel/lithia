@@ -19,6 +19,21 @@ func textDocumentCompletion(context *glsp.Context, params *protocol.CompletionPa
 		return nil, err
 	}
 
+	insertAsStatement := false
+	contextReferenceType := targetNode.Type()
+	if contextReferenceType == parser.TYPE_NODE_IDENTIFIER {
+		contextReferenceType = targetNode.Parent().Type()
+	}
+	switch contextReferenceType {
+	case parser.TYPE_NODE_FUNCTION_DECLARATION, "function_body", parser.TYPE_NODE_FUNCTION_LITERAL,
+		parser.TYPE_NODE_SOURCE_FILE:
+		insertAsStatement = true
+	case parser.TYPE_NODE_ARRAY_LITERAL,
+		parser.TYPE_NODE_BINARY_EXPRESSION,
+		parser.TYPE_NODE_DICT_LITERAL, parser.TYPE_NODE_DICT_ENTRY:
+		insertAsStatement = false
+	}
+
 	completionItems := []protocol.CompletionItem{}
 
 	switch targetNode.Type() {
@@ -40,25 +55,17 @@ func textDocumentCompletion(context *glsp.Context, params *protocol.CompletionPa
 		}
 		return completionItems, nil
 	case parser.TYPE_NODE_MEMBER_ACCESS, ".":
-		return rc.textDocumentMemberAccessCompletionItems(context)
-	case parser.TYPE_NODE_TYPE_EXPRESSION:
-		insert := "type Abc {}"
-		return []protocol.CompletionItem{
-			protocol.CompletionItem{
-				Label:      "Completion",
-				InsertText: &insert,
-			},
-		}, nil
+		return rc.textDocumentMemberAccessCompletionItems(context, insertAsStatement)
 	}
 
 	for _, imported := range rc.accessibleDeclarations(context) {
-		completions := rc.generalCompletionItemsForDecl(imported)
+		completions := rc.generalCompletionItemsForDecl(imported, insertAsStatement)
 		completionItems = append(completionItems, completions...)
 	}
 	return completionItems, nil
 }
 
-func (rc *ReqContext) textDocumentMemberAccessCompletionItems(context *glsp.Context) ([]protocol.CompletionItem, error) {
+func (rc *ReqContext) textDocumentMemberAccessCompletionItems(context *glsp.Context, asStatement bool) ([]protocol.CompletionItem, error) {
 	defaultScope := rc.accessibleDeclarations(context)
 	targetNode, err := rc.findNode()
 	if err != nil {
@@ -91,7 +98,7 @@ func (rc *ReqContext) textDocumentMemberAccessCompletionItems(context *glsp.Cont
 			for _, imported := range scope {
 				completionItems = append(
 					completionItems,
-					rc.generalCompletionItemsForDecl(imported)...,
+					rc.generalCompletionItemsForDecl(imported, asStatement)...,
 				)
 			}
 			return completionItems, nil
@@ -101,14 +108,14 @@ func (rc *ReqContext) textDocumentMemberAccessCompletionItems(context *glsp.Cont
 	for _, imported := range defaultScope {
 		switch imported.decl.(type) {
 		case ast.DeclData, ast.DeclExternType:
-			completionItems = append(completionItems, rc.memberAccessCompletionItemsForDecl(imported, accessedExpr)...)
+			completionItems = append(completionItems, rc.memberAccessCompletionItemsForDecl(imported, accessedExpr, asStatement)...)
 		}
 	}
 	return completionItems, nil
 }
 
-func (rc *ReqContext) generalCompletionItemsForDecl(imported importedDecl) []protocol.CompletionItem {
-	insertText := insertTextForImportedDecl(imported)
+func (rc *ReqContext) generalCompletionItemsForDecl(imported importedDecl, asStatement bool) []protocol.CompletionItem {
+	insertText := insertTextForImportedDecl(imported, asStatement)
 	var detail string
 	if imported.decl.Meta().ModuleName != "" {
 		detail = string(imported.decl.Meta().ModuleName) +
@@ -153,7 +160,7 @@ func (rc *ReqContext) generalCompletionItemsForDecl(imported importedDecl) []pro
 	return completionItems
 }
 
-func (rc *ReqContext) memberAccessCompletionItemsForDecl(imported importedDecl, accessedExpr string) []protocol.CompletionItem {
+func (rc *ReqContext) memberAccessCompletionItemsForDecl(imported importedDecl, accessedExpr string, asStatement bool) []protocol.CompletionItem {
 	switch decl := imported.decl.(type) {
 	case ast.DeclModule:
 		moduleDecls := rc.moduleDeclarations()
@@ -166,7 +173,7 @@ func (rc *ReqContext) memberAccessCompletionItemsForDecl(imported importedDecl, 
 		}
 		completionItems := make([]protocol.CompletionItem, 0)
 		for _, current := range importedDecls {
-			completion := rc.generalCompletionItemsForDecl(current)
+			completion := rc.generalCompletionItemsForDecl(current, asStatement)
 			completionItems = append(completionItems, completion...)
 		}
 		return completionItems
@@ -227,7 +234,7 @@ func (rc *ReqContext) memberAccessCompletionItemsForDecl(imported importedDecl, 
 	}
 }
 
-func insertTextForImportedDecl(imported importedDecl) string {
+func insertTextForImportedDecl(imported importedDecl, asStatement bool) string {
 	var importPrefix string
 	if imported.importDecl != nil {
 		importPrefix = fmt.Sprintf("%s.", imported.importDecl.DeclName())
@@ -235,38 +242,41 @@ func insertTextForImportedDecl(imported importedDecl) string {
 
 	switch decl := imported.decl.(type) {
 	case ast.DeclFunc:
-		return insertTextForCallableDeclParams(decl, importPrefix, decl.Impl.Parameters)
+		return insertTextForCallableDeclParams(decl, importPrefix, decl.Impl.Parameters, asStatement)
 	case ast.DeclExternFunc:
-		return insertTextForCallableDeclParams(decl, importPrefix, decl.Parameters)
+		return insertTextForCallableDeclParams(decl, importPrefix, decl.Parameters, asStatement)
 	case ast.DeclData:
-		return insertTextForCallableDeclFields(decl, importPrefix, decl.Fields)
+		return insertTextForCallableDeclFields(decl, importPrefix, decl.Fields, asStatement)
 	default:
 		return string(decl.DeclName())
 	}
 }
 
-func insertTextForCallableDeclParams(decl ast.Decl, importPrefix string, parameters []ast.DeclParameter) string {
+func insertTextForCallableDeclParams(decl ast.Decl, importPrefix string, parameters []ast.DeclParameter, asStatement bool) string {
 	paramNames := make([]string, len(parameters))
 	for i, param := range parameters {
 		paramNames[i] = string(param.DeclName())
 	}
-	return insertTextForCallableDecl(decl, importPrefix, paramNames)
+	return insertTextForCallableDecl(decl, importPrefix, paramNames, asStatement)
 }
 
-func insertTextForCallableDeclFields(decl ast.Decl, importPrefix string, fields []ast.DeclField) string {
+func insertTextForCallableDeclFields(decl ast.Decl, importPrefix string, fields []ast.DeclField, asStatement bool) string {
 	fieldNames := make([]string, len(fields))
 	for i, param := range fields {
 		fieldNames[i] = string(param.DeclName())
 	}
-	return insertTextForCallableDecl(decl, importPrefix, fieldNames)
+	return insertTextForCallableDecl(decl, importPrefix, fieldNames, asStatement)
 }
 
-func insertTextForCallableDecl(decl ast.Decl, importPrefix string, parameters []string) string {
+func insertTextForCallableDecl(decl ast.Decl, importPrefix string, parameters []string, asStatement bool) string {
 	if len(parameters) == 0 {
 		return string(decl.DeclName())
 	}
 	if len(parameters) == 1 {
 		return fmt.Sprintf("%s%s %s", importPrefix, decl.DeclName(), parameters[0])
+	}
+	if asStatement {
+		return fmt.Sprintf("%s%s %s", importPrefix, decl.DeclName(), strings.Join(parameters, ", "))
 	}
 	return fmt.Sprintf("(%s%s %s)", importPrefix, decl.DeclName(), strings.Join(parameters, ", "))
 }
