@@ -3,6 +3,7 @@ package langsrv
 import (
 	"fmt"
 	"strings"
+	"unicode"
 
 	"github.com/tliron/glsp"
 	protocol "github.com/tliron/glsp/protocol_3_16"
@@ -39,57 +40,191 @@ func textDocumentCompletion(context *glsp.Context, params *protocol.CompletionPa
 		}
 		return completionItems, nil
 	case parser.TYPE_NODE_MEMBER_ACCESS, ".":
-		decls := rc.accessibleDeclarations(context)
-
-		for _, imported := range decls {
-			switch decl := imported.decl.(type) {
-			case ast.DeclData:
-				for _, field := range decl.Fields {
-					insertText := string(field.DeclName())
-					var detail string
-					if imported.decl.Meta().ModuleName != "" {
-						detail = string(imported.decl.Meta().ModuleName) +
-							"." +
-							string(imported.decl.DeclName()) +
-							"." +
-							string(field.DeclName())
-					}
-
-					completionItems = append(completionItems, protocol.CompletionItem{
-						Label:            string(field.DeclName()),
-						Kind:             completionItemKindForDecl(imported.decl),
-						InsertText:       &insertText,
-						Detail:           &detail,
-						CommitCharacters: []string{"."},
-						Documentation:    documentationMarkupContentForDecl(imported.decl),
-					})
-				}
-			}
-		}
-		return completionItems, nil
+		return rc.textDocumentMemberAccessCompletionItems(context)
+	case parser.TYPE_NODE_TYPE_EXPRESSION:
+		insert := "type Abc {}"
+		return []protocol.CompletionItem{
+			protocol.CompletionItem{
+				Label:      "Completion",
+				InsertText: &insert,
+			},
+		}, nil
 	}
 
 	for _, imported := range rc.accessibleDeclarations(context) {
-		insertText := insertTextForImportedDecl(imported)
-		var detail string
-		if imported.decl.Meta().ModuleName != "" {
-			detail = string(imported.decl.Meta().ModuleName) +
-				"." +
-				string(imported.decl.DeclName())
+		completions := rc.generalCompletionItemsForDecl(imported)
+		completionItems = append(completionItems, completions...)
+	}
+	return completionItems, nil
+}
+
+func (rc *ReqContext) textDocumentMemberAccessCompletionItems(context *glsp.Context) ([]protocol.CompletionItem, error) {
+	defaultScope := rc.accessibleDeclarations(context)
+	targetNode, err := rc.findNode()
+	if err != nil {
+		return nil, err
+	}
+	accessedNode := targetNode
+	if accessedNode.Type() == "." {
+		accessTarget := targetNode.PrevNamedSibling()
+		if accessTarget != nil {
+			accessedNode = accessTarget
 		}
-		var importPrefix string
-		if imported.importDecl != nil {
-			importPrefix = fmt.Sprintf("%s.", imported.importDecl.DeclName())
+	}
+	accessedExpr := accessedNode.Content([]byte(rc.textDocumentEntry.item.Text))
+	for _, imported := range defaultScope {
+		switch decl := imported.decl.(type) {
+		case ast.DeclModule:
+			if string(decl.DeclName()) != accessedExpr {
+				continue
+			}
+			moduleDecls := rc.moduleDeclarations()
+			scope := make([]importedDecl, 0)
+			for _, moduleDecl := range moduleDecls {
+				if !moduleDecl.IsExportedDecl() {
+					continue
+				}
+				scope = append(scope, importedDecl{decl: moduleDecl, module: rc.textDocumentEntry.module, importDecl: nil})
+			}
+
+			var completionItems []protocol.CompletionItem
+			for _, imported := range scope {
+				completionItems = append(
+					completionItems,
+					rc.generalCompletionItemsForDecl(imported)...,
+				)
+			}
+			return completionItems, nil
 		}
-		completionItems = append(completionItems, protocol.CompletionItem{
-			Label:         importPrefix + string(imported.decl.DeclName()),
-			Kind:          completionItemKindForDecl(imported.decl),
+	}
+	var completionItems []protocol.CompletionItem
+	for _, imported := range defaultScope {
+		switch imported.decl.(type) {
+		case ast.DeclData, ast.DeclExternType:
+			completionItems = append(completionItems, rc.memberAccessCompletionItemsForDecl(imported, accessedExpr)...)
+		}
+	}
+	return completionItems, nil
+}
+
+func (rc *ReqContext) generalCompletionItemsForDecl(imported importedDecl) []protocol.CompletionItem {
+	insertText := insertTextForImportedDecl(imported)
+	var detail string
+	if imported.decl.Meta().ModuleName != "" {
+		detail = string(imported.decl.Meta().ModuleName) +
+			"." +
+			string(imported.decl.DeclName())
+	}
+	var importPrefix string
+	if imported.importDecl != nil {
+		importPrefix = fmt.Sprintf("%s.", imported.importDecl.DeclName())
+	}
+	completionItems := make([]protocol.CompletionItem, 0, 2)
+	declCompletion := protocol.CompletionItem{
+		Label:         importPrefix + string(imported.decl.DeclName()),
+		Kind:          completionItemKindForDecl(imported.decl),
+		InsertText:    &insertText,
+		Detail:        &detail,
+		Documentation: documentationMarkupContentForDecl(imported.decl),
+	}
+	completionItems = append(completionItems, declCompletion)
+	if enumDecl, ok := imported.decl.(ast.DeclEnum); ok {
+		kind := protocol.CompletionItemKindSnippet
+		insertText := fmt.Sprintf("type %s%s {", importPrefix, string(enumDecl.DeclName()))
+		if len(enumDecl.Cases) != 0 {
+			insertText += "\n"
+		}
+		for _, enumCase := range enumDecl.Cases {
+			caseName := string(enumCase.DeclName())
+			lowerHead := unicode.ToLower(rune(caseName[0]))
+			varName := string(lowerHead) + caseName[1:]
+			insertText += fmt.Sprintf("    %s: { %s => },\n", caseName, varName)
+		}
+		insertText += "}"
+		typeCompletion := protocol.CompletionItem{
+			Label:         "type " + importPrefix + string(enumDecl.DeclName()),
+			Kind:          &kind,
 			InsertText:    &insertText,
 			Detail:        &detail,
-			Documentation: documentationMarkupContentForDecl(imported.decl),
-		})
+			Documentation: documentationMarkupContentForDecl(enumDecl),
+		}
+		completionItems = append(completionItems, typeCompletion)
 	}
-	return &completionItems, nil
+	return completionItems
+}
+
+func (rc *ReqContext) memberAccessCompletionItemsForDecl(imported importedDecl, accessedExpr string) []protocol.CompletionItem {
+	switch decl := imported.decl.(type) {
+	case ast.DeclModule:
+		moduleDecls := rc.moduleDeclarations()
+		importedDecls := make([]importedDecl, 0, len(moduleDecls))
+		for _, moduleDecl := range moduleDecls {
+			if !moduleDecl.IsExportedDecl() {
+				continue
+			}
+			importedDecls = append(importedDecls, importedDecl{decl: moduleDecl, module: rc.textDocumentEntry.module, importDecl: nil})
+		}
+		completionItems := make([]protocol.CompletionItem, 0)
+		for _, current := range importedDecls {
+			completion := rc.generalCompletionItemsForDecl(current)
+			completionItems = append(completionItems, completion...)
+		}
+		return completionItems
+	case ast.DeclImport:
+		// TODO
+		return nil
+	case ast.DeclImportMember:
+		// TODO
+		return nil
+	case ast.DeclExternType:
+		completionItems := make([]protocol.CompletionItem, 0, len(decl.Fields))
+		for _, field := range decl.Fields {
+			insertText := string(field.DeclName())
+			var detail string
+			if imported.decl.Meta().ModuleName != "" {
+				detail = string(imported.decl.Meta().ModuleName) +
+					"." +
+					string(imported.decl.DeclName()) +
+					"." +
+					string(field.DeclName())
+			}
+
+			completionItems = append(completionItems, protocol.CompletionItem{
+				Label:            string(field.DeclName()),
+				Kind:             completionItemKindForDecl(imported.decl),
+				InsertText:       &insertText,
+				Detail:           &detail,
+				CommitCharacters: []string{"."},
+				Documentation:    documentationMarkupContentForDecl(imported.decl),
+			})
+		}
+		return completionItems
+	case ast.DeclData:
+		completionItems := make([]protocol.CompletionItem, 0, len(decl.Fields))
+		for _, field := range decl.Fields {
+			insertText := string(field.DeclName())
+			var detail string
+			if imported.decl.Meta().ModuleName != "" {
+				detail = string(imported.decl.Meta().ModuleName) +
+					"." +
+					string(imported.decl.DeclName()) +
+					"." +
+					string(field.DeclName())
+			}
+
+			completionItems = append(completionItems, protocol.CompletionItem{
+				Label:            string(field.DeclName()),
+				Kind:             completionItemKindForDecl(imported.decl),
+				InsertText:       &insertText,
+				Detail:           &detail,
+				CommitCharacters: []string{"."},
+				Documentation:    documentationMarkupContentForDecl(imported.decl),
+			})
+		}
+		return completionItems
+	default:
+		return nil
+	}
 }
 
 func insertTextForImportedDecl(imported importedDecl) string {
