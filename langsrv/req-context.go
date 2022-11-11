@@ -86,7 +86,7 @@ func (rc *ReqContext) globalAndModuleDeclarations(context *glsp.Context) []impor
 	}
 
 	globals := make([]importedDecl, 0)
-	for _, moduleDecl := range rc.moduleDeclarations() {
+	for _, moduleDecl := range rc.currentModuleDeclarations() {
 		globals = append(globals, importedDecl{decl: moduleDecl, module: rc.textDocumentEntry.module, importDecl: nil})
 	}
 	globals = append(globals, rc.importedDeclarations(context)...)
@@ -101,7 +101,7 @@ func (rc *ReqContext) sourceFileDeclarations() []ast.Decl {
 	return rc.sourceFile.Declarations
 }
 
-func (rc *ReqContext) moduleDeclarations() []ast.Decl {
+func (rc *ReqContext) currentModuleDeclarations() []ast.Decl {
 	if rc.sourceFile == nil {
 		return nil
 	}
@@ -119,6 +119,30 @@ func (rc *ReqContext) moduleDeclarations() []ast.Decl {
 		globalDeclarations = append(globalDeclarations, docEntry.sourceFile.ExportedDeclarations()...)
 	}
 	return globalDeclarations
+}
+
+func (rc *ReqContext) moduleDeclarationsForImportDecl(importDecl ast.DeclImport) ([]ast.Decl, error) {
+	if rc.sourceFile == nil {
+		return nil, nil
+	}
+	resolvedModule, err := ls.resolver.ResolveModuleFromPackage(rc.module.Package(), importDecl.ModuleName)
+	if err != nil {
+		return nil, err
+	}
+	globalDeclarations := make([]ast.Decl, 0)
+	for _, sameModuleFile := range resolvedModule.Files {
+		fileUrl := "file://" + sameModuleFile
+		if rc.item.URI == fileUrl {
+			continue
+		}
+		docEntry := ls.documentCache.documents[fileUrl]
+		if docEntry == nil || docEntry.sourceFile == nil {
+			continue
+		}
+
+		globalDeclarations = append(globalDeclarations, docEntry.sourceFile.ExportedDeclarations()...)
+	}
+	return globalDeclarations, nil
 }
 
 type importedDecl struct {

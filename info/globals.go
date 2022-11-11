@@ -1,4 +1,13 @@
 package info
 
-var Version = "0.0.18-next"
-var Debug = true
+var Version = "dev"
+var Commit string
+var Date string
+var BuiltBy = "dev"
+var Debug bool
+
+func init() {
+	if BuiltBy == "dev" {
+		Debug = true
+	}
+}

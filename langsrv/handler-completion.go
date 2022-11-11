@@ -25,7 +25,8 @@ func textDocumentCompletion(context *glsp.Context, params *protocol.CompletionPa
 	}
 	switch contextReferenceType {
 	case parser.TYPE_NODE_FUNCTION_DECLARATION, "function_body", parser.TYPE_NODE_FUNCTION_LITERAL,
-		parser.TYPE_NODE_SOURCE_FILE:
+		parser.TYPE_NODE_SOURCE_FILE,
+		parser.TYPE_NODE_MEMBER_ACCESS, ".":
 		insertAsStatement = true
 	case parser.TYPE_NODE_ARRAY_LITERAL,
 		parser.TYPE_NODE_BINARY_EXPRESSION,
@@ -36,16 +37,21 @@ func textDocumentCompletion(context *glsp.Context, params *protocol.CompletionPa
 	completionItems := []protocol.CompletionItem{}
 
 	switch targetNode.Type() {
-	case parser.TYPE_NODE_IMPORT_DECLARATION:
+	case parser.TYPE_NODE_IMPORT_DECLARATION, "import":
 		kind := protocol.CompletionItemKindModule
 		mods, err := ls.resolver.ImportableModules(rc.module.Package())
 		if err != nil {
 			return nil, err
 		}
 		for _, mod := range mods {
+			insertText := string(mod.RelativeName)
+			if targetNode.Type() == "import" {
+				insertText = fmt.Sprintf("import %s", insertText)
+			}
 			completionItems = append(completionItems, protocol.CompletionItem{
-				Label: string(mod.RelativeName),
-				Kind:  &kind,
+				Label:      "import " + string(mod.RelativeName),
+				InsertText: &insertText,
+				Kind:       &kind,
 				Documentation: &protocol.MarkupContent{
 					Kind:  protocol.MarkupKindMarkdown,
 					Value: fmt.Sprintf("`import %s`", mod.RelativeName),
@@ -123,6 +129,21 @@ func (rc *ReqContext) keywordCompletionItems(asStatement bool) []protocol.Comple
 			Detail:           &detail,
 		}
 		completionItems = append(completionItems, item)
+
+		kind := protocol.CompletionItemKindModule
+		mods, _ := ls.resolver.ImportableModules(rc.module.Package())
+		for _, mod := range mods {
+			insertText := fmt.Sprintf("import %s", string(mod.RelativeName))
+			completionItems = append(completionItems, protocol.CompletionItem{
+				Label:      "import " + string(mod.RelativeName),
+				InsertText: &insertText,
+				Kind:       &kind,
+				Documentation: &protocol.MarkupContent{
+					Kind:  protocol.MarkupKindMarkdown,
+					Value: fmt.Sprintf("`import %s`", mod.RelativeName),
+				},
+			})
+		}
 	}
 	{
 		insertFormat := protocol.InsertTextFormatSnippet
@@ -208,11 +229,36 @@ func (rc *ReqContext) textDocumentMemberAccessCompletionItems(context *glsp.Cont
 	accessedExpr := accessedNode.Content([]byte(rc.textDocumentEntry.item.Text))
 	for _, imported := range defaultScope {
 		switch decl := imported.decl.(type) {
+		case ast.DeclImport:
+			if string(decl.DeclName()) != accessedExpr {
+				continue
+			}
+			// TODO: support imported module
+			moduleDecls, err := rc.moduleDeclarationsForImportDecl(decl)
+			if err != nil {
+				return nil, err
+			}
+			scope := make([]importedDecl, 0)
+			for _, moduleDecl := range moduleDecls {
+				if !moduleDecl.IsExportedDecl() {
+					continue
+				}
+				scope = append(scope, importedDecl{decl: moduleDecl, module: rc.textDocumentEntry.module, importDecl: nil})
+			}
+
+			var completionItems []protocol.CompletionItem
+			for _, imported := range scope {
+				completionItems = append(
+					completionItems,
+					rc.generalCompletionItemsForDecl(imported, asStatement)...,
+				)
+			}
+			return completionItems, nil
 		case ast.DeclModule:
 			if string(decl.DeclName()) != accessedExpr {
 				continue
 			}
-			moduleDecls := rc.moduleDeclarations()
+			moduleDecls := rc.currentModuleDeclarations()
 			scope := make([]importedDecl, 0)
 			for _, moduleDecl := range moduleDecls {
 				if !moduleDecl.IsExportedDecl() {
@@ -293,7 +339,7 @@ func (rc *ReqContext) generalCompletionItemsForDecl(imported importedDecl, asSta
 func (rc *ReqContext) memberAccessCompletionItemsForDecl(imported importedDecl, accessedExpr string, asStatement bool) []protocol.CompletionItem {
 	switch decl := imported.decl.(type) {
 	case ast.DeclModule:
-		moduleDecls := rc.moduleDeclarations()
+		moduleDecls := rc.currentModuleDeclarations()
 		importedDecls := make([]importedDecl, 0, len(moduleDecls))
 		for _, moduleDecl := range moduleDecls {
 			if !moduleDecl.IsExportedDecl() {
