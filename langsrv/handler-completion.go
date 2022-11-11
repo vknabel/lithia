@@ -2,7 +2,6 @@ package langsrv
 
 import (
 	"fmt"
-	"strings"
 	"unicode"
 
 	"github.com/tliron/glsp"
@@ -62,7 +61,135 @@ func textDocumentCompletion(context *glsp.Context, params *protocol.CompletionPa
 		completions := rc.generalCompletionItemsForDecl(imported, insertAsStatement)
 		completionItems = append(completionItems, completions...)
 	}
+	completionItems = append(completionItems, rc.keywordCompletionItems(insertAsStatement)...)
 	return completionItems, nil
+}
+
+func (rc *ReqContext) keywordCompletionItems(asStatement bool) []protocol.CompletionItem {
+	var completionItems []protocol.CompletionItem
+	keywordKind := protocol.CompletionItemKindKeyword
+	{
+		insertFormat := protocol.InsertTextFormatSnippet
+		insertText := "type ${1:Type} {\n    $0\n}"
+		detail := "type expression"
+		item := protocol.CompletionItem{
+			Label:            "type",
+			Kind:             &keywordKind,
+			InsertText:       &insertText,
+			InsertTextFormat: &insertFormat,
+			Detail:           &detail,
+		}
+		completionItems = append(completionItems, item)
+	}
+	if !asStatement {
+		return completionItems
+	}
+	{
+		insertFormat := protocol.InsertTextFormatSnippet
+		insertText := "let ${1:var} = $0"
+		detail := "constant declaration"
+		item := protocol.CompletionItem{
+			Label:            "let",
+			Kind:             &keywordKind,
+			InsertText:       &insertText,
+			InsertTextFormat: &insertFormat,
+			Detail:           &detail,
+		}
+		completionItems = append(completionItems, item)
+	}
+	{
+		insertFormat := protocol.InsertTextFormatSnippet
+		name := string(rc.module.RelativeName)
+		insertText := fmt.Sprintf("module ${0:%s}", name)
+		detail := "module declaration"
+		item := protocol.CompletionItem{
+			Label:            "module",
+			Kind:             &keywordKind,
+			InsertText:       &insertText,
+			InsertTextFormat: &insertFormat,
+			Detail:           &detail,
+		}
+		completionItems = append(completionItems, item)
+	}
+	{
+		insertFormat := protocol.InsertTextFormatSnippet
+		insertText := "import $0"
+		detail := "import declaration"
+		item := protocol.CompletionItem{
+			Label:            "import",
+			Kind:             &keywordKind,
+			InsertText:       &insertText,
+			InsertTextFormat: &insertFormat,
+			Detail:           &detail,
+		}
+		completionItems = append(completionItems, item)
+	}
+	{
+		insertFormat := protocol.InsertTextFormatSnippet
+		insertText := "import ${1:alias} = ${2:module.path}"
+		detail := "import declaration"
+		item := protocol.CompletionItem{
+			Label:            "import =",
+			Kind:             &keywordKind,
+			InsertText:       &insertText,
+			InsertTextFormat: &insertFormat,
+			Detail:           &detail,
+		}
+		completionItems = append(completionItems, item)
+	}
+	{
+		insertFormat := protocol.InsertTextFormatSnippet
+		insertText := "func ${1:name} { $2=>\n    $0\n}"
+		detail := "function declaration"
+		item := protocol.CompletionItem{
+			Label:            "func",
+			Kind:             &keywordKind,
+			InsertText:       &insertText,
+			InsertTextFormat: &insertFormat,
+			Detail:           &detail,
+		}
+		completionItems = append(completionItems, item)
+	}
+	{
+		insertFormat := protocol.InsertTextFormatSnippet
+		insertText := "enum ${1:Name} {\n    $0\n}"
+		detail := "enum declaration"
+		item := protocol.CompletionItem{
+			Label:            "enum",
+			Kind:             &keywordKind,
+			InsertText:       &insertText,
+			InsertTextFormat: &insertFormat,
+			Detail:           &detail,
+		}
+		completionItems = append(completionItems, item)
+	}
+	{
+		insertFormat := protocol.InsertTextFormatSnippet
+		insertText := "data ${1:Name}"
+		detail := "data declaration"
+		item := protocol.CompletionItem{
+			Label:            "data",
+			Kind:             &keywordKind,
+			InsertText:       &insertText,
+			InsertTextFormat: &insertFormat,
+			Detail:           &detail,
+		}
+		completionItems = append(completionItems, item)
+	}
+	{
+		insertFormat := protocol.InsertTextFormatSnippet
+		insertText := "extern ${0:Name}"
+		detail := "extern declaration"
+		item := protocol.CompletionItem{
+			Label:            "extern",
+			Kind:             &keywordKind,
+			InsertText:       &insertText,
+			InsertTextFormat: &insertFormat,
+			Detail:           &detail,
+		}
+		completionItems = append(completionItems, item)
+	}
+	return completionItems
 }
 
 func (rc *ReqContext) textDocumentMemberAccessCompletionItems(context *glsp.Context, asStatement bool) ([]protocol.CompletionItem, error) {
@@ -115,7 +242,7 @@ func (rc *ReqContext) textDocumentMemberAccessCompletionItems(context *glsp.Cont
 }
 
 func (rc *ReqContext) generalCompletionItemsForDecl(imported importedDecl, asStatement bool) []protocol.CompletionItem {
-	insertText := insertTextForImportedDecl(imported, asStatement)
+	insertFormat, insertText := insertTextForImportedDecl(imported, asStatement)
 	var detail string
 	if imported.decl.Meta().ModuleName != "" {
 		detail = string(imported.decl.Meta().ModuleName) +
@@ -128,11 +255,12 @@ func (rc *ReqContext) generalCompletionItemsForDecl(imported importedDecl, asSta
 	}
 	completionItems := make([]protocol.CompletionItem, 0, 2)
 	declCompletion := protocol.CompletionItem{
-		Label:         importPrefix + string(imported.decl.DeclName()),
-		Kind:          completionItemKindForDecl(imported.decl),
-		InsertText:    &insertText,
-		Detail:        &detail,
-		Documentation: documentationMarkupContentForDecl(imported.decl),
+		Label:            importPrefix + string(imported.decl.DeclName()),
+		Kind:             completionItemKindForDecl(imported.decl),
+		InsertText:       &insertText,
+		InsertTextFormat: &insertFormat,
+		Detail:           &detail,
+		Documentation:    documentationMarkupContentForDecl(imported.decl),
 	}
 	completionItems = append(completionItems, declCompletion)
 	if enumDecl, ok := imported.decl.(ast.DeclEnum); ok {
@@ -141,19 +269,21 @@ func (rc *ReqContext) generalCompletionItemsForDecl(imported importedDecl, asSta
 		if len(enumDecl.Cases) != 0 {
 			insertText += "\n"
 		}
-		for _, enumCase := range enumDecl.Cases {
+		for i, enumCase := range enumDecl.Cases {
 			caseName := string(enumCase.DeclName())
 			lowerHead := unicode.ToLower(rune(caseName[0]))
 			varName := string(lowerHead) + caseName[1:]
-			insertText += fmt.Sprintf("    %s: { %s => },\n", caseName, varName)
+			insertText += fmt.Sprintf("    %s: { %s => $%d },\n", caseName, varName, i+1)
 		}
 		insertText += "}"
+		insertFormat := protocol.InsertTextFormatSnippet
 		typeCompletion := protocol.CompletionItem{
-			Label:         "type " + importPrefix + string(enumDecl.DeclName()),
-			Kind:          &kind,
-			InsertText:    &insertText,
-			Detail:        &detail,
-			Documentation: documentationMarkupContentForDecl(enumDecl),
+			Label:            "type " + importPrefix + string(enumDecl.DeclName()),
+			Kind:             &kind,
+			InsertText:       &insertText,
+			InsertTextFormat: &insertFormat,
+			Detail:           &detail,
+			Documentation:    documentationMarkupContentForDecl(enumDecl),
 		}
 		completionItems = append(completionItems, typeCompletion)
 	}
@@ -178,10 +308,8 @@ func (rc *ReqContext) memberAccessCompletionItemsForDecl(imported importedDecl, 
 		}
 		return completionItems
 	case ast.DeclImport:
-		// TODO
 		return nil
 	case ast.DeclImportMember:
-		// TODO
 		return nil
 	case ast.DeclExternType:
 		completionItems := make([]protocol.CompletionItem, 0, len(decl.Fields))
@@ -234,7 +362,7 @@ func (rc *ReqContext) memberAccessCompletionItemsForDecl(imported importedDecl, 
 	}
 }
 
-func insertTextForImportedDecl(imported importedDecl, asStatement bool) string {
+func insertTextForImportedDecl(imported importedDecl, asStatement bool) (protocol.InsertTextFormat, string) {
 	var importPrefix string
 	if imported.importDecl != nil {
 		importPrefix = fmt.Sprintf("%s.", imported.importDecl.DeclName())
@@ -248,11 +376,11 @@ func insertTextForImportedDecl(imported importedDecl, asStatement bool) string {
 	case ast.DeclData:
 		return insertTextForCallableDeclFields(decl, importPrefix, decl.Fields, asStatement)
 	default:
-		return string(decl.DeclName())
+		return protocol.InsertTextFormatPlainText, string(decl.DeclName())
 	}
 }
 
-func insertTextForCallableDeclParams(decl ast.Decl, importPrefix string, parameters []ast.DeclParameter, asStatement bool) string {
+func insertTextForCallableDeclParams(decl ast.Decl, importPrefix string, parameters []ast.DeclParameter, asStatement bool) (protocol.InsertTextFormat, string) {
 	paramNames := make([]string, len(parameters))
 	for i, param := range parameters {
 		paramNames[i] = string(param.DeclName())
@@ -260,7 +388,7 @@ func insertTextForCallableDeclParams(decl ast.Decl, importPrefix string, paramet
 	return insertTextForCallableDecl(decl, importPrefix, paramNames, asStatement)
 }
 
-func insertTextForCallableDeclFields(decl ast.Decl, importPrefix string, fields []ast.DeclField, asStatement bool) string {
+func insertTextForCallableDeclFields(decl ast.Decl, importPrefix string, fields []ast.DeclField, asStatement bool) (protocol.InsertTextFormat, string) {
 	fieldNames := make([]string, len(fields))
 	for i, param := range fields {
 		fieldNames[i] = string(param.DeclName())
@@ -268,17 +396,23 @@ func insertTextForCallableDeclFields(decl ast.Decl, importPrefix string, fields 
 	return insertTextForCallableDecl(decl, importPrefix, fieldNames, asStatement)
 }
 
-func insertTextForCallableDecl(decl ast.Decl, importPrefix string, parameters []string, asStatement bool) string {
+func insertTextForCallableDecl(decl ast.Decl, importPrefix string, parameters []string, asStatement bool) (protocol.InsertTextFormat, string) {
 	if len(parameters) == 0 {
-		return string(decl.DeclName())
+		return protocol.InsertTextFormatPlainText, string(decl.DeclName())
 	}
-	if len(parameters) == 1 {
-		return fmt.Sprintf("%s%s %s", importPrefix, decl.DeclName(), parameters[0])
+	insertText := fmt.Sprintf("%s%s", importPrefix, decl.DeclName())
+	for i, parameter := range parameters {
+		if i > 0 {
+			insertText += ", "
+		} else {
+			insertText += " "
+		}
+		insertText += fmt.Sprintf("${%d:%s}", i+1, parameter)
 	}
-	if asStatement {
-		return fmt.Sprintf("%s%s %s", importPrefix, decl.DeclName(), strings.Join(parameters, ", "))
+	if len(parameters) == 1 || asStatement {
+		return protocol.InsertTextFormatSnippet, insertText
 	}
-	return fmt.Sprintf("(%s%s %s)", importPrefix, decl.DeclName(), strings.Join(parameters, ", "))
+	return protocol.InsertTextFormatSnippet, fmt.Sprintf("(%s)", insertText)
 }
 
 func documentationMarkupContentForDecl(decl ast.Decl) *protocol.MarkupContent {

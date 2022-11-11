@@ -12,6 +12,7 @@
 - lsp: field completions #35
 - lsp: type switch completions #35
 - lsp: improved statement completions
+- lsp: completions for keywords
 - lsp: outline symbols for current file
 - lsp: workspace symbols for all files
 - chore: bump dependencies
