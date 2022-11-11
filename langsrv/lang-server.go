@@ -38,17 +38,21 @@ func init() {
 		Shutdown:    shutdown,
 		SetTrace:    setTrace,
 
+		CancelRequest: func(context *glsp.Context, params *protocol.CancelParams) error { return nil },
+
 		TextDocumentDidOpen:   textDocumentDidOpen,
 		TextDocumentDidChange: textDocumentDidChange,
 		TextDocumentDidClose:  func(context *glsp.Context, params *protocol.DidCloseTextDocumentParams) error { return nil },
 
 		WorkspaceDidDeleteFiles: workspaceDidDeleteFiles,
+		WorkspaceSymbol:         workspaceSymbol,
 
 		TextDocumentHover:          textDocumentHover,
 		TextDocumentCompletion:     textDocumentCompletion,
 		TextDocumentDefinition:     textDocumentDefinition,
 		TextDocumentTypeDefinition: textDocumentTypeDefinition,
 		TextDocumentDeclaration:    textDocumentDeclaration,
+		TextDocumentDocumentSymbol: textDocumentDocumentSymbol,
 
 		TextDocumentSemanticTokensFull: textDocumentSemanticTokensFull,
 	}

@@ -59,6 +59,7 @@ func openModuleTextDocumentsIfNeeded(context *glsp.Context, mod resolution.Resol
 		syntaxErrs = append(syntaxErrs, errs...)
 
 		ls.documentCache.documents[fileUri] = &textDocumentEntry{
+			item:       protocol.TextDocumentItem{URI: fileUri, LanguageID: "lithia", Version: 0, Text: contents},
 			parser:     lithiaParser,
 			fileParser: fileParser,
 			sourceFile: sourceFile,
