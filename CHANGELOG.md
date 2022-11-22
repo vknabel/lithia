@@ -1,6 +1,8 @@
 # Changelog
 
-## v0.0.18-next
+## v0.0.19-next
+
+## v0.0.18
 
 - stdlib: `docs.docsToMarkup` now sorts extern properties
 - stdlib: new function `prelude.eager` which recursively evaluates a given value
