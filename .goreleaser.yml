@@ -78,6 +78,8 @@ changelog:
 
 brews:
   - name: lithia
+    description: "Functional programming language with an implicit but strong and dynamic type system"
+    homepage: "https://github.com/vknabel/lithia"
     tap:
       owner: vknabel
       name: homebrew-lithia
