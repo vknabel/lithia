@@ -29,6 +29,7 @@ Will always be imported implicitly.
 - _func_ [compose](#compose) f, g, value
 - _func_ [const](#const) value, _
 - _extern_ [debug](#debug) message
+- _extern_ [eager](#eager) value
 - _func_ [identity](#identity) value
 - _func_ [if](#if) condition, then, else
 - _func_ [pipe](#pipe) functions, initial
@@ -220,6 +221,13 @@ Always returns the first argument.
 _func_ `debug message`
 
 Prints a debug message to stdout.
+
+## eager
+
+_func_ `eager value`
+
+Eagerly evaluates a given value recursively.
+All members of lists, dictionaries and data structures will be evaluated.
 
 ## identity
 

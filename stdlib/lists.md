@@ -16,6 +16,7 @@ _module_
 - _func_ [forEach](#forEach) list, action
 - _func_ [isEmpty](#isEmpty) list
 - _func_ [map](#map) transform, list
+- _func_ [prepend](#prepend) element, list
 - _func_ [prependList](#prependList) prefix, postfix
 - _func_ [pure](#pure) value
 - _func_ [reduce](#reduce) accumulator, initial
@@ -111,6 +112,12 @@ True if the given list is Nil. Otherwise False.
 _func_ `map transform, list`
 
 Transforms the list values, while keeping their order.
+
+## prepend
+
+_func_ `prepend element, list`
+
+Prepends an element to the start of a list.
 
 ## prependList
 

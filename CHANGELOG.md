@@ -6,6 +6,7 @@
 - fix(cli): correctly handle running script and repl
 - feat(stdlib): `os.args` returns the arguments passed to the program
 - feat(error): impproved error messages for missing members
+- feat(stdlib): introduced `apps`
 
 ## v0.0.18
 

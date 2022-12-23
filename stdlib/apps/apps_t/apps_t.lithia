@@ -1,0 +1,136 @@
+import apps
+import rx
+import results
+import strings
+import tests { test }
+
+test "apps.update Store changes state", { fail =>
+    enum Msg {
+        data Incr
+        data Decr
+    }
+    let model = apps.Model 0, { i =>
+        type Msg {
+            Incr: { msg =>
+                apps.Update i + 1, Nil
+            },
+            Decr: { msg =>
+                apps.Update i - 1, Nil
+            }
+        }
+    }
+    let store = apps.storeFrom model
+    let cmd = apps.update store, Incr
+    eager cmd
+    
+    when (store.states.current != 1), fail (strings.concat ["unexpected current state ", store.states.current])
+    unless cmd == Nil, fail (strings.concat ["unexpected cmd", cmd])
+}
+
+test "apps.send consecutively applies messages as cmd", { fail =>
+    enum Msg {
+        data Incr
+        data Incr2
+        data Decr
+    }
+    let model = apps.Model 0, { i =>
+        type Msg {
+            Incr2: { msg =>
+                apps.Update i + 1, Incr
+            },
+            Incr: { msg =>
+                apps.Update i + 1, Nil
+            },
+            Decr: { msg =>
+                apps.Update i - 1, Nil
+            }
+        }
+    }
+    let store = apps.storeFrom model
+    rx.await (apps.send store, Incr2)
+    when (store.states.current != 2), fail (strings.concat ["unexpected current state ", store.states.current])
+}
+
+test "apps.send consecutively awaits async cmds", { fail =>
+    enum Msg {
+        data Incr
+        data Incr2
+        data Decr
+    }
+    let model = apps.Model 0, { i =>
+        type Msg {
+            Incr2: { msg =>
+                apps.Update i + 1, rx.Future { receive =>
+                    receive (results.Success Incr)
+                }
+            },
+            Incr: { msg =>
+                apps.Update i + 1, Nil
+            },
+            Decr: { msg =>
+                apps.Update i - 1, Nil
+            }
+        }
+    }
+    let store = apps.storeFrom model
+    rx.await (apps.send store, Incr2)
+    
+    when (store.states.current != 2), fail (strings.concat ["unexpected current state ", store.states.current])
+}
+
+test "apps.send notifies all observers", { fail =>
+    enum Msg {
+        data Incr
+        data Decr
+    }
+    let hasBeenNotified = rx.Variable False
+    let model = apps.Model 0, { i =>
+        type Msg {
+            Incr: { msg =>
+                apps.Update i + 1, Nil
+            },
+            Decr: { msg =>
+                apps.Update i - 1, Nil
+            }
+        }
+    }
+    let store = apps.storeFrom model
+    apps.subscribe { _ =>
+        hasBeenNotified.accept True
+    }, store
+    rx.await (apps.send store, Incr)
+    
+    unless hasBeenNotified.current, fail "observer not notified"
+}
+
+test "apps.send updated state should be equal", { fail =>
+    enum Msg {
+        data Incr
+        data Incr2
+        data Decr
+    }
+    let notifiedState = rx.Variable None
+    let model = apps.Model 0, { i =>
+        type Msg {
+            Incr2: { msg =>
+                apps.Update i + 1, rx.Future { receive =>
+                    receive (results.Success Incr)
+                }
+            },
+            Incr: { msg =>
+                apps.Update i + 1, Nil
+            },
+            Decr: { msg =>
+                apps.Update i - 1, Nil
+            }
+        }
+    }
+    let store = apps.storeFrom model
+    apps.subscribe { state =>
+        notifiedState.accept Some state
+    }, store
+    rx.await (apps.send store, Incr2)
+    
+
+    when ((Some store.states.current) != notifiedState.current), fail (strings.concat ["unexpected current state ", store.states.current, notifiedState.current])
+}

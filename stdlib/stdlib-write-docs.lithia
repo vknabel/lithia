@@ -1,3 +1,4 @@
+import apps
 import booleans
 import cmp
 import controls
@@ -104,6 +105,7 @@ main (GroupedModuleDocs "Lithia Standard Library",
     "Other modules are not imported implicitly."
     ]),
     [
+    apps,
     booleans,
     cmp,
     controls,

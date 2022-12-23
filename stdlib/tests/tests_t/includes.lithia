@@ -3,6 +3,7 @@
 /// To run these, import `tests.t`.
 module tests_t
 
+import apps.apps_t
 import booleans
 import cmp
 import controls

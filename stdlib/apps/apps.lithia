@@ -1,0 +1,207 @@
+/// A simple, uni-directional data flow architecture.
+/// All global functions inside this module can be used on all statefuls.
+///
+/// ## Example
+///
+/// We start by defining a model. A model is a record with an initial state and an update function.
+/// The update function takes a state and a message and returns an `Update` record.
+/// 
+/// In this example we have a simple counter model.
+///
+/// ```lithia
+/// import apps
+///
+/// enum Message {
+///     data Inc
+///     data Dec
+/// }
+///
+/// let model = apps.defineModel 0, { state, msg =>
+///     with msg, type apps.Message {
+///         Inc: { _ => apps.Update state + 1, Nil },
+///         Dec: { _ => apps.Update state - 1, Nil },
+///     }
+/// }
+///
+/// let view = apps.render model, { dispatch, state =>
+///     print strings.join ["Current state: ", state]
+/// }
+///
+/// import tests
+///
+/// tests.test "apps", { fail =>
+///     rx.await (apps.send view, Inc)
+///
+///     unless (apps.currentState view) == 1, fail "should be 1"
+/// }
+/// ```
+
+module apps
+
+import rx { Async, Future }
+import lists
+import results
+import strings
+
+/// Represents all statefuls like Stores and Views.
+enum Stateful {
+    Store
+    View
+}
+
+/// Directly applies a message to a stateful.
+func update { stateful, msg =>
+    with stateful, type Stateful {
+        Store: { store =>
+            let update = store.model.update apps.currentState store, msg
+            store.states.accept update.state
+            lists.forEach store.observers.current, { observer =>
+                observer update.state
+            }
+            update.cmd
+        },
+        View: { view =>
+            update view.store, msg
+        }
+    }
+}
+
+/// Sends an eventually async Command to a stateful.
+/// Always returns a Future.
+func send { stateful, cmd =>
+    rx.Future { receive =>
+        let nextCmd = update stateful, cmd
+        with nextCmd, type Command {
+            Async: rx.flatMap type Message {
+                Nil: { _ => receive results.Success stateful },
+                None: { _ => receive results.Success stateful },
+                Any: { msg =>
+                    let asyncNext = send stateful, msg
+                    receive rx.await asyncNext
+                }
+            },
+            Batch: { batch =>
+                let newResult = lists.reduce { statefulResult, cmd =>
+                    results.flatMapSuccess { stateful =>
+                        let asyncNext = dispatch stateful, msg
+                        rx.await asyncNext
+                    }, statefulResult
+                }, results.Success stateful
+                receive newResult
+            },
+            Message: type Message {
+                Nil: { _ => receive results.Success stateful },
+                None: { _ => receive results.Success stateful },
+                Any: { msg =>
+                    receive rx.await (send stateful, msg)
+                },
+            }
+        }
+    }
+}
+
+/// Observes changes of a stateful.
+func subscribe { observer, stateful =>
+    with stateful, type Stateful {
+        Store: { store =>
+            let updated = lists.prepend observer, store.observers.current
+            eager updated
+            store.observers.accept updated
+        },
+        View: { view =>
+            subscribe observer, view.store
+        }
+    }
+}
+
+/// Returns the current state of a stateful.
+func currentState { stateful =>
+    with stateful, type Stateful {
+        Store: { store =>
+            store.states.current
+        },
+        View: { view =>
+            currentState view.store
+        }
+    }
+}
+
+/// A model defines the abstract and underlaying behaviour of a stateful.
+/// It has an initial state and an update function.
+data Model {
+    /// The initial state
+    initial
+    /// The update function.
+    /// Takes a state and a message and returns an `Update` record.
+    update state, msg
+}
+
+/// The update record includes the new state after applying a message and a command to be send to the store.
+data Update {
+    /// The new state
+    state
+    /// A command to be send to the store.
+    cmd
+}
+
+/// A command can be either a message, a batch of messages or an async message.
+enum Command {
+    /// An async msg
+    Async
+    /// A batch of Commands
+    data Batch { cmds }
+    Message
+}
+
+/// The messages any stateful can handle.
+/// `prelude.Nil` and `prelude.None` are used to indicate that no message should be send.
+/// `prelude.Any` is used to indicate that any message should be send.
+enum Message {
+    /// Quits the whole program
+    data Quit
+    Nil
+    None
+    Any
+}
+
+/// A stateful which holds a state and can be observed.
+data Store {
+    /// The Model
+    model
+    /// A rx.Variable of a State
+    states
+    /// A rx.Variable of functions to be notified.
+    observers
+}
+
+/// Creates a new model.
+func defineModel { initial, update =>
+    Model initial, { state, msg =>
+        eager (update state, msg)
+    }
+}
+
+/// Creates a new store from a model.
+/// This essentially adds dynamic behaviour to a model.
+func storeFrom { model =>
+    let states = rx.Variable model.initial
+    let observers = rx.Variable []
+    Store model, states, observers
+}
+
+/// A stateful which renders a view.
+/// The result of the view differs from use case to use case.
+///
+/// Whenever you have one representation of your whole state, the `View` is the right choice.
+data View {
+    /// The underlying and observed store.
+    store
+    /// A function which renders the current state.
+    /// Might `dispatch cmd`.
+    view dispatch, state
+}
+
+/// Creates a new view by rendering a store on every change.
+func render { model, view =>
+    View storeFrom model, view
+}

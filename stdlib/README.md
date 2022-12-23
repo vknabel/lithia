@@ -3,6 +3,7 @@
 There is one implicitly imported module for all files, called `prelude`.
 Other modules are not imported implicitly.
 
+- [apps](./apps.md)
 - [booleans](./booleans.md)
 - [cmp](./cmp.md)
 - [controls](./controls.md)

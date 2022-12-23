@@ -29,11 +29,6 @@ func (e EvaluatableExpr) Evaluate() (RuntimeValue, *RuntimeError) {
 		if e.Context.fileDef.Path != e.Expr.Meta().Source.FileName {
 			panic("Mixing files in declared evaluatable expr!")
 		}
-		defer func() {
-			// if err := recover(); err != nil {
-			// 	error = NewRuntimeError(fmt.Errorf("panic: %q", err))
-			// }
-		}()
 
 		if e.Expr == nil {
 			panic("cannot evaluate nil expr")
