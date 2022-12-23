@@ -9,5 +9,6 @@ func New() World {
 		Stderr: os.Stderr,
 		FS:     OSFS{},
 		Env:    OSEnv{},
+		Args:   os.Args,
 	}
 }

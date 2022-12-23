@@ -33,7 +33,7 @@ func (f PreludeAnonymousFunction) Lookup(member string) (Evaluatable, *RuntimeEr
 	case "arity":
 		return NewConstantRuntimeValue(PreludeInt(f.Arity())), nil
 	default:
-		return nil, NewRuntimeErrorf("no such member: %s", member)
+		return nil, NewRuntimeErrorf("no such member: %s for %s", member, f.RuntimeType().String())
 	}
 }
 

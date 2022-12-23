@@ -149,7 +149,7 @@ func (rv PreludeDict) Lookup(member string) (Evaluatable, *RuntimeError) {
 		dataList, err := rv.context.environment.MakeList(values)
 		return NewConstantRuntimeValue(dataList), err
 	default:
-		return nil, NewRuntimeErrorf("no such member: %s", member)
+		return nil, NewRuntimeErrorf("no such member: %s for %s", member, rv.RuntimeType().String())
 	}
 }
 

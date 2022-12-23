@@ -17,10 +17,10 @@ func (s PreludeString) EagerEvaluate() *RuntimeError {
 	return nil
 }
 
-func (i PreludeString) Lookup(member string) (Evaluatable, *RuntimeError) {
+func (s PreludeString) Lookup(member string) (Evaluatable, *RuntimeError) {
 	switch member {
 	case "length":
-		return NewConstantRuntimeValue(PreludeInt(len(i))), nil
+		return NewConstantRuntimeValue(PreludeInt(len(s))), nil
 	case "append":
 		return NewConstantRuntimeValue(MakeAnonymousFunction(
 			"append",
@@ -30,9 +30,9 @@ func (i PreludeString) Lookup(member string) (Evaluatable, *RuntimeError) {
 				if err != nil {
 					return nil, err
 				}
-				return PreludeString(i) + PreludeString(value.String()), nil
+				return PreludeString(s) + PreludeString(value.String()), nil
 			})), nil
 	default:
-		return nil, NewRuntimeErrorf("no such member: %s", member)
+		return nil, NewRuntimeErrorf("no such member: %s for %s", member, s.RuntimeType().String())
 	}
 }

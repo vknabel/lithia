@@ -27,12 +27,12 @@ func MakePreludeTypeSwitchExpr(context *InterpreterContext, decl ast.ExprTypeSwi
 	return PreludeTypeSwitchExpr{decl, context, MakeEvaluatableExpr(context, decl.Type), caseValue}
 }
 
-func (f PreludeTypeSwitchExpr) Lookup(member string) (Evaluatable, *RuntimeError) {
+func (t PreludeTypeSwitchExpr) Lookup(member string) (Evaluatable, *RuntimeError) {
 	switch member {
 	case "arity":
-		return NewConstantRuntimeValue(PreludeInt(f.Arity())), nil
+		return NewConstantRuntimeValue(PreludeInt(t.Arity())), nil
 	default:
-		return nil, NewRuntimeErrorf("no such member: %s", member)
+		return nil, NewRuntimeErrorf("no such member: %s for %s", member, t.RuntimeType().String())
 	}
 }
 

@@ -10,8 +10,9 @@ type World struct {
 	Stdout io.Writer
 	Stderr io.Writer
 
-	FS  WorldFS
-	Env WorldEnv
+	FS   WorldFS
+	Env  WorldEnv
+	Args []string
 }
 
 type WorldFS interface {

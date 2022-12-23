@@ -5,6 +5,7 @@
 - fix(lsp): `lithia lsp tcp` didn't work as expected
 - fix(cli): correctly handle running script and repl
 - feat(stdlib): `os.args` returns the arguments passed to the program
+- feat(error): impproved error messages for missing members
 
 ## v0.0.18
 

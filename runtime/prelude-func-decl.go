@@ -48,7 +48,7 @@ func (f PreludeFuncDecl) Lookup(member string) (Evaluatable, *RuntimeError) {
 	case "arity":
 		return NewConstantRuntimeValue(PreludeInt(f.Arity())), nil
 	default:
-		return nil, NewRuntimeErrorf("no such member: %s", member)
+		return nil, NewRuntimeErrorf("no such member: %s for %s", member, f.RuntimeType().String())
 	}
 }
 
