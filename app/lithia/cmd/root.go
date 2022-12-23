@@ -21,10 +21,10 @@ var rootCmd = &cobra.Command{
 		"\n" +
 		"Lean more at https://github.com/vknabel/lithia",
 	Version: fmt.Sprintf("%s\ncommit: %s\nbuilt by: %s\nbuilt at: %s", info.Version, info.Commit, info.Date, info.BuiltBy),
-	Args:    cobra.RangeArgs(0, 1),
+	Args:    cobra.MinimumNArgs(0),
 	Run: func(cmd *cobra.Command, args []string) {
-		if len(args) == 1 {
-			runFile(args[0])
+		if len(args) >= 1 {
+			runFile(args[0], args)
 		} else {
 			runPrompt()
 		}

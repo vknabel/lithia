@@ -16,13 +16,14 @@ func init() {
 var runCmd = &cobra.Command{
 	Use:   "run [script]",
 	Short: "Runs a Lithia script",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.MinimumNArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		runFile(args[0])
+		runFile(args[0], args)
 	},
 }
 
-func runFile(fileName string) {
+func runFile(fileName string, args []string) {
+	world.Current.Args = args
 	scriptData, err := world.Current.FS.ReadFile(fileName)
 	if err != nil {
 		fmt.Fprint(world.Current.Stderr, err)

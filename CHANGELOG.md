@@ -3,6 +3,7 @@
 ## v0.0.19-next
 
 - fix(lsp): `lithia lsp tcp` didn't work as expected
+- fix(cli): correctly handle running script and repl
 
 ## v0.0.18
 
