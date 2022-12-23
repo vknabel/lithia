@@ -21,12 +21,12 @@ func TestStdlib(t *testing.T) {
 
 	scriptData, err := world.Current.FS.ReadFile(filepath.Join(pathToStdlib, "stdlib-tests.lithia"))
 	if err != nil {
-		t.Errorf("Error reading stdlib-tests.lithia: %s", err)
+		t.Errorf("error reading stdlib-tests.lithia: %s", err)
 		return
 	}
 	_, err = inter.Interpret("stdlib-tests.lithia", string(scriptData))
 	if err != nil {
-		t.Errorf("Error interpreting stdlib-tests.lithia: %s", err)
+		t.Errorf("error interpreting stdlib-tests.lithia: %s", err)
 		return
 	}
 	if mockOS.calledExitCode != r.PreludeInt(0) && mockOS.calledExitCode != r.PreludeInt(-1) {
@@ -38,6 +38,7 @@ func TestStdlib(t *testing.T) {
 type mockExternalOS struct {
 	calledExitCode r.PreludeInt
 	env            map[string]string
+	args           []string
 }
 
 func (e *mockExternalOS) Lookup(name string, env *r.Environment, decl ast.Decl) (r.RuntimeValue, bool) {
@@ -48,6 +49,16 @@ func (e *mockExternalOS) Lookup(name string, env *r.Environment, decl ast.Decl) 
 		}), true
 	case "env":
 		return mockOsEnv(env, decl, e.env), true
+	case "args":
+		preludeStrings := make([]r.RuntimeValue, len(e.args))
+		for i, arg := range e.args {
+			preludeStrings[i] = r.PreludeString(arg)
+		}
+		argsList, err := env.MakeEagerList(preludeStrings)
+		if err != nil {
+			return nil, false
+		}
+		return argsList, true
 	default:
 		return nil, false
 	}
