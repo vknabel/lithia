@@ -16,6 +16,17 @@ func (e ExternalOS) Lookup(name string, env *Environment, decl ast.Decl) (Runtim
 		return builtinOsExit(decl), true
 	case "env":
 		return builtinOsEnv(env, decl), true
+	case "args":
+		relevantArgs := world.Current.Args
+		runtimeArgs := make([]RuntimeValue, len(relevantArgs))
+		for i, arg := range relevantArgs {
+			runtimeArgs[i] = PreludeString(arg)
+		}
+		list, err := env.MakeEagerList(runtimeArgs)
+		if err != nil {
+			return nil, false
+		}
+		return list, true
 	default:
 		return nil, false
 	}
