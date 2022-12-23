@@ -76,8 +76,8 @@ func (rv PreludeDict) Lookup(member string) (Evaluatable, *RuntimeError) {
 				if err != nil {
 					return nil, err
 				}
-				if key, ok := key.(PreludeString); ok {
-					if value, ok := rv.dict[key]; ok {
+				if stringKey, ok := key.(PreludeString); ok {
+					if value, ok := rv.dict[stringKey]; ok {
 						return rv.context.environment.MakeSome(value)
 					} else {
 						return rv.context.environment.MakeNone()
@@ -96,9 +96,9 @@ func (rv PreludeDict) Lookup(member string) (Evaluatable, *RuntimeError) {
 					return nil, err
 				}
 
-				if key, ok := key.(PreludeString); ok {
+				if stringKey, ok := key.(PreludeString); ok {
 					copy := rv.copy()
-					copy.dict[key] = args[1]
+					copy.dict[stringKey] = args[1]
 					return copy, nil
 				} else {
 					return nil, NewRuntimeErrorf("dict key must be a string, got %s", key)
@@ -114,9 +114,9 @@ func (rv PreludeDict) Lookup(member string) (Evaluatable, *RuntimeError) {
 					return nil, err
 				}
 
-				if key, ok := key.(PreludeString); ok {
+				if stringKey, ok := key.(PreludeString); ok {
 					copy := rv.copy()
-					delete(copy.dict, key)
+					delete(copy.dict, stringKey)
 					return copy, nil
 				} else {
 					return nil, NewRuntimeErrorf("dict key must be a string, got %s", key)

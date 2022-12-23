@@ -7,6 +7,7 @@
 - feat(stdlib): `os.args` returns the arguments passed to the program
 - feat(error): impproved error messages for missing members
 - feat(stdlib): introduced `apps`
+- feat(error): improved error messages for dicts
 
 ## v0.0.18
 
