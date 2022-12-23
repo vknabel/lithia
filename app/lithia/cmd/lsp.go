@@ -75,7 +75,7 @@ var lspTCPCmd = &cobra.Command{
 	Short: `opens a tcp connection on the specified address. Make sure the port is free.`,
 	Args:  cobra.RangeArgs(0, 1),
 	Run: func(cmd *cobra.Command, args []string) {
-		err := langsrv.RunSocket(lspSocketAddress)
+		err := langsrv.RunTCP(lspTCPAddress)
 		if err != nil {
 			panic(err)
 		}

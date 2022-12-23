@@ -2,6 +2,8 @@
 
 ## v0.0.19-next
 
+- fix(lsp): `lithia lsp tcp` didn't work as expected
+
 ## v0.0.18
 
 - stdlib: `docs.docsToMarkup` now sorts extern properties
