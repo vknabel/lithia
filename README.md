@@ -1,15 +1,15 @@
 # <img src="./assets/lithia.png" width="50"> Lithia Programming Language
 
-Lithia is an experimental functional programming language with an implicit but strong and dynamic type system.
-Lithia is designed around a few core concepts in mind all language features contribute to.
-
-- Composition instead inheritance
-- Predictability
-- Readability
+Lithia is an experimental functional programming language.
+It tries to combine a dynamic but strong type system with great tooling support in mind into a simple programming language.
+Every feature needs to contribute to these goals.
 
 ## Is Lithia for you?
 
-No, unless you want to play around with new language concepts for local non-production projects with a proof of concept programming language. I’d be happy to hear your feedback!
+Lithia is not the next programming language to build your next big project with. If you like to learn, play around, [discuss](https://github.com/vknabel/lithia/discussions), design and eventually contribute to a new programming language, Lithia might be a great fit for you.
+I'd be really happy to hear your feedback! The goal is to create an ecosystem with great tooling support for Lithia.
+
+If you search a production ready language, Lithia is not for you.
 
 ### Roadmap
 
