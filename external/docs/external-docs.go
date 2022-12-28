@@ -10,7 +10,13 @@ import (
 
 var _ runtime.ExternalDefinition = ExternalDocs{}
 
-type ExternalDocs struct{}
+type ExternalDocs struct {
+	inter *runtime.Interpreter
+}
+
+func New(inter *runtime.Interpreter) ExternalDocs {
+	return ExternalDocs{inter}
+}
 
 func (e ExternalDocs) Lookup(name string, env *runtime.Environment, decl ast.Decl) (runtime.RuntimeValue, bool) {
 	switch name {
@@ -32,12 +38,12 @@ func (e ExternalDocs) docsInspectValueFunction(env *runtime.Environment, decl as
 			if err != nil {
 				return nil, err
 			}
-			return docsInspectValue(value, env)
+			return e.docsInspectValue(value, env)
 		},
 	)
 }
 
-func docsInspectValue(value runtime.RuntimeValue, env *runtime.Environment) (runtime.RuntimeValue, *runtime.RuntimeError) {
+func (exdocs ExternalDocs) docsInspectValue(value runtime.RuntimeValue, env *runtime.Environment) (runtime.RuntimeValue, *runtime.RuntimeError) {
 	switch value := value.(type) {
 	case runtime.PreludeModule:
 		sortedKeys := make([]string, 0, len(value.Module.Environment.Scope))
@@ -53,7 +59,7 @@ func docsInspectValue(value runtime.RuntimeValue, env *runtime.Environment) (run
 			if err != nil {
 				return nil, err
 			}
-			child, err := docsInspectValue(lazyChild, env)
+			child, err := exdocs.docsInspectValue(lazyChild, env)
 			if err != nil {
 				return nil, err
 			}
@@ -160,7 +166,7 @@ func docsInspectValue(value runtime.RuntimeValue, env *runtime.Environment) (run
 				return nil, err
 			}
 
-			enumCaseValueDocs, err := docsInspectValue(enumCase, env)
+			enumCaseValueDocs, err := exdocs.docsInspectValue(enumCase, env)
 			if err != nil {
 				return nil, err
 			}
@@ -213,7 +219,7 @@ func docsInspectValue(value runtime.RuntimeValue, env *runtime.Environment) (run
 		})
 
 	case runtime.RuntimeType:
-		decl, err := value.Declaration()
+		decl, err := value.Declaration(exdocs.inter)
 		if err != nil {
 			return nil, err
 		}

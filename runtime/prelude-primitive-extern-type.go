@@ -7,10 +7,10 @@ var _ DeclRuntimeValue = PreludePrimitiveExternType{}
 
 type PreludePrimitiveExternType struct {
 	*ast.DeclExternType
-	hasInstance func(value RuntimeValue) (bool, *RuntimeError)
+	hasInstance func(inter *Interpreter, value RuntimeValue) (bool, *RuntimeError)
 }
 
-func MakePrimitiveExternType(decl ast.DeclExternType, hasInstance func(value RuntimeValue) (bool, *RuntimeError)) PreludePrimitiveExternType {
+func MakePrimitiveExternType(decl ast.DeclExternType, hasInstance func(inter *Interpreter, value RuntimeValue) (bool, *RuntimeError)) PreludePrimitiveExternType {
 	return PreludePrimitiveExternType{
 		DeclExternType: &decl,
 		hasInstance:    hasInstance,
@@ -29,6 +29,6 @@ func (t PreludePrimitiveExternType) RuntimeType() RuntimeTypeRef {
 	return PreludeAnyTypeRef
 }
 
-func (t PreludePrimitiveExternType) HasInstance(value RuntimeValue) (bool, *RuntimeError) {
-	return t.hasInstance(value)
+func (t PreludePrimitiveExternType) HasInstance(inter *Interpreter, value RuntimeValue) (bool, *RuntimeError) {
+	return t.hasInstance(inter, value)
 }

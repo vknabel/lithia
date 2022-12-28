@@ -10,9 +10,9 @@ import (
 
 func NewDefaultInterpreter(referenceFile string, importRoots ...string) *runtime.Interpreter {
 	inter := runtime.NewIsolatedInterpreter(referenceFile, importRoots...)
-	inter.ExternalDefinitions["os"] = extos.ExternalOS{}
-	inter.ExternalDefinitions["rx"] = extrx.ExternalRx{}
-	inter.ExternalDefinitions["docs"] = extdocs.ExternalDocs{}
-	inter.ExternalDefinitions["fs"] = extfs.ExternalFS{}
+	inter.ExternalDefinitions["os"] = extos.New(inter)
+	inter.ExternalDefinitions["rx"] = extrx.New(inter)
+	inter.ExternalDefinitions["docs"] = extdocs.New(inter)
+	inter.ExternalDefinitions["fs"] = extfs.New(inter)
 	return inter
 }

@@ -24,11 +24,11 @@ func (RxVariableType) String() string {
 	return RxVariableTypeRef.String()
 }
 
-func (t RxVariableType) Declaration() (ast.Decl, *runtime.RuntimeError) {
+func (t RxVariableType) Declaration(inter *runtime.Interpreter) (ast.Decl, *runtime.RuntimeError) {
 	return t.DeclExternType, nil
 }
 
-func (d RxVariableType) HasInstance(value runtime.RuntimeValue) (bool, *runtime.RuntimeError) {
+func (d RxVariableType) HasInstance(inter *runtime.Interpreter, value runtime.RuntimeValue) (bool, *runtime.RuntimeError) {
 	if _, ok := value.(RxVariable); ok {
 		return true, nil
 	} else {

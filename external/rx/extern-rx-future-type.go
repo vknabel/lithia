@@ -14,6 +14,7 @@ var RxFutureTypeRef = runtime.MakeRuntimeTypeRef("Future", "rx")
 
 type RxFutureType struct {
 	ast.DeclExternType
+	exrx ExternalRx
 }
 
 func (RxFutureType) RuntimeType() runtime.RuntimeTypeRef {
@@ -24,11 +25,11 @@ func (RxFutureType) String() string {
 	return RxVariableTypeRef.String()
 }
 
-func (t RxFutureType) Declaration() (ast.Decl, *runtime.RuntimeError) {
+func (t RxFutureType) Declaration(inter *runtime.Interpreter) (ast.Decl, *runtime.RuntimeError) {
 	return t.DeclExternType, nil
 }
 
-func (d RxFutureType) HasInstance(value runtime.RuntimeValue) (bool, *runtime.RuntimeError) {
+func (d RxFutureType) HasInstance(inter *runtime.Interpreter, value runtime.RuntimeValue) (bool, *runtime.RuntimeError) {
 	if _, ok := value.(RxFuture); ok {
 		return true, nil
 	} else {
@@ -53,7 +54,7 @@ func (t RxFutureType) Call(arguments []runtime.Evaluatable, fromExpr ast.Expr) (
 		return nil, err.CascadeDecl(t.DeclExternType)
 	}
 	if receive, ok := receive.(runtime.CallableRuntimeValue); ok {
-		return MakeRxFuture(&t, receive), nil
+		return t.exrx.MakeRxFuture(&t, receive), nil
 	} else {
 		return nil, runtime.NewRuntimeErrorf("%s is not callable", receive)
 	}

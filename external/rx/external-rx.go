@@ -7,7 +7,13 @@ import (
 
 var _ runtime.ExternalDefinition = ExternalRx{}
 
-type ExternalRx struct{}
+type ExternalRx struct {
+	inter *runtime.Interpreter
+}
+
+func New(inter *runtime.Interpreter) ExternalRx {
+	return ExternalRx{inter}
+}
 
 func (e ExternalRx) Lookup(name string, env *runtime.Environment, decl ast.Decl) (runtime.RuntimeValue, bool) {
 	switch name {
@@ -19,7 +25,7 @@ func (e ExternalRx) Lookup(name string, env *runtime.Environment, decl ast.Decl)
 		}
 	case "Future":
 		if decl, ok := decl.(ast.DeclExternType); ok {
-			return RxFutureType{decl}, true
+			return RxFutureType{decl, e}, true
 		} else {
 			panic("rx.Future must be an extern type")
 		}

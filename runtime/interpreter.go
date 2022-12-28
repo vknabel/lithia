@@ -7,8 +7,6 @@ import (
 	"github.com/vknabel/lithia/world"
 )
 
-var interpreter *Interpreter
-
 type Interpreter struct {
 	Resolver            resolution.ModuleResolver
 	Parser              *parser.Parser
@@ -25,7 +23,6 @@ func NewIsolatedInterpreter(referenceFile string, importRoots ...string) *Interp
 		ExternalDefinitions: make(map[ast.ModuleName]ExternalDefinition),
 	}
 	inter.ExternalDefinitions["prelude"] = ExternalPrelude{}
-	interpreter = inter
 	return inter
 }
 

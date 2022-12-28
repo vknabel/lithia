@@ -25,7 +25,7 @@ type RxFuture struct {
 	storage    *internalPromise
 }
 
-func MakeRxFuture(futureType *RxFutureType, configure runtime.CallableRuntimeValue) RxFuture {
+func (rx ExternalRx) MakeRxFuture(futureType *RxFutureType, configure runtime.CallableRuntimeValue) RxFuture {
 	future := RxFuture{
 		futureType: futureType,
 		storage: &internalPromise{
@@ -41,7 +41,7 @@ func MakeRxFuture(futureType *RxFutureType, configure runtime.CallableRuntimeVal
 				return nil, err.CascadeDecl(futureType.DeclExternType)
 			}
 			resultTypeRef := runtime.MakeRuntimeTypeRef("Result", "results")
-			isResult, err := resultTypeRef.HasInstance(value)
+			isResult, err := resultTypeRef.HasInstance(rx.inter, value)
 			if err != nil {
 				return nil, err.CascadeDecl(futureType.DeclExternType)
 			} else if !isResult {

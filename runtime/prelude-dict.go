@@ -153,6 +153,14 @@ func (rv PreludeDict) Lookup(member string) (Evaluatable, *RuntimeError) {
 	}
 }
 
+func (rv PreludeDict) ToMap() map[string]Evaluatable {
+	result := make(map[string]Evaluatable)
+	for k, v := range rv.dict {
+		result[string(k)] = v
+	}
+	return result
+}
+
 func (rv PreludeDict) copy() PreludeDict {
 	return MakePreludeDict(rv.context, rv.dict)
 }

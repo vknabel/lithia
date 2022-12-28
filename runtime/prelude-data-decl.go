@@ -27,7 +27,7 @@ func (d PreludeDataDecl) String() string {
 	return fmt.Sprintf("data %s", d.Decl.Name)
 }
 
-func (d PreludeDataDecl) HasInstance(value RuntimeValue) (bool, *RuntimeError) {
+func (d PreludeDataDecl) HasInstance(inter *Interpreter, value RuntimeValue) (bool, *RuntimeError) {
 	if dataVal, ok := value.(DataRuntimeValue); ok {
 		return reflect.DeepEqual(*dataVal.TypeDecl, d), nil
 	} else {

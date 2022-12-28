@@ -33,7 +33,8 @@ func MakeDataRuntimeValueMemberwise(decl *PreludeDataDecl, members map[string]Ev
 
 func (d DataRuntimeValue) String() string {
 	params := make([]string, 0)
-	for _, arg := range d.Members {
+	for _, field := range d.TypeDecl.Decl.Fields {
+		arg := d.Members[string(field.Name)]
 		value, err := arg.Evaluate()
 		if err != nil {
 			params = append(params, err.Error())
@@ -72,5 +73,10 @@ func (d DataRuntimeValue) Lookup(name string) (Evaluatable, *RuntimeError) {
 }
 
 func (d DataRuntimeValue) RuntimeType() RuntimeTypeRef {
-	panic("TODO: there are not only global dependencies!")
+	return RuntimeTypeRef{
+		Name:   d.TypeDecl.Decl.Name,
+		Module: d.TypeDecl.Decl.MetaInfo.ModuleName,
+	}
+	// d.TypeDecl.Decl.DeclName()
+	// panic("TODO: there are not only global dependencies!")
 }

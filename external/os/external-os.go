@@ -2,15 +2,21 @@ package os
 
 import (
 	"github.com/vknabel/lithia/ast"
-	. "github.com/vknabel/lithia/runtime"
+	"github.com/vknabel/lithia/runtime"
 	"github.com/vknabel/lithia/world"
 )
 
-var _ ExternalDefinition = ExternalOS{}
+var _ runtime.ExternalDefinition = ExternalOS{}
 
-type ExternalOS struct{}
+type ExternalOS struct {
+	inter *runtime.Interpreter
+}
 
-func (e ExternalOS) Lookup(name string, env *Environment, decl ast.Decl) (RuntimeValue, bool) {
+func New(inter *runtime.Interpreter) ExternalOS {
+	return ExternalOS{inter}
+}
+
+func (e ExternalOS) Lookup(name string, env *runtime.Environment, decl ast.Decl) (runtime.RuntimeValue, bool) {
 	switch name {
 	case "exit":
 		return builtinOsExit(decl), true
@@ -18,9 +24,9 @@ func (e ExternalOS) Lookup(name string, env *Environment, decl ast.Decl) (Runtim
 		return builtinOsEnv(env, decl), true
 	case "args":
 		relevantArgs := world.Current.Args
-		runtimeArgs := make([]RuntimeValue, len(relevantArgs))
+		runtimeArgs := make([]runtime.RuntimeValue, len(relevantArgs))
 		for i, arg := range relevantArgs {
-			runtimeArgs[i] = PreludeString(arg)
+			runtimeArgs[i] = runtime.PreludeString(arg)
 		}
 		list, err := env.MakeEagerList(runtimeArgs)
 		if err != nil {
@@ -32,36 +38,36 @@ func (e ExternalOS) Lookup(name string, env *Environment, decl ast.Decl) (Runtim
 	}
 }
 
-func builtinOsExit(decl ast.Decl) PreludeExternFunction {
-	return MakeExternFunction(
+func builtinOsExit(decl ast.Decl) runtime.PreludeExternFunction {
+	return runtime.MakeExternFunction(
 		decl,
-		func(args []Evaluatable) (RuntimeValue, *RuntimeError) {
+		func(args []runtime.Evaluatable) (runtime.RuntimeValue, *runtime.RuntimeError) {
 			value, err := args[0].Evaluate()
 			if err != nil {
 				return nil, err
 			}
-			if code, ok := value.(PreludeInt); ok {
+			if code, ok := value.(runtime.PreludeInt); ok {
 				world.Current.Env.Exit(int(code))
 				return value, nil
 			} else {
-				return nil, NewRuntimeErrorf("%s is not an int", value).CascadeDecl(decl)
+				return nil, runtime.NewRuntimeErrorf("%s is not an int", value).CascadeDecl(decl)
 			}
 		},
 	)
 }
 
-func builtinOsEnv(prelude *Environment, decl ast.Decl) PreludeExternFunction {
-	return MakeExternFunction(
+func builtinOsEnv(prelude *runtime.Environment, decl ast.Decl) runtime.PreludeExternFunction {
+	return runtime.MakeExternFunction(
 		decl,
-		func(args []Evaluatable) (RuntimeValue, *RuntimeError) {
+		func(args []runtime.Evaluatable) (runtime.RuntimeValue, *runtime.RuntimeError) {
 			value, err := args[0].Evaluate()
 			if err != nil {
 				return nil, err.CascadeDecl(decl)
 			}
-			if key, ok := value.(PreludeString); ok {
+			if key, ok := value.(runtime.PreludeString); ok {
 				if env, ok := world.Current.Env.LookupEnv(string(key)); ok && env != "" {
-					value, err := prelude.MakeDataRuntimeValue("Some", map[string]Evaluatable{
-						"value": NewConstantRuntimeValue(PreludeString(env)),
+					value, err := prelude.MakeDataRuntimeValue("Some", map[string]runtime.Evaluatable{
+						"value": runtime.NewConstantRuntimeValue(runtime.PreludeString(env)),
 					})
 					return value, err.CascadeDecl(decl)
 				} else {
@@ -69,7 +75,7 @@ func builtinOsEnv(prelude *Environment, decl ast.Decl) PreludeExternFunction {
 					return value, err.CascadeDecl(decl)
 				}
 			} else {
-				return nil, NewRuntimeErrorf("%s is not a string", value).CascadeDecl(decl)
+				return nil, runtime.NewRuntimeErrorf("%s is not a string", value).CascadeDecl(decl)
 			}
 		},
 	)

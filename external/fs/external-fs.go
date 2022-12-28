@@ -10,7 +10,13 @@ import (
 
 var _ ExternalDefinition = ExternalFS{}
 
-type ExternalFS struct{}
+type ExternalFS struct {
+	inter *Interpreter
+}
+
+func New(inter *Interpreter) ExternalFS {
+	return ExternalFS{inter}
+}
 
 func (e ExternalFS) Lookup(name string, env *Environment, decl ast.Decl) (RuntimeValue, bool) {
 	switch name {
