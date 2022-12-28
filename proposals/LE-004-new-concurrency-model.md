@@ -16,31 +16,80 @@ When comparing this with the Go concurrency model, where async function calls ar
 
 ## Proposed Solution
 
-The new concurrency model is based on channels and coroutines. Coroutines are similar to async functions, but they are not blocking. They can be called using the `async` function. The `async` function is followed by an expression, which is executed in a new coroutine. The coroutine can be suspended using the `await` function. The `await` keyword is followed by an expression, which is evaluated in the current coroutine. The result of the expression is returned to the coroutine, which called `await`.
+The new concurrency model is based on channels and coroutines. Coroutines are similar to async functions, but they are not blocking. They can be called using the `async` function. The `async` function is followed by an expression, which is executed in background.
 
 ```lithia
-let task = async { =>
-    let channel = Channel 0
-    select { on, closed =>
-        on channel, { value =>
-            print value
-        }
-        on None, { _ =>
-            print "No value"
-        }
-        closed channel, { reason =>
-            print reason
-        }
+// create an unbuffered channel
+let channel = Channel 0
+
+// start a new coroutine
+async { =>
+    // send a value to the channel
+    // as unbuffered, send is blocking until received
+    channel.send "Hello World"
+}
+
+// start selecting on the channel
+// blocking until fulfilled
+select { on, closed =>
+    // on new value in channel
+    on channel, { value =>
+        print value
+    }
+    // channel is closed
+    closed channel, { reason =>
+        print reason
+    }
+    // default case
+    on None, { _ =>
+        print "No value"
     }
 }
-await task
 ```
+
+When spinning up a new async task, a `Task` is returned. This can be used to `await` for the task to finish.
+But in contrast to other languages, long running tasks are not async by default and returning Tasks is considered an anti-pattern. Invocations of `async` and `await` are designed to take place on the call site.
+
+```lithia
+// start all jobs in background
+let tasks = lists.map jobs, { job => async run job }
+// wait for all tasks to finish
+lists.map tasks, await
+```
+
+The goal of a `Task` is to avoid local channels to wait for multiple results, requested in parallel. They should not escape your function scope.
 
 ## Detailed Design
 
-`Channel` is just a wrapper around a Go-channel. But in contrast to `close` in Go, `close` in Lithia takes a reason.
+The new concurrency model is based around three basic building blocks:
 
-The `async` function directly creates a new Goroutine with a `Task` under the hood. It is implemented similar to `rx.Future`.
+1. Channels - represent a communication channel between different parts of the program
+2. Select - allows to wait for certain events to take place
+3. Async Tasks - represent a small unit of work, which can be executed in background
+
+### Channels
+
+Channels are used to communicate between different parts of the program. They are created using the `Channel` type. The `Channel` type is a wrapper around a Go-channel. It can be created with a buffer size. If the buffer size is 0, the channel is unbuffered. Otherwise it is buffered.
+
+- Sending a value to a channel is blocking if the channel is unbuffered or if the buffer is full until there is a receiver.
+- Receiving a value from a channel is blocking if the channel is unbuffered or if the buffer is empty until there is a sender.
+- Closing a channel not blocking.
+- Waiting for a channel to be closed is blocking until it has been blocked.
+- Closing a channel requires a reason.
+- Sending a value to a closed channel is a runtime error.
+- Closing an already closed channel is a runtime error. Even if the reason is the same.
+
+### Select
+
+The `select` function allows to handle the fastest case in a set of channels or Async Tasks. It is blocking until one of the cases is fulfilled. The `select` function takes a function as argument. This function is called with two functions `on` and `closed`. The `on` function is used to register a case for a channel. The `closed` function is used to register a case for a closed channel.
+
+If `on` is called with `None` or `Nil`, it is called if no other case is fulfilled immediately. If it has been omitted, the `select` function will block until one of the cases is fulfilled.
+
+### Async Tasks
+
+Async Tasks are used to execute a small unit of work in background. They are created using the `async` function. The `async` function takes an expression as argument. This expression is executed in background. The `async` function returns a `Task` which can be used to `await` for the task to finish.
+
+When awaiting a task, the current coroutine is blocked until the task has finished. The result of the task is returned. Tasks cannot fail.
 
 ## Changes to the Standard Library
 
@@ -66,4 +115,6 @@ The `Task` could be dropped, but it might be useful.
 
 ## Acknowledgements
 
-This is heavily inspired by Go. `Task` is inspired by Swift.
+`Channel`, `select`, but also `async` are heavily inspired by Go. But in contrast to Go, they require a reason to close a channel.
+
+`Task`, `async` and `await` are inspired by many implementations like in TypeScript or Swift. Especially decoupling errors from async operations like in Swift really fit into Lithia's design.
