@@ -1,4 +1,4 @@
-# Template Proposal
+# String Concatenation
 
 - Proposal: LE-003
 - Status: **Draft**
