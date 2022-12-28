@@ -29,8 +29,11 @@ This allows comparisions of concatenated strings.
 
 ## Changes to the Standard Library
 
-Only implementations are affected.
 `strings.concat` will still be available, and will never be deprecated.
+
+Implementations of string related functions should use `..` internally.
+
+Deprecation of `String.append`.
 
 ## Alternatives Considered
 
