@@ -32,8 +32,13 @@ func runPrompt() {
 		world.Current.Env.Exit(1)
 	}
 	reader := bufio.NewReader(world.Current.Stdin)
-	inter := lithia.NewDefaultInterpreter(importRoot)
+	inter, ctx := lithia.NewDefaultInterpreter(importRoot)
 	for {
+		select {
+		case <-ctx.Done():
+			return
+		default:
+		}
 		fmt.Print("> ")
 		line, err := reader.ReadString('\n')
 		if err == io.EOF {

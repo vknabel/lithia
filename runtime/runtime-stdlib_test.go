@@ -12,7 +12,8 @@ import (
 
 func TestStdlib(t *testing.T) {
 	pathToStdlib := "../stdlib"
-	inter := l.NewDefaultInterpreter(pathToStdlib, "../stdlib")
+	inter, ctx := l.NewDefaultInterpreter(pathToStdlib, "../stdlib")
+	defer ctx.Done()
 	mockOS := &mockExternalOS{
 		calledExitCode: -1,
 		env:            map[string]string{"LITHIA_TESTS": "1"},

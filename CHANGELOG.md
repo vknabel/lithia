@@ -8,6 +8,8 @@
 - feat(error): impproved error messages for missing members
 - feat(stdlib): introduced `apps`
 - feat(error): improved error messages for dicts
+- feat(cli): whitelist external definitions #39 LE-001
+- feat(cli): timeout for scripts #39 LE-001
 
 ## v0.0.18
 

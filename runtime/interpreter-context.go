@@ -26,7 +26,7 @@ func (inter *Interpreter) NewInterpreterContext(fileDef *ast.SourceFile, module 
 		module:      module,
 		path:        []string{},
 		environment: environment,
-		evalCache:   NewLazyEvaluationCache(),
+		evalCache:   NewLazyEvaluationCache(inter.Context),
 	}
 }
 
@@ -37,7 +37,7 @@ func (i *InterpreterContext) NestedInterpreterContext(name string) *InterpreterC
 		module:      i.module,
 		path:        append(i.path, name),
 		environment: NewEnvironment(i.environment),
-		evalCache:   NewLazyEvaluationCache(),
+		evalCache:   NewLazyEvaluationCache(i.interpreter.Context),
 	}
 }
 
@@ -48,6 +48,11 @@ func (i *InterpreterContext) Evaluate() (RuntimeValue, *RuntimeError) {
 		}
 		var result RuntimeValue
 		for _, stmt := range i.fileDef.Statements {
+			select {
+			case <-i.interpreter.Context.Done():
+				return nil, NewRuntimeError(i.interpreter.Context.Err())
+			default:
+			}
 			expr := MakeEvaluatableExpr(i, stmt)
 			value, err := expr.Evaluate()
 			if err != nil {

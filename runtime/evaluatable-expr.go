@@ -18,7 +18,7 @@ func MakeEvaluatableExpr(context *InterpreterContext, expr ast.Expr) Evaluatable
 	if context.fileDef.Path != expr.Meta().Source.FileName {
 		panic("Mixing files in declared evaluatable expr!")
 	}
-	return EvaluatableExpr{&copy, expr, NewLazyEvaluationCache()}
+	return EvaluatableExpr{&copy, expr, NewLazyEvaluationCache(context.interpreter.Context)}
 }
 
 func (e EvaluatableExpr) Evaluate() (RuntimeValue, *RuntimeError) {

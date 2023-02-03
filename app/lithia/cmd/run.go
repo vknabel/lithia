@@ -29,7 +29,8 @@ func runFile(fileName string, args []string) {
 		fmt.Fprint(world.Current.Stderr, err)
 		world.Current.Env.Exit(1)
 	}
-	inter := lithia.NewDefaultInterpreter(path.Dir(fileName))
+
+	inter, _ := lithia.NewDefaultInterpreter(path.Dir(fileName))
 	script := string(scriptData) + "\n"
 	_, err = inter.Interpret(fileName, script)
 	if err != nil {

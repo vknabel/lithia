@@ -1,6 +1,8 @@
 package runtime
 
 import (
+	"context"
+
 	"github.com/vknabel/lithia/ast"
 	"github.com/vknabel/lithia/parser"
 	"github.com/vknabel/lithia/resolution"
@@ -8,6 +10,7 @@ import (
 )
 
 type Interpreter struct {
+	Context             context.Context
 	Resolver            resolution.ModuleResolver
 	Parser              *parser.Parser
 	Modules             map[ast.ModuleName]*RuntimeModule
@@ -15,8 +18,9 @@ type Interpreter struct {
 	Prelude             *Environment
 }
 
-func NewIsolatedInterpreter(referenceFile string, importRoots ...string) *Interpreter {
+func NewIsolatedInterpreter(ctx context.Context, referenceFile string, importRoots ...string) *Interpreter {
 	inter := &Interpreter{
+		Context:             ctx,
 		Resolver:            resolution.NewDefaultModuleResolver(importRoots...),
 		Parser:              parser.NewParser(),
 		Modules:             make(map[ast.ModuleName]*RuntimeModule),
