@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.0.19-next
+## v0.0.19
 
 - fix(lsp): `lithia lsp tcp` didn't work as expected
 - fix(cli): correctly handle running script and repl
