@@ -33,7 +33,7 @@ let view = apps.render model, { dispatch, state =>
 import tests
 
 tests.test "apps", { fail =>
-    rx.await (apps.send view, Inc)
+    apps.send view, Inc
 
     unless (apps.currentState view) == 1, fail "should be 1"
 }
@@ -98,7 +98,7 @@ It has an initial state and an update function.
 
 - `initial` - The initial state
 - `update state, msg` - The update function.
-  Takes a state and a message and returns an `Update` record.
+Takes a state and a message and returns an `Update` record.
 
 ## Quit
 
@@ -144,7 +144,7 @@ Whenever you have one representation of your whole state, the `View` is the righ
 
 - `store` - The underlying and observed store.
 - `view dispatch, state` - A function which renders the current state.
-  Might `dispatch cmd`.
+Might `dispatch cmd`.
 
 ## currentState
 
@@ -169,7 +169,7 @@ Creates a new view by rendering a store on every change.
 _func_ `send stateful, cmd`
 
 Sends an eventually async Command to a stateful.
-Always returns a Future.
+Always returns a Result.
 
 ## storeFrom
 
@@ -189,3 +189,4 @@ Observes changes of a stateful.
 _func_ `update stateful, msg`
 
 Directly applies a message to a stateful.
+
