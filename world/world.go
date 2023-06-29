@@ -28,6 +28,7 @@ type WorldFS interface {
 type WorldEnv interface {
 	Exit(code int)
 	LookupEnv(key string) (string, bool)
+	Environ() []string
 }
 
 var Current World = New()

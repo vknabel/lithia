@@ -73,7 +73,7 @@ test "apps.send consecutively awaits async cmds", { fail =>
         }
     }
     let store = apps.storeFrom model
-    rx.await (apps.send store, Incr2)
+    apps.send store, Incr2
     
     when (store.states.current != 2), fail (strings.concat ["unexpected current state ", store.states.current])
 }
@@ -129,7 +129,7 @@ test "apps.send updated state should be equal", { fail =>
     apps.subscribe { state =>
         notifiedState.accept Some state
     }, store
-    rx.await (apps.send store, Incr2)
+    apps.send store, Incr2
     
 
     when ((Some store.states.current) != notifiedState.current), fail (strings.concat ["unexpected current state ", store.states.current, notifiedState.current])

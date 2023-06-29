@@ -1,0 +1,16 @@
+module deps
+
+import apps
+import pot
+
+enum Dependency {
+    data Git {
+        name
+        url
+        version
+    }
+}
+
+func git { name, url, version => 
+    apps.send pot.store, pot.SetDep (Git name, url, version)
+}

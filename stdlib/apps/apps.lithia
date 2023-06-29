@@ -30,7 +30,7 @@
 /// import tests
 ///
 /// tests.test "apps", { fail =>
-///     rx.await (apps.send view, Inc)
+///     apps.send view, Inc
 ///
 ///     unless (apps.currentState view) == 1, fail "should be 1"
 /// }
@@ -67,35 +67,26 @@ func update { stateful, msg =>
 }
 
 /// Sends an eventually async Command to a stateful.
-/// Always returns a Future.
+/// Always returns a Result.
 func send { stateful, cmd =>
-    rx.Future { receive =>
-        let nextCmd = update stateful, cmd
-        with nextCmd, type Command {
-            Async: rx.flatMap type Message {
-                Nil: { _ => receive results.Success stateful },
-                None: { _ => receive results.Success stateful },
-                Any: { msg =>
-                    let asyncNext = send stateful, msg
-                    receive rx.await asyncNext
-                }
+    let nextCmd = update stateful, cmd
+    with nextCmd, type Command {
+        Async: { asyncCmd =>
+            results.flatMap { msg => send stateful, msg }, rx.await asyncCmd
+        },
+        Batch: { batch =>
+            let newResult = lists.reduce { statefulResult, cmd =>
+                results.flatMapSuccess { stateful =>
+                    dispatch stateful, msg
+                }, statefulResult
+            }, results.Success stateful
+        },
+        Message: type Message {
+            Nil: { _ => results.Success stateful },
+            None: { _ => results.Success stateful },
+            Any: { msg =>
+                send stateful, msg
             },
-            Batch: { batch =>
-                let newResult = lists.reduce { statefulResult, cmd =>
-                    results.flatMapSuccess { stateful =>
-                        let asyncNext = dispatch stateful, msg
-                        rx.await asyncNext
-                    }, statefulResult
-                }, results.Success stateful
-                receive newResult
-            },
-            Message: type Message {
-                Nil: { _ => receive results.Success stateful },
-                None: { _ => receive results.Success stateful },
-                Any: { msg =>
-                    receive rx.await (send stateful, msg)
-                },
-            }
         }
     }
 }

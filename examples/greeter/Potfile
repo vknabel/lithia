@@ -1,3 +1,17 @@
-import pot.cmds
+module potfile
 
-cmds.run "test", "cmd/test.lithia"
+import pot
+import pot.cmds
+import pot.deps
+
+cmds.add "test", { c =>
+  c.script "cmd/test.lithia"
+  c.summary "runs all tests"
+  c.env "LITHIA_TESTS", "1"
+  c.flag "verbose", { f =>
+    f.short "v"
+    f.summary "verbose logging"
+  }
+}
+
+deps.git "tests", "https://github.com/vknabel/lithia-tests.git", deps.Branch "main"

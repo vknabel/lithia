@@ -19,3 +19,11 @@ func (e *MapEnv) LookupEnv(key string) (string, bool) {
 func (e *MapEnv) Exit(code int) {
 	e.ExitCode = &code
 }
+
+func (e *MapEnv) Environ() []string {
+	env := make([]string, 0, len(e.Map))
+	for key, val := range e.Map {
+		env = append(env, key+"="+val)
+	}
+	return env
+}

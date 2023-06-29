@@ -11,3 +11,7 @@ func (OSEnv) Exit(code int) {
 func (OSEnv) LookupEnv(key string) (string, bool) {
 	return os.LookupEnv(key)
 }
+
+func (OSEnv) Environ() []string {
+	return os.Environ()
+}

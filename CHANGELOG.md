@@ -8,6 +8,7 @@
 - feat(error): impproved error messages for missing members
 - feat(stdlib): introduced `apps`
 - feat(error): improved error messages for dicts
+- feat(stdlib): introduced `pot`, `pot.cmds` and `pot.deps`
 
 ## v0.0.18
 

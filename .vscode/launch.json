@@ -55,6 +55,21 @@
       }
     },
     {
+      "name": "lithia run test",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/app/lithia/main.go",
+      "args": [
+        "run",
+        "test"
+      ],
+      "cwd": "${workspaceFolder}/examples/greeter",
+      "env": {
+        "LITHIA_STDLIB": "${workspaceFolder}/stdlib"
+      }
+    },
+    {
       "name": "Launch fib-type",
       "type": "go",
       "request": "launch",

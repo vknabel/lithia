@@ -1,0 +1,7 @@
+module deps
+
+enum Dependency {
+    data Branch {
+        name
+    }
+}

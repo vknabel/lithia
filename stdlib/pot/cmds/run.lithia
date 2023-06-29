@@ -1,0 +1,124 @@
+module cmds
+
+import strings
+import rx
+import pot
+import apps
+import lists
+
+data Command {
+    /// The name of the command
+    name
+    /// The summary of the command
+    summary
+    /// a dict of flags of the command
+    flags
+    /// A dict environment variables of the command
+    envs
+    /// The path to the binary. Default is lithia
+    bin
+    /// List of args, eventually starting with the path to the script.
+    args
+}
+
+data CommandBuilder {
+    summary text
+    flag name, conf
+    env name, value
+    bin name
+    script path
+    args args
+}
+
+func add { name, conf =>
+    let initCmd = Command name, "", [:], [:], "lithia", []
+    let latestCmd = rx.Variable initCmd
+
+    let setSummary = { text =>
+        let cmd = latestCmd.current
+        let newCmd = Command name, text, cmd.flags, cmd.envs, cmd.bin, cmd.args
+        latestCmd.accept newCmd
+    }
+    let addFlag = { flagName, conf =>
+        let flagBuilder = _buildFlag flagName, conf
+        let cmd = latestCmd.current
+        let newFlags = cmd.flags.set flagName, flagBuilder
+        let newCmd = Command name, cmd.summary, newFlags, cmd.envs, cmd.bin, cmd.args
+        latestCmd.accept newCmd
+    }
+    let addEnv = { envName, value =>
+        let cmd = latestCmd.current
+        let newEnvs = cmd.envs.set envName, value
+        let newCmd = Command name, cmd.summary, cmd.flags, newEnvs, cmd.bin, cmd.args
+        latestCmd.accept newCmd
+    }
+    let setBin = { name =>
+        let cmd = latestCmd.current
+        let newCmd = Command name, cmd.summary, cmd.flags, cmd.envs, cmd.bin, cmd.args
+        latestCmd.accept newCmd
+    }
+    let setScript = { path =>
+        let cmd = latestCmd.current
+        let newCmd = Command name, cmd.summary, cmd.flags, cmd.envs, cmd.bin, (lists.prependList ["run", path], cmd.args)
+        latestCmd.accept newCmd
+    }
+    let setArgs = { args =>
+        let cmd = latestCmd.current
+        let newCmd = Command name, cmd.summary, cmd.flags, cmd.envs, cmd.bin, args
+        latestCmd.accept newCmd
+    }
+
+    let cmdBuilder = CommandBuilder setSummary, addFlag, addEnv, setBin, setScript, setArgs
+    conf cmdBuilder
+    apps.send pot.store, pot.SetCmd latestCmd.current
+}
+
+data Flag {
+    /// The name of the flag
+    name
+    /// The short name of the flag
+    short
+    /// The summary of the flag
+    summary
+    /// The default value of the flag
+    default
+    /// If the flag is required
+    required
+}
+
+data FlagBuilder {
+    summary text
+    short name
+    default value
+    required Bool
+}
+
+func _buildFlag { flagName, conf => 
+    let initFlag = Flag flagName, "", "", "", False
+    let latestFlag = rx.Variable initFlag
+    
+    let setSummary = { text =>
+        let flag = latestFlag.current
+        let newFlag = Flag flagName, flag.short, text, flag.default, flag.required
+        latestFlag.accept newFlag
+    }
+    let setShort = { name =>
+        let flag = latestFlag.current
+        let newFlag = Flag flagName, name, flag.summary, flag.default, flag.required
+        latestFlag.accept newFlag
+    }
+    let setDefault = { value =>
+        let flag = latestFlag.current
+        let newFlag = Flag flagName, flag.short, flag.summary, value, flag.required
+        latestFlag.accept newFlag
+    }
+    let setRequired = { Bool =>
+        let flag = latestFlag.current
+        let newFlag = Flag flagName, flag.short, flag.summary, flag.default, Bool
+        latestFlag.accept newFlag
+    }
+
+    let flagBuilder = FlagBuilder setSummary, setShort, setDefault, setRequired
+    conf flagBuilder
+    latestFlag.current
+}

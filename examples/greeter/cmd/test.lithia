@@ -4,9 +4,11 @@ import tests
 
 tests.test "example", { fail =>
     unless True, fail "should never happen"
-    with type Maybe {
+    with Some 42, type Maybe {
         Some: { some => unless some.value == 42, fail "should be 42" },
         None: { none => fail "none instead of 42" },
         Any: { any => fail "should be Some 42" },
-    }, Some 42
+    }
 }
+
+when tests.enabled, tests.runTests

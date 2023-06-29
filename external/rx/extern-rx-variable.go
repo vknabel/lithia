@@ -56,6 +56,12 @@ func (v *RxVariable) Accept(lazyValue runtime.Evaluatable) (runtime.RuntimeValue
 	if err != nil {
 		return nil, err
 	}
+	if eagerEvaluatable, ok := value.(runtime.EagerEvaluatableRuntimeValue); ok {
+		err = eagerEvaluatable.EagerEvaluate()
+		if err != nil {
+			return nil, err
+		}
+	}
 	v.lock.Lock()
 	defer v.lock.Unlock()
 	*v.current = value

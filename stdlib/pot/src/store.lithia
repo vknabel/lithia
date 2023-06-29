@@ -1,0 +1,35 @@
+module pot
+
+import apps
+import lists
+
+data State {
+    cmds
+    deps
+}
+
+enum Msg {
+    data SetCmd {
+        cmd
+    }
+    data SetDep {
+        dependency
+    }
+}
+
+let model = apps.defineModel (State [:], [:]), { state, msg =>
+    with msg, type Msg {
+        SetCmd: { action =>
+            let cmds = state.cmds.set action.cmd.name, action.cmd
+            let next = State cmds, state.deps
+            apps.Update next, None
+        },
+        SetDep: { action =>
+            let deps = state.deps.set action.dependency.name, action.dependency
+            let next = State state.cmds, deps
+            apps.Update next, None
+        },
+    }
+}
+
+let store = apps.storeFrom model
