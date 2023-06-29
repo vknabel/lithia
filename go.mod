@@ -3,11 +3,11 @@ module github.com/vknabel/lithia
 go 1.19
 
 require (
-	github.com/smacker/go-tree-sitter v0.0.0-20221031025734-03a9c97d8039
+	github.com/smacker/go-tree-sitter v0.0.0-20230501083651-a7d92773b3aa
 	github.com/spf13/cobra v1.6.1
 	github.com/tliron/glsp v0.1.2-0.20220804144236-0fe570f215a5
 	github.com/tliron/kutil v0.1.65
-	github.com/vknabel/tree-sitter-lithia v0.2.2
+	github.com/vknabel/tree-sitter-lithia v0.2.3
 )
 
 require (
