@@ -340,7 +340,7 @@ data Greetable {
 }
 
 let shortPersonGreetable = Greetable { person =>
-  strings.append "Hi " person.name
+  strings.append "Hi ", person.name
 }
 
 
