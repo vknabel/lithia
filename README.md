@@ -37,9 +37,6 @@ Currently Lithia is an early proof of concept. Basic language features exist, bu
 
 Not all features end up on the list above. Improving the standard libraries and documentation is an ongoing process.
 
-To hit version **0.1.0**, Lithia needs [all planned language features](https://github.com/vknabel/lithia/milestone/2), a [rich standard library](https://github.com/vknabel/lithia/milestone/1) and at least a [basic language server](https://github.com/vknabel/lithia/milestone/3) implementation.
-To reach **1.0.0**, we need a stable standard library, documentation, solid and broad tooling.
-
 ### Breaking Changes
 
 Until we reach **0.1.0** every update is considered breaking.

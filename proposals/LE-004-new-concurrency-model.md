@@ -1,7 +1,7 @@
 # New Concurrency Model
 
 - Proposal: LE-004
-- Status: **Draft**
+- Status: **Accepted**
 - Author: [**@vknabel**](https://github.com/vknabel)
 
 ## Introduction

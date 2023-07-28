@@ -1,7 +1,7 @@
 # String Concatenation
 
 - Proposal: LE-003
-- Status: **Draft**
+- Status: **Accepted**
 - Author: [**@vknabel**](https://github.com/vknabel)
 
 ## Introduction

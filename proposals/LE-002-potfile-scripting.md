@@ -1,7 +1,7 @@
 # Potfile Scripting
 
 - Proposal: LE-002
-- Status: **Draft**
+- Status: **Implemented** in v0.0.19
 - Author: [**@vknabel**](https://github.com/vknabel)
 
 ## Introduction

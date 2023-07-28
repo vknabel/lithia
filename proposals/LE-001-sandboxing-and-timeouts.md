@@ -1,7 +1,7 @@
 # Sandboxing and Timeouts
 
 - Proposal: LE-001
-- Status: **Draft**
+- Status: **Accepted**
 - Author: [**@vknabel**](https://github.com/vknabel)
 
 ## Introduction
