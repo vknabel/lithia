@@ -106,6 +106,7 @@ dockers:
       - info
       - langsrv
       - parser
+      - potfile
       - reporting
       - resolution
       - runtime
